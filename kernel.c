@@ -78,7 +78,7 @@ void test(struct regs *r) {
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
 void kernel_initialize() {
 
-	vga_setcolor(VGA_LIGHTGREY);
+	vga_setcolor(VGA_COLOR(VGA_LIGHTGREY, VGA_BLACK));
 	vga_clear();
 
 	vga_puts("baremetal!\n");
@@ -90,11 +90,12 @@ void kernel_initialize() {
 	itoa(s, 16, d, 8, 'a');
 	vga_puts("Kernel loaded to: ");
 	vga_puts(s);
-	vga_pretty("Red", 0x4);
-	vga_pretty("Blue", 0x9);
-	vga_pretty("Green", 0x2);
-	vga_pretty("Cyan", VGA_CYAN);
-	vga_pretty("Grey", VGA_LIGHTGREY);
+	vga_putc('\n');
+	vga_pretty("Red\n", VGA_RED);
+	vga_pretty("Blue\n", VGA_BLUE);
+	vga_pretty("Green\n", VGA_GREEN);
+	vga_pretty("Cyan\n", VGA_CYAN);
+	vga_pretty("Grey\n", VGA_LIGHTGREY);
 	vga_pretty("Pink\n", VGA_LIGHTMAGENTA);
 
 	for(;;);

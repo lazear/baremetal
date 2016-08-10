@@ -29,8 +29,8 @@ void vga_update_cursor() {
 	vga_move_cursor(CURRENT_X/2, CURRENT_Y);
 }
 
-void vga_setcolor(int attrib) {
-	CURRENT_ATTRIB = attrib;
+void vga_setcolor(int color) {
+	CURRENT_ATTRIB = color;
 }
 
 void vga_clear() {

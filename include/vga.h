@@ -18,7 +18,7 @@ extern void vga_clear();
 extern void vga_puts(char* s);
 extern void vga_kputc(char c, int x, int y);
 extern void vga_putc(char c);
-extern void vga_setcolor(int attrib);
+extern void vga_setcolor(int color);
 
 extern int vga_current_x();
 extern int vga_current_y();
@@ -39,6 +39,6 @@ extern int vga_current_y();
 #define VGA_LIGHTMAGENTA	0x0D
 #define VGA_LIGHTBROWN		0x0E
 #define VGA_WHITE		0x0F
-
+#define VGA_COLOR(f, b)	((b << 4) | (f & 0xF))
 
 #endif
