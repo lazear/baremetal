@@ -26,36 +26,27 @@ void test(struct regs *r) {
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
 void kernel_initialize() {
 
-	vga_setcolor(VGA_COLOR(VGA_LIGHTGREY, VGA_BLACK));
+	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
 
 	vga_puts("baremetal!\n");
 	irq_install_handler(1, test);
 	irq_install_handler(0, timer);
-	char *s;
+
+
+	//char *buff = 0xC0000000;
+	char *buff = alloc(10);
+	//memset(buff, 0, 4096);
+	vga_puts(buff);
 	int d = &kernel_initialize; // position of the kernel in memory
+	itoa(d, buff, 16);
 
-	itoa(s, 16, d, 8, 'a');
-	vga_puts("Kernel loaded to: ");
-	vga_puts(s);
+	char text[100] = "Kernel loaded to: 0x";
+	vga_puts(strcat(text, buff));
 	vga_putc('\n');
-	vga_pretty("Red\n", VGA_RED);
-	vga_pretty("Blue\n", VGA_BLUE);
-	vga_pretty("Green\n", VGA_GREEN);
-	vga_pretty("Cyan\n", VGA_CYAN);
-	vga_pretty("Grey\n", VGA_LIGHTGREY);
-	vga_pretty("Pink\n", VGA_LIGHTMAGENTA);
+	k_heap_init();
 
-	char* name = "Michael Lazear, (C) 2016";
-
-
-	char *dest = "Michael Lazear";
-	memcpy(dest, "HE", 2);
-
-	vga_puts(dest);
-
-	memset(name+2, '5', 5);
-	vga_puts(name);
+	vga_test();
 
 
 	for(;;);

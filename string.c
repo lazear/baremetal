@@ -1,6 +1,6 @@
 /*
 string.c
-2007-2016 (C) Michael Lazear
+Michael Lazear, 2007-2016
 
 Implementation of string library for baremetal project
 */
@@ -55,11 +55,25 @@ char* strcpy(char *dest, const char *src) {
 }
 
 
-char *strchr(const char* s, int c) {
+char* strchr(const char* s, int c) {
 	while (*s != '\0')
 		if (*s++ == c) return (char*) s;
 	return NULL;
 }
+
+/*
+In-place string reverse. May be dangerous to use.
+*/
+char* strrev(char* s) {
+	int length = strlen(s) - 1;
+	for (int i = 0; i <= length/2; i++) {
+		char temp = s[i];
+		s[i] = s[length-i];
+		s[length-i] = temp;
+	}
+	return s;
+}
+
 
 void* memcpy(void *s1, const void *s2, uint32_t n) {
 	uint8_t* src = (uint8_t*) s2;
@@ -75,4 +89,19 @@ void* memset(void *s, int c, size_t n) {
 	for (int i = 0; i < n; i++)
 		dest[i] = c;
 	return s;
+}
+
+void* memmove(void *s1, const void* s2, size_t n) {
+	char* dest 	= (char*) s1;
+	char* src 	= (char*) s2;
+	char temp[n]; // add in malloc
+
+	for (int i = 0; i < n; i++)
+		temp[i] = src[i];
+	for (int i = 0; i < n; i++)
+		dest[i] = temp[i];
+
+	//add in free(temp)
+
+	return s1;
 }

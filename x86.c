@@ -1,3 +1,11 @@
+/*
+vga.c
+Michael Lazear, 2007-2016
+
+Implementation of x86 interrupts and inline assembly for baremetal
+*/
+
+
 
 #include <types.h>
 #include <x86.h>

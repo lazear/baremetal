@@ -5,8 +5,9 @@ stdlib.h
 #ifndef __baremetal_stdlib__
 #define __baremetal_stdlib__
 
+#define IS_NUMERIC_CHAR(c)	((c >= '0') && (c <= '9'))
 
-extern void itoa(char *buf, int base, int d, signed int length, char flags);
+extern char* itoa(int num, char* buffer, int base);
 extern int atoi(char* s);
 
 #endif

@@ -1,4 +1,9 @@
-//vga.c
+/*
+vga.c
+Michael Lazear, 2007-2016
+
+Implementation of vga driver for baremetal
+*/
 
 #include <vga.h>
 #include <types.h>
@@ -94,4 +99,22 @@ void vga_pretty(char* s, int color) {
 
 	vga_overwrite_color(color, start_x, start_y, CURRENT_X, CURRENT_Y);
 
+}
+
+void vga_test() {
+	vga_pretty("Blue\n", VGA_BLUE);
+	vga_pretty("Green\n", VGA_GREEN);
+	vga_pretty("Cyan\n", VGA_CYAN);
+	vga_pretty("Red\n", VGA_RED);
+	vga_pretty("Magenta\n", VGA_MAGENTA);
+	vga_pretty("Brown\n", VGA_BROWN);
+	vga_pretty("Light Grey\n", VGA_LIGHTGREY);
+	vga_pretty("Dark Grey\n", VGA_DARKGREY);
+	vga_pretty("Light Blue\n", VGA_LIGHTBLUE);
+	vga_pretty("Light Green\n", VGA_LIGHTGREEN);
+	vga_pretty("Light Cyan\n", VGA_LIGHTCYAN);
+	vga_pretty("Light Red \n", VGA_LIGHTRED);
+	vga_pretty("Light Magenta\n", VGA_LIGHTMAGENTA);
+	vga_pretty("Light Brown\n", VGA_LIGHTBROWN);
+	vga_pretty("White\n", VGA_WHITE);
 }
