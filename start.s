@@ -5,12 +5,19 @@
 [BITS 32]
 
 extern kernel_initialize
+extern gdt_init
+extern idt_init
+
 global entry
 entry:
 	mov esp, stack + SIZE
 	push ebx
-
-	call kernel_initialize
+	call gdt_init
+	call idt_init
+	call enableA20
+	call enter_protected_mode
+	sti
+	jmp 08h:kernel_initialize
 	jmp $
 
 
@@ -156,6 +163,20 @@ gdt_flush:
 	jmp 0x08:flush
 flush:
 	ret
+
+enableA20:
+	in al, 0x92
+	or al, 2
+	out 0x92, al
+
+enter_protected_mode:
+	cli
+	lgdt [gdt_pointer]
+	mov eax, cr0
+	or al, 1
+	mov cr0, eax
+
+
 
 section .bss
 align 32
