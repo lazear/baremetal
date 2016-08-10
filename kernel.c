@@ -82,15 +82,19 @@ void kernel_initialize() {
 	vga_clear();
 
 	vga_puts("Hello, World from baremetal!\n");
-
 	irq_install_handler(1, test);
 	irq_install_handler(0, timer);
-
 	char *s;
 	int d = &kernel_initialize; // position of the kernel in memory
 
 	itoa(s, 16, d, 8, 'a');
+	vga_puts("Kernel loaded to: ");
 	vga_puts(s);
+	vga_puts("\nEnd!");
+	vga_pretty("Red", 0x4);
+	vga_pretty("Blue", 0x9);
+	vga_pretty("Green", 0x2);
+	vga_pretty("Cyan", 0x3);
 
 	for(;;);
 }
