@@ -2,13 +2,12 @@
 #ifndef __baremetal_types__
 #define __baremetal_types__
 
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned long uint32_t;
-typedef unsigned long long uint64_t;
+typedef unsigned char uint8_t;			// 1 byte
+typedef unsigned short uint16_t;		// 2 bytes
+typedef unsigned long uint32_t;			// 4 bytes
+typedef unsigned long long uint64_t;	// 8 bytes
 
-typedef unsigned short size_t;
-
+typedef unsigned long size_t;			// 4 bytes
 
 
 

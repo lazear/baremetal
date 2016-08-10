@@ -6,6 +6,7 @@ Implementation of stdlib for baremetal
 */
 
 #include <types.h>
+#include <ctype.h>
 #include <stdlib.h>
 
 
@@ -30,6 +31,11 @@ void *alloc(uint32_t bytes) {
 
 }
 
+void* free(void* ptr) {
+
+}
+
+
 void k_heap_init(struct KHEAPBM *master) {
 	//master->block = 0;
 
@@ -38,15 +44,166 @@ void k_heap_init(struct KHEAPBM *master) {
 	kb->size= 4096;
 
 	char buf[8];
-	itoa(kb, buf, 16);
+	kprintx("KB meml ", kb);
+	kprintx("KB size ", kb->size);
+	kprintx("KB next ", kb->next);
+	kprintx("HEAP id ", INDEX);
 
-	vga_puts(buf);
+}
+
+/*
+Quick and dirty print hexidecimal, with appended 0x
+Uses bad alloc
+*/
+void kprintx(char* message, int n) {
+	char* nbuffer = alloc(8);
+	char* sbuffer = alloc(strlen(message) + 10);
+	itoa(n, nbuffer, 16);
+	strcpy(sbuffer, message);
+	strcpy(sbuffer+strlen(message), "0x");
+
+	strcat(sbuffer, nbuffer);
+	vga_puts(sbuffer);
+	vga_putc('\n');
+
+}
+
+/*
+Quick and dirty print base 10, with appended 0x
+Uses bad alloc
+*/
+void kprintd(char* message, int n) {
+	char* nbuffer = alloc(8);
+	char* sbuffer = alloc(strlen(message) + 10);
+	itoa(n, nbuffer, 10);
+	strcpy(sbuffer, message);
+
+	strcat(sbuffer, nbuffer);
+	vga_puts(sbuffer);
+	vga_putc('\n');
+
+}
+
+double atof(char* s) {
+	double integer = 0;
+	double decimal = 0;
+	double divisor = 1.0;
+	double sign = 1.0;
+
+	bool fraction = false;
+	double tot = 0;
+
+	while (*s != '\0') {
+		if (isdigit(*s)) {
+			if(fraction) {
+				decimal = decimal*10 + (*s - '0');
+				divisor *= 10;
+				vga_puts(ftoa(decimal/divisor));
+				vga_putc('\n');
+			} else {
+				integer = (*s - '0');
+				//integer *= 10;
+				//integer += (*s - '0');
+				tot = tot*10 + integer;
+				vga_puts(ftoa(tot));
+				vga_putc('\n');
+			}
+
+		} else if (*s == '.') {
+			fraction = true;
+			vga_puts("Decimal found\n");
+		} else if (*s == '-') {
+			sign = -1.0;
+		} else {
+			//return sign * (integer + decimal/divisor);;
+		}
+		s++;
+	}
+	return sign * (tot + decimal/divisor);
 
 }
 
 
-// string to double
-double atof();
+# define PRECISION 5
+// adapted from http://stackoverflow.com/questions/2302969/how-to-implement-char-ftoafloat-num-without-sprintf-library-function-i/2303011#2303011
+char*  ftoa(double num)
+{
+   int whole_part = num;
+   int digit = 0, reminder =0;
+   int log_value = dlog10(num), index = log_value;
+   long wt =0;
+
+   // String containg result
+   char* str = alloc(20);
+
+   //Initilise stirng to zero
+   memset(str, 0 ,20);
+
+   //Extract the whole part from float num
+   for(int i = 1 ; i < log_value + 2 ; i++)
+   {
+       wt  =  pow(10,i);
+       reminder = whole_part  %  wt;
+       digit = (reminder - digit) / (wt/10);
+
+       //Store digit in string
+       str[index--] = digit + 48;              // ASCII value of digit  = digit + 48
+       if (index == -1)
+          break;    
+   }
+
+    index = log_value + 1;
+    str[index] = '.';
+
+   double fraction_part  = num - whole_part;
+   double tmp1 = fraction_part,  tmp =0;
+
+   //Extract the fraction part from  num
+   for( int i= 1; i < PRECISION; i++)
+   {
+      wt = 10; 
+      tmp  = tmp1 * wt;
+      digit = tmp;
+
+      //Store digit in string
+      str[++index] = digit + 48;           // ASCII value of digit  = digit + 48
+      tmp1 = tmp - digit;
+   }    
+
+   return str;
+}
+
+// log10 for doubles
+int dlog10(double v) {
+    return (v >= 1000000000u) ? 9 : (v >= 100000000u) ? 8 : 
+        (v >= 10000000u) ? 7 : (v >= 1000000u) ? 6 : 
+        (v >= 100000u) ? 5 : (v >= 10000u) ? 4 :
+        (v >= 1000u) ? 3 : (v >= 100u) ? 2 : (v >= 10u) ? 1u : 0u; 
+}
+
+// log10 for integers
+int log10(int v) {
+    return (v >= 1000000000u) ? 9 : (v >= 100000000u) ? 8 : 
+        (v >= 10000000u) ? 7 : (v >= 1000000u) ? 6 : 
+        (v >= 100000u) ? 5 : (v >= 10000u) ? 4 :
+        (v >= 1000u) ? 3 : (v >= 100u) ? 2 : (v >= 10u) ? 1u : 0u; 
+}
+
+uint32_t abs(int x) {
+	if (x < 0)
+		return x * -1;
+	return x;
+}
+
+// raise n^x
+int pow(int n, int x) {
+	if (x = 0) return 1;
+	while(x-- > 1)
+	{
+		n = n * n;
+	}
+	return n;
+}
 
 // string to integer
 int atoi(char* s) {
@@ -74,13 +231,16 @@ char* itoa(int num, char* buffer, int base) {
 		buffer[1] = '\0';
 		return buffer;
 	}
-	if (num < 0) sign = 0;
+	if (num < 0) {
+		sign = 0;
+		num = abs(num);
+	}
 
 	// go in reverse order
 	while (num != 0) {
 		int remainder = num % base;
 		// case for hexadecimal
-		buffer[i++] = (remainder > 9)? (remainder - 10) + 'a' : remainder + '0';
+		buffer[i++] = (remainder > 9)? (remainder - 10) + 'A' : remainder + '0';
 		num = num / base;
 	}
 

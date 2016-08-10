@@ -9,5 +9,12 @@ stdlib.h
 
 extern char* itoa(int num, char* buffer, int base);
 extern int atoi(char* s);
+extern double atof(char* s);
+extern char* ftoa(double num);
+
+extern int dlog10(double v);
+extern int log10(int v);
+extern uint32_t abs(int x);
+extern int pow(int n, int x);
 
 #endif

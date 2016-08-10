@@ -10,14 +10,15 @@ extern idt_init
 
 global entry
 entry:
-	mov esp, stack + SIZE
-	push ebx
+
 	call gdt_init
 	call idt_init
 	call enableA20
 	call enter_protected_mode
+
 	sti
-	jmp 08h:kernel_initialize
+	call kernel_initialize
+	;jmp 08h:kernel_initialize	;not sure if this is necesary?
 	jmp $
 
 
@@ -168,13 +169,16 @@ enableA20:
 	in al, 0x92
 	or al, 2
 	out 0x92, al
+	ret
 
 enter_protected_mode:
 	cli
-	lgdt [gdt_pointer]
+	;lgdt [gdt_pointer]
 	mov eax, cr0
 	or al, 1
 	mov cr0, eax
+	ret
+
 
 
 

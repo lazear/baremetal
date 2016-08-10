@@ -119,7 +119,7 @@ void irq_handler(struct regs *r)
 {
 
 	if (r->int_no < 32) {
-		vga_puts("System exception");
+		kprintd("Exception: ", r->int_no);
 		return;
 	}
 

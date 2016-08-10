@@ -24,7 +24,7 @@ void test(struct regs *r) {
 }
 
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
-void kernel_initialize() {
+void kernel_initialize(int ebx) {
 
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
@@ -39,15 +39,12 @@ void kernel_initialize() {
 	//memset(buff, 0, 4096);
 	vga_puts(buff);
 	int d = &kernel_initialize; // position of the kernel in memory
-	itoa(d, buff, 16);
+	kprintx("Kernel loaded to: ", d);
 
-	char text[100] = "Kernel loaded to: 0x";
-	vga_puts(strcat(text, buff));
-	vga_putc('\n');
 	k_heap_init();
-
-	vga_test();
-
+		// throwing system exception when calling ftoa(atof(""))
+		//ftoa(c);
+	kprintx("", ebx);
 
 	for(;;);
 }
