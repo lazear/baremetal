@@ -78,10 +78,10 @@ void test(struct regs *r) {
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
 void kernel_initialize() {
 
-	vga_setcolor(0x2);
+	vga_setcolor(VGA_LIGHTGREY);
 	vga_clear();
 
-	vga_puts("Hello, World from baremetal!\n");
+	vga_puts("baremetal!\n");
 	irq_install_handler(1, test);
 	irq_install_handler(0, timer);
 	char *s;
@@ -90,11 +90,12 @@ void kernel_initialize() {
 	itoa(s, 16, d, 8, 'a');
 	vga_puts("Kernel loaded to: ");
 	vga_puts(s);
-	vga_puts("\nEnd!");
 	vga_pretty("Red", 0x4);
 	vga_pretty("Blue", 0x9);
 	vga_pretty("Green", 0x2);
-	vga_pretty("Cyan", 0x3);
+	vga_pretty("Cyan", VGA_CYAN);
+	vga_pretty("Grey", VGA_LIGHTGREY);
+	vga_pretty("Pink\n", VGA_LIGHTMAGENTA);
 
 	for(;;);
 }
