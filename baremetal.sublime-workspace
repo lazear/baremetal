@@ -1,0 +1,1324 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"int",
+				"integer_size"
+			],
+			[
+				"in",
+				"integer"
+			],
+			[
+				"pre",
+				"pre_size"
+			],
+			[
+				"de",
+				"decimal"
+			],
+			[
+				"uin",
+				"uint16_t"
+			],
+			[
+				"un",
+				"uint8_t"
+			],
+			[
+				"VGA_LIGHT",
+				"VGA_LIGHTMAGENTA"
+			],
+			[
+				"color",
+				"color"
+			],
+			[
+				"vga",
+				"vga_pretty"
+			],
+			[
+				"start",
+				"start_y"
+			],
+			[
+				"CURR",
+				"CURRENT_ATTRIB"
+			],
+			[
+				"CUR",
+				"CURRENT_Y"
+			],
+			[
+				"st",
+				"start_y"
+			],
+			[
+				"vga_",
+				"vga_puts"
+			],
+			[
+				"stat",
+				"start_y"
+			],
+			[
+				"CU",
+				"CURRENT_Y"
+			],
+			[
+				"kene",
+				"kernel_initialize"
+			],
+			[
+				"ent",
+				"enter_protected_mode"
+			],
+			[
+				"gdt",
+				"gdt_init"
+			],
+			[
+				"idt",
+				"idt_entry"
+			],
+			[
+				"irq",
+				"irqstub"
+			],
+			[
+				"CURRE",
+				"CURRENT_ATTRIB"
+			],
+			[
+				"vg",
+				"vga_kputc"
+			],
+			[
+				"VGA",
+				"VGA_TERMINAL"
+			],
+			[
+				"KERNE",
+				"KERNEL_VIRTUAL_BASE"
+			],
+			[
+				"get",
+				"get_brite_terms	function"
+			],
+			[
+				"ge",
+				"geneid	statement"
+			],
+			[
+				"a",
+				"accession	param"
+			],
+			[
+				"map",
+				"map_dict	param"
+			],
+			[
+				"inp",
+				"input_file	param"
+			],
+			[
+				"mapp",
+				"mapping_file	param"
+			],
+			[
+				"dict",
+				"dictionary	statement"
+			],
+			[
+				"re",
+				"requests	module"
+			],
+			[
+				"write",
+				"writelines	function"
+			],
+			[
+				"dic",
+				"dictionary	statement"
+			],
+			[
+				"di",
+				"dictionary	statement"
+			],
+			[
+				"gene",
+				"generate_hierarchy	function"
+			],
+			[
+				"not",
+				"not_found	statement"
+			],
+			[
+				"no",
+				"not_found	statement"
+			],
+			[
+				"ca",
+				"catgories	statement"
+			],
+			[
+				"cou",
+				"counts_cat	statement"
+			],
+			[
+				"json",
+				"json_dict"
+			],
+			[
+				"json_",
+				"json_dict	statement"
+			],
+			[
+				"res",
+				"res_names	statement"
+			],
+			[
+				"res_sites_",
+				"res_sites_rev	statement"
+			],
+			[
+				"pr",
+				"process3	function"
+			],
+			[
+				"h",
+				"h_name	statement"
+			],
+			[
+				"proce",
+				"process3	function"
+			],
+			[
+				"drugb",
+				"drugbank_enrich	function"
+			],
+			[
+				"count",
+				"counts_indb	statement"
+			],
+			[
+				"db",
+				"db_yayornay	statement"
+			],
+			[
+				"proc",
+				"process	function"
+			],
+			[
+				"pro",
+				"process2	function"
+			],
+			[
+				"annot",
+				"annotation	statement"
+			],
+			[
+				"pep",
+				"peptide	param"
+			],
+			[
+				"seq",
+				"sequence"
+			],
+			[
+				"uni",
+				"uniprotID	param"
+			],
+			[
+				"find",
+				"findresidue	function"
+			],
+			[
+				"con",
+				"conserved	statement"
+			],
+			[
+				"align",
+				"aligned	statement"
+			],
+			[
+				"go",
+				"go_dict	statement"
+			],
+			[
+				"dis",
+				"distance_from_top	param"
+			],
+			[
+				"pa",
+				"parent_dict	forstmt"
+			],
+			[
+				"sort",
+				"sort_keys	param"
+			],
+			[
+				"h_",
+				"h_sequence	statement"
+			],
+			[
+				"chi",
+				"chi_dict	statement"
+			],
+			[
+				"fly",
+				"fly_unlabelled	statement"
+			],
+			[
+				"flc",
+				"flyc	statement"
+			],
+			[
+				"head",
+				"headers	statement"
+			],
+			[
+				"org",
+				"org_dict	forstmt"
+			],
+			[
+				"lab",
+				"labelled_num	statement"
+			],
+			[
+				"unl",
+				"unlabelled_num	statement"
+			],
+			[
+				"lba",
+				"labelled_ratios	statement"
+			],
+			[
+				"rat",
+				"ratio_la	statement"
+			],
+			[
+				"labe",
+				"labelled_ratios	statement"
+			],
+			[
+				"ratio",
+				"ratio_un	statement"
+			],
+			[
+				"unlab",
+				"unlabelled_ratios	statement"
+			],
+			[
+				"unbal",
+				"unlabelled"
+			],
+			[
+				"id",
+				"identifier"
+			],
+			[
+				"other",
+				"other_lysines	statement"
+			],
+			[
+				"actu",
+				"actual_count	statement"
+			],
+			[
+				"acual",
+				"actual_count"
+			],
+			[
+				"fasta",
+				"fastasearch	function"
+			],
+			[
+				"co",
+				"conserved	statement"
+			],
+			[
+				"anno",
+				"annotation_dict	statement"
+			],
+			[
+				"ipi",
+				"ipi_with_res	statement"
+			],
+			[
+				"ac",
+				"actual_count	statement"
+			],
+			[
+				"al",
+				"aligned	param"
+			],
+			[
+				"human",
+				"human_ipi	statement"
+			],
+			[
+				"bait",
+				"bait_symbol	param"
+			],
+			[
+				"ann",
+				"annotation	statement"
+			],
+			[
+				"annota",
+				"annotation	statement"
+			],
+			[
+				"bio",
+				"getBioGridData"
+			],
+			[
+				"du",
+				"drugbank	statement"
+			],
+			[
+				"dru",
+				"drugbankfile	param"
+			],
+			[
+				"dr",
+				"drugbankfile	param"
+			],
+			[
+				"clus",
+				"clusterl	function"
+			],
+			[
+				"value",
+				"values	function"
+			],
+			[
+				"next",
+				"nextbest	statement"
+			],
+			[
+				"top",
+				"top_level_mapping	statement"
+			],
+			[
+				"best",
+				"best_dict	statement"
+			],
+			[
+				"pare",
+				"parentdict	forstmt"
+			],
+			[
+				"mi",
+				"mindepth	statement"
+			],
+			[
+				"max",
+				"maxdepth	statement"
+			],
+			[
+				"T",
+				"TERMS	statement"
+			],
+			[
+				"ass",
+				"assemblePANTHER	function"
+			],
+			[
+				"new",
+				"new_ipi	statement"
+			],
+			[
+				"master",
+				"master_out	statement"
+			],
+			[
+				"wr",
+				"writeTab	function"
+			],
+			[
+				"ma",
+				"master_peptide_for_residue	statement"
+			],
+			[
+				"mast",
+				"master_peptide_for_residue	statement"
+			],
+			[
+				"mas",
+				"master_peptide_for_residue	statement"
+			],
+			[
+				"new_",
+				"new_noqps	statement"
+			],
+			[
+				"by",
+				"by_res	statement"
+			],
+			[
+				"se",
+				"sequence	statement"
+			],
+			[
+				"wri",
+				"writeJSON	function"
+			],
+			[
+				"pept",
+				"peptides"
+			],
+			[
+				"list",
+				"list_of_peptides	param"
+			],
+			[
+				"R2",
+				"R2_CUTOFF	statement"
+			],
+			[
+				"pepd",
+				"peptides	statement"
+			],
+			[
+				"result",
+				"result_table	statement"
+			],
+			[
+				"R",
+				"R2_CUTOFF	statement"
+			],
+			[
+				"i",
+				"ipis	statement"
+			],
+			[
+				"unip",
+				"uniprotIPI	function"
+			],
+			[
+				"read",
+				"readTab	function"
+			],
+			[
+				"set",
+				"set_names	param"
+			],
+			[
+				"out",
+				"output_rt_to_excel	param"
+			],
+			[
+				"h_i",
+				"h_ipi	statement"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "paging.c",
+			"settings":
+			{
+				"buffer_size": 4507,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "stdlib.c",
+			"settings":
+			{
+				"buffer_size": 5356,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "string.c",
+			"settings":
+			{
+				"buffer_size": 2422,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "vga.c",
+			"settings":
+			{
+				"buffer_size": 2774,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "x86.c",
+			"settings":
+			{
+				"buffer_size": 7611,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel.c",
+			"settings":
+			{
+				"buffer_size": 1130,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/paging.h",
+			"settings":
+			{
+				"buffer_size": 407,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/stdarg.h",
+			"settings":
+			{
+				"buffer_size": 768,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/stdlib.h",
+			"settings":
+			{
+				"buffer_size": 393,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/string.h",
+			"settings":
+			{
+				"buffer_size": 259,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 288.0,
+		"last_filter": "anacoda",
+		"selected_items":
+		[
+			[
+				"anacoda",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"delint",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"dislint",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"install package",
+				"Package Control: Install Package"
+			],
+			[
+				"packag",
+				"Preferences: Browse Packages"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 160.0,
+		"history":
+		[
+			"def fastaUniProt(x):",
+			"fastaUniProt()",
+			"stop()",
+			"exit()",
+			"help",
+			"help()",
+			"version()",
+			"version",
+			"import numpy.matrix",
+			"import numpy",
+			"names = [[][]]",
+			"names",
+			"names[1].append(2)",
+			"names[0].append(1)",
+			"names",
+			"names=[[]]",
+			"names[1].append(1)",
+			"names",
+			"names.append(1)",
+			"names",
+			"names[0].append(1)",
+			"names",
+			"names.append(1)",
+			"names",
+			"names=[[]]",
+			"names",
+			"names=[]",
+			"names = [1][1]",
+			"next(c)",
+			"reader = csv.reader(c, delimiter='\\t')",
+			"reader = csv.read(c, delimiter='\\t')",
+			"import csv",
+			"c = open('compare.txt')",
+			"c.read()",
+			"c",
+			"c.read()",
+			"c",
+			"c = open('compare.txt')",
+			"print(\"hello\")",
+			"help()",
+			"help",
+			"dir()",
+			"dir",
+			"ls",
+			"c",
+			"py",
+			"python",
+			"sublimetest",
+			"b",
+			"help",
+			"python --version",
+			"python",
+			"function1",
+			"x",
+			"function(h)",
+			"function",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/concoct.py",
+		"/C/Users/Mike/Documents/GitHub/os/libc/string.c",
+		"/C/Users/Mike/Documents/GitHub/os/libc/stdio.c",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/external.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/gdt.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/kernel.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/keyboard.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/multiboot.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/mutex.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/paging.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/regs.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/stdarg.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/tss.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/types.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/video.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/assert.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/assert.h",
+		"/C/Users/Mike/Documents/GitHub/os/drivers/char/text.c",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/atomic.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/bool.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/ctype.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/Makefile",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/iso646.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/ctype.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/iso646.h",
+		"/C/Users/Mike/Documents/GitHub/os/libc/printf.c",
+		"/C/Users/Mike/Documents/GitHub/os/main.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/init.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/start.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/x86.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/x86.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/linker.ld",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/types.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/vga.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/vga.h",
+		"/C/Users/Mike/Documents/GitHub/os/drivers/char/keyboard.c",
+		"/C/Users/Mike/Downloads/irq.c",
+		"/C/Users/Mike/Downloads/isrs (1).c",
+		"/C/Users/Mike/Downloads/start (1).asm",
+		"/C/Users/Mike/Documents/GitHub/os/syscall/syscall.c",
+		"/C/Users/Mike/Documents/GitHub/os/asm/higherhalf.s",
+		"/C/Users/Mike/Documents/GitHub/os/asm/switch.asm",
+		"/C/Users/Mike/Documents/GitHub/os/asm/start.s",
+		"/C/Users/Mike/Downloads/isrs.c",
+		"/C/Users/Mike/Downloads/idt.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/interrupts.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/arch/gdt.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/arch/isr.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/arch/idt.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/arch/irq.c",
+		"/C/Users/Mike/Documents/GitHub/os/asm/gdt.asm",
+		"/C/Users/Mike/Documents/GitHub/os/asm/irq.asm",
+		"/C/Users/Mike/Downloads/start.asm",
+		"/C/Users/Mike/Documents/GitHub/os/core/sched.c",
+		"/C/Users/Mike/Documents/GitHub/os/asm/isr.asm",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/vga.h",
+		"/C/Users/Mike/Documents/GitHub/os/Makefile",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/Makefile",
+		"/C/Users/Mike/Documents/GitHub/os/elf.ld",
+		"/C/Users/Mike/Documents/GitHub/os/asm/bootsect.asm",
+		"/C/Users/Mike/Documents/GitHub/os/core/memory/paging.c",
+		"/C/Users/Mike/Documents/GitHub/os/asm/inc.asm",
+		"/C/Users/Mike/Documents/GitHub/os/drivers/clock/timer.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/memory/stack.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/memory/malloc.c",
+		"/C/Users/Mike/Documents/GitHub/os/asm/loader.asm",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/stdarg.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/fs.h",
+		"/C/Users/Mike/Documents/GitHub/os/core/arch/cpuid.c",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/task.h",
+		"/C/Users/Mike/Documents/GitHub/os/core/arch/x86.c",
+		"/C/Users/Mike/Documents/GitHub/os/include/core/exec.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/syscall.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/api.h",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/combine/mirage.py",
+		"/C/Users/Mike/Documents/GitHub/kegg/__pycache__/html.cpython-35.pyc",
+		"/C/Users/Mike/Documents/GitHub/kegg/pulldowns",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/init.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/main.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/include/lib/assert.h",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/arch/x86.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/task/malloc.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/memory/stack.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/arch/cpuid.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/memory/paging.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/syscall/syscall.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/start.s",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/switch.asm",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/libc/stdio.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/libc/string.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/include/lib/api.h",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/libc/printf.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/drivers/char/text.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/drivers/disk/fs.c",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/higherhalf.s",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/loader.asm",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/gdt.asm",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/module.c",
+		"/C/Users/Mike/Documents/GitHub/kegg/parse_brite.py",
+		"/C/Users/Mike/Documents/GitHub/kegg/autobrite",
+		"/C/Users/Mike/Documents/GitHub/kegg/brite_to_json.py",
+		"/C/Users/Mike/Documents/GitHub/kegg/superfamily.py",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/exec.c",
+		"/C/Users/Mike/Documents/GitHub/kegg/brite",
+		"/C/Users/Mike/Documents/GitHub/kegg/test.txt",
+		"/C/Users/Mike/Documents/GitHub/kegg/pulldowns.txt",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/bootsect.asm",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/parse.py",
+		"/C/Users/Mike/Documents/GitHub/kegg/acc_to_geneid.py",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/ctest.py",
+		"/C/Users/Mike/Documents/GitHub/kegg/t",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/traverse.py",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/annotate.py",
+		"/C/Users/Mike/Documents/GitHub/fun/roman.py",
+		"/C/Users/Mike/Documents/GitHub/fun/codon.py",
+		"/C/Users/Mike/Documents/GitHub/fun/uniprot",
+		"/C/Users/Mike/Downloads/ko03041.keg",
+		"/C/Users/Mike/Downloads/br08904.keg",
+		"/C/Users/Mike/Downloads/br08902.keg",
+		"/C/Users/Mike/Documents/Cravatt/Pin1/4TNS_out/4TNS_PYMOL.sh",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/elf.ld",
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/higherhalf.ld",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/gui.py",
+		"/C/Users/Mike/Documents/GitHub/fun/easyclone.py",
+		"/C/Users/Mike/AppData/Local/Temp/7zO43BA8A8D/HUMAN_9606_idmapping.dat",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/combine/combine_by_res.py",
+		"/C/Users/Mike/Documents/GitHub/dev/mirage/combine/uniprot.py"
+	],
+	"find":
+	{
+		"height": 27.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"ISR_ERRCODE",
+			"Reverse_",
+			"Reverse",
+			"()\n",
+			",",
+			"0005524",
+			"GO:0005524",
+			"q13526",
+			"Q9Y383",
+			"cerve",
+			"xenopus trop",
+			"xenopus",
+			"P51888",
+			":001015",
+			"001015",
+			"GO_hie",
+			"table",
+			"TABLE",
+			"init",
+			"uniprot",
+			"mirage",
+			"print",
+			"0",
+			"sub.table",
+			"sub.table$f",
+			"vn1",
+			"vn2",
+			"r2.cutoff",
+			"surfact",
+			"'GO:0016209'",
+			"GO:0005215",
+			".-",
+			"ggatcc",
+			"ttcgaa",
+			"lint",
+			"console"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"ISR_MACRO",
+			"",
+			"Reverse_"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "paging.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4507,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "stdlib.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5356,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "string.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2422,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "vga.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2774,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "x86.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7611,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								145,
+								145
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 5,
+					"file": "kernel.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1130,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "include/paging.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 407,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "include/stdarg.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 768,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "include/stdlib.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 393,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "include/string.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 259,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								259,
+								259
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 30.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/Python/Python.sublime-build",
+	"project": "baremetal.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "kegg",
+		"selected_items":
+		[
+			[
+				"kegg",
+				"C:\\Users\\Mike\\Documents\\GitHub\\kegg\\kegg.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": false,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

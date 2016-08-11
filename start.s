@@ -7,6 +7,7 @@
 extern kernel_initialize
 extern gdt_init
 extern idt_init
+extern kernel_end
 
 global entry
 entry:
@@ -17,6 +18,7 @@ entry:
 	;call enter_protected_mode
 
 	sti
+	push kernel_end
 	call kernel_initialize
 	;jmp 08h:kernel_initialize	;not sure if this is necesary?
 	jmp $

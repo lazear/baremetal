@@ -10,46 +10,6 @@ Implementation of stdlib for baremetal
 #include <stdlib.h>
 
 
-struct  KHEAPBLOCK {
-	struct KHEAPBLOCK	*next;
-	uint32_t	size;
-	uint8_t		used;
-} __attribute__((__packed__));
-
-struct  KHEAPBM {
-	struct KHEAPBLOCK 	*block;
-} __attribute__((__packed__));
-
-// QUICK and DIRTY alloc function
-void *HEAP = 	0x00200000;
-void *PHEAP = 	0x00300000;
-int INDEX = 0;
-int PINDEX = 0;
-void *alloc(size_t bytes) {
-	
-	void* ptr = HEAP + INDEX;
-	INDEX+=bytes;
-	return ptr;
-
-}
-
-void* page_alloc() {
-	void* ptr = PHEAP + (PINDEX * 0x1000);
-	PINDEX++;
-	return ptr;
-}
-
-void* free(void* ptr) {
-	return ptr;
-}
-
-int k_p_index() {
-	return PINDEX * 0x1000;
-}
-void k_heap_init(struct KHEAPBM *master) {
-
-}
-
 /*
 Quick and dirty print hexidecimal, with appended 0x
 Uses bad alloc
@@ -77,6 +37,18 @@ void kprintd(char* message, int n) {
 	char* nbuffer = alloc(8);
 	char* sbuffer = alloc(strlen(message) + 10);
 	itoa(n, nbuffer, 10);
+	strcpy(sbuffer, message);
+
+	strcat(sbuffer, nbuffer);
+	vga_puts(sbuffer);
+	vga_putc('\n');
+
+}
+
+void kprintb(char* message, int n) {
+	char* nbuffer = alloc(32);
+	char* sbuffer = alloc(strlen(message) + 10);
+	itoa(n, nbuffer, 2);
 	strcpy(sbuffer, message);
 
 	strcat(sbuffer, nbuffer);
@@ -226,6 +198,11 @@ int atoi(char* s) {
 char* itoa(uint32_t num, char* buffer, int base) {
 	int i = 0;
 	//num = abs(num);
+	int len = 8;
+
+	if (base == 2)
+		len = 32;
+
 	if (num == 0 || base == 0) {
 		buffer[0] = '0';
 		buffer[1] = '\0';
@@ -233,12 +210,15 @@ char* itoa(uint32_t num, char* buffer, int base) {
 	}
 
 	// go in reverse order
-	while (num != 0) {
+	while (num != 0 && len--) {
 		int remainder = num % base;
 		// case for hexadecimal
 		buffer[i++] = (remainder > 9)? (remainder - 10) + 'A' : remainder + '0';
 		num = num / base;
 	}
+
+	while(len-- && base != 10)
+		buffer[i++] = '0';
 
 	buffer[i] = '\0';
 
