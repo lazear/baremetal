@@ -7,7 +7,7 @@ stdlib.h
 
 #define IS_NUMERIC_CHAR(c)	((c >= '0') && (c <= '9'))
 
-extern char* itoa(int num, char* buffer, int base);
+extern char* itoa(uint32_t num, char* buffer, int base);
 extern int atoi(char* s);
 extern double atof(char* s);
 extern char* ftoa(double num);

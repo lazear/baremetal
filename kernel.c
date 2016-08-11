@@ -52,17 +52,15 @@ void kernel_initialize(int ebx) {
 	
 
 	uint32_t* dir = k_paging_get_dir();
-	k_paging_map_block(dir, 0xDEADBEEF, 0xDEADBEEF, 0x3);
-
+	k_paging_map_block(dir, 0xDEAD0000, 0xDEAD0000, 0x3);
+	//k_paging_map_block(dir, 0xB0000000, 0xB0000000, 0x3);
 	load_page_directory(dir);
-	flush_tlb();
+	//flush_tlb();
 
-	int* pt = dir[0xDEADBEEF >> 22];
-	int* pp = pt[(0xDEADBEEF >> 12) & 0x3FF];
-	kprintx("", pp );
 
-	char* ptr = 0xDEADBEEF;
+	char* ptr = 0xDEAD1100;
 	*ptr = 'A';
+	vga_puts(ptr);
 
 	for(;;);
 }

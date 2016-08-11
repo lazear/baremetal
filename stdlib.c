@@ -21,14 +21,22 @@ struct  KHEAPBM {
 } __attribute__((__packed__));
 
 // QUICK and DIRTY alloc function
-void *HEAP = 0x00200000;
+void *HEAP = 	0x00200000;
+void *PHEAP = 	0x00300000;
 int INDEX = 0;
+int PINDEX = 0;
 void *alloc(size_t bytes) {
 	
 	void* ptr = HEAP + INDEX;
 	INDEX+=bytes;
 	return ptr;
 
+}
+
+void* page_alloc() {
+	void* ptr = PHEAP + (PINDEX * 0x1000);
+	PINDEX++;
+	return ptr;
 }
 
 void* free(void* ptr) {
@@ -45,7 +53,7 @@ Quick and dirty print hexidecimal, with appended 0x
 Uses bad alloc
 */
 void kprintx(char* message, int n) {
-	char* nbuffer = alloc(8);
+	char* nbuffer = alloc(12);
 	char* sbuffer = alloc(strlen(message) + 32);
 
 	itoa(n, nbuffer, 16);
@@ -55,7 +63,7 @@ void kprintx(char* message, int n) {
 	strcat(sbuffer, nbuffer);
 	vga_puts(sbuffer);
 	vga_putc('\n');
-	alloc(64);
+
 
 }
 
@@ -212,19 +220,14 @@ int atoi(char* s) {
 
 }
 
-// integer to string
-char* itoa(int num, char* buffer, int base) {
+// unsigned integer to string
+char* itoa(uint32_t num, char* buffer, int base) {
 	int i = 0;
-	int sign = 1;
-
-	if (num == 0) {
+	//num = abs(num);
+	if (num == 0 || base == 0) {
 		buffer[0] = '0';
 		buffer[1] = '\0';
 		return buffer;
-	}
-	if (num < 0) {
-		sign = 0;
-		num = abs(num);
 	}
 
 	// go in reverse order
@@ -235,9 +238,37 @@ char* itoa(int num, char* buffer, int base) {
 		num = num / base;
 	}
 
-	if (sign == 0) buffer[i++] = '-';
 	buffer[i] = '\0';
 
 	return strrev(buffer);
 }
+// signed integer to string
+char* sitoa(int num, char* buffer, int base) {
+	int i = 0;
+	int sign = 1;
+	int len = 8;
+	//num = abs(num);
+	if (num == 0 || base == 0) {
+		buffer[0] = '0';
+		buffer[1] = '\0';
+		return buffer;
+	}
+	if (num < 0) {
+		sign = 0;
+		num = abs(num);
+	}
 
+	// go in reverse order
+	while (num != 0 && len--) {
+		int remainder = num % base;
+		// case for hexadecimal
+		buffer[i++] = (remainder > 9)? (remainder - 10) + 'A' : remainder + '0';
+		num = num / base;
+	}
+
+	if (sign == 0) buffer[i++] = '-';
+
+	buffer[i] = '\0';
+
+	return strrev(buffer);
+}
