@@ -2,11 +2,7 @@
 paging.c
 
 
-Linear address structure - 32 bits of address space w/ 4KB pages
-31			 22	21	 	  12 11		0
--------------------------------------
-| Directory 	| Table 	| Offset|
--------------------------------------
+
 
 */
 
@@ -19,12 +15,18 @@ Linear address structure - 32 bits of address space w/ 4KB pages
 extern void paging_enable();
 extern void load_page_directory(uint32_t* dir);
 
-// Page directory -> Page table -> Page
+/*
+Page directory -> Page table -> Page
+1024 entires in directory (1024 page tables)
+1024 entires in pagetalbe (1024 pages)
+4096 bytes in each page (4 KB)
+
+= 4GB per page directory
+*/
+
 uint32_t page_directory[1024] __attribute__((aligned(4096)));
 
-uint32_t* paged_memory_start  = 0;
-uint32_t* paged_memory_end = 0;
-
+uint32_t* K_CURRENT_PAGE_DIRECTORY = 0;
 
 uint32_t switch_pd(uint32_t dir)
 {
@@ -42,9 +44,44 @@ void enable_paging(void)
 	asm volatile("mov %%eax, %%cr0" :: "a"(cr0));
 }
 
-void map(uint32_t pd, uint32_t phys, uint32_t virt, uint8_t flags) {
-	uint8_t id = virt >> 22;
-	kprintx("", id);
+/*
+Remap a virtual address to a physical address
+This will be more useful in user mode/multithreading environment
+
+We need to lookup the page for a given virtual address, 
+and then set it to the physical address + flags
+*/
+
+void flush_tlb(uint32_t mem)
+{
+	asm volatile("invlpg %0" :: "m"(mem));
+}
+
+
+uint32_t* k_unmap(uint32_t virt) {
+	uint32_t page_directory_index = virt >> 22;
+	uint32_t page_table_index = virt >> 12 & 0x03FF;	// Shift 12 AND last 12 bits
+
+	uint32_t* page_table = (uint32_t*) page_directory[page_directory_index];
+	//uint32_t* page_table = (uint32_t*) 0xFFC00000 + (0x400 * page_directory_index);
+
+	return (void*)((page_table[page_table_index] & ~0xFFF) + ((uint32_t) virt & 0xFFF));
+}
+
+void k_map(uint32_t phys, uint32_t virt, uint8_t flags) {
+	uint32_t page_directory_index = virt >> 22;
+	uint32_t page_table_index = virt >> 12 & 0x03FF;	// Shift 12 AND last 12 bits
+
+	//uint32_t* page_table = page_directory[page_directory_index];
+	uint32_t* page_table = 	(uint32_t*) 0xFFC00000 + (0x400 * page_directory_index);
+	uint32_t* pd = 			(uint32_t*) 0xFFF00000;
+
+	pd[page_directory_index] |= 0x3;	// Mark as Present, RW
+	page_table[page_table_index] = phys | (flags & 0xFFF) | PF_PRESENT;
+
+	load_page_directory(pd);
+	flush_tlb(virt);
+
 }
 
 
@@ -56,7 +93,40 @@ void k_page_fault(struct regs* r) {
 	for(;;);
 }
 
-void paging_init() {
+uint32_t* k_paging_get_dir(){
+	return page_directory;
+}
+
+uint32_t* k_paging_get_phys(uint32_t* dir, uint32_t virt) {
+	int _pdi = virt >> 22;
+	int _pti = (virt >> 12) & 0x3FF;
+
+	uint32_t* pt = (uint32_t*) dir[_pdi];
+	return ((uint32_t*) pt[_pti]);
+}
+
+void k_paging_map_block( uint32_t* dir, uint32_t phys, uint32_t virt, uint8_t flags) {
+	int _pdi = virt >> 22;
+	int _pti = (virt >> 12) & 0x3FF;
+
+	uint32_t* pt = (uint32_t*) dir[_pdi];
+	//dir[_pdi] |= PF_RW | PF_PRESENT;
+	pt[_pti] = (phys) | (flags) | PF_PRESENT;
+
+	dir[_pdi] = ((uint32_t) pt | PF_PRESENT | PF_RW);
+
+
+	kprintx("Page Dir Index:   ", _pdi);
+	kprintx("Page Table Index: ", _pti);
+	kprintx("Virtual Address:  ", virt);
+	kprintx("Physical Address: ", pt[_pti]);
+
+
+	// load_page_directory(dir);
+	// flush_tlb(virt);
+}
+
+void k_paging_init() {
 
 	/* load a custom ISR14 handler for page faults */
 	idt_set_gate(14, k_page_fault, 0x08, 0x8E);
@@ -71,29 +141,27 @@ void paging_init() {
 	/ page_table[num] >> 12 == num for linear mapping
 	*/
 	uint32_t first_page_table[1024] __attribute__((aligned(4096)));
-	uint32_t second_page_table[1024]__attribute__((aligned(4096)));
+
 	for (int i = 0; i < 1024; i++) {
 		// 0x1000 = 4 KB * 1024 = 4 MB
 		first_page_table[i] = (i * 0x1000) | PF_PRESENT | PF_RW | PF_SUPERVISOR; 
 
 	}
-	for (int i = 0; i < 1024; i++) {
-		// 0x1000 = 4 KB * 1024 = 4 MB
-		second_page_table[i] = (i * 0x1000) + 0x00400000| PF_PRESENT | PF_RW | PF_SUPERVISOR; 
 
-	}
-
-	page_directory[0] = ((uint32_t) first_page_table) | 3;
-	page_directory[1] = ((uint32_t) second_page_table) | 3;
 	
 
+	for (int i = 1; i < (1024 ); i++ )
+		k_paging_map_block(page_directory, i*0x1000, i*0x1000, 0x3);
+
+	// Map out the first 4 MB for the kernel
+	page_directory[0] =		((uint32_t) first_page_table | 3);
+
+
+
+	// Map the last 4 MB to the page directory
+	page_directory[1023] =	((uint32_t) page_directory | 0x3);
+	kprintx("FPT: ", page_directory[10]);
 	load_page_directory(&page_directory);
 	paging_enable();
 
-	char* buf = alloc(64);
-	itoa(first_page_table, buf, 2);
-	kprintx("PT: ", buf);
-
-	//vga_pretty(buf, 0x2);
-	//enable_paging();
 }

@@ -32,22 +32,11 @@ void *alloc(size_t bytes) {
 }
 
 void* free(void* ptr) {
-
+	return ptr;
 }
 
 
 void k_heap_init(struct KHEAPBM *master) {
-	//master->block = 0;
-
-	//struct KHEAPBLOCK* kb = (struct KHEAPBLOCK*) HEAP;
-	struct KHEAPBLOCK* kb = alloc(sizeof(struct KHEAPBLOCK));
-	kb->size= 4096;
-
-	char buf[8];
-	kprintx("KB meml ", kb);
-	kprintx("KB size ", kb->size);
-	kprintx("KB next ", kb->next);
-	kprintx("HEAP id ", INDEX);
 
 }
 
@@ -57,7 +46,8 @@ Uses bad alloc
 */
 void kprintx(char* message, int n) {
 	char* nbuffer = alloc(8);
-	char* sbuffer = alloc(strlen(message) + 10);
+	char* sbuffer = alloc(strlen(message) + 32);
+
 	itoa(n, nbuffer, 16);
 	strcpy(sbuffer, message);
 	strcpy(sbuffer+strlen(message), "0x");
@@ -65,6 +55,7 @@ void kprintx(char* message, int n) {
 	strcat(sbuffer, nbuffer);
 	vga_puts(sbuffer);
 	vga_putc('\n');
+	alloc(64);
 
 }
 

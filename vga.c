@@ -46,6 +46,8 @@ void vga_clear() {
 		*vga_address++ = 0; // character value
 		*vga_address++ = CURRENT_ATTRIB; // color value
 	}
+	CURRENT_Y = 0;
+	CURRENT_X = 0;
 }
 
 void vga_overwrite_color(int color, int start_x, int start_y, int end_x, int end_y) {
@@ -86,6 +88,10 @@ void vga_putc(char c) {
 	if (CURRENT_X >= 160) {
 		CURRENT_X = 0;
 		CURRENT_Y += 1;
+	}
+	if (CURRENT_Y >= 25) {
+		vga_clear();
+
 	}
 	vga_update_cursor();
 

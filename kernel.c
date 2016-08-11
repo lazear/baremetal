@@ -25,29 +25,44 @@ void test(struct regs *r) {
 	asm volatile("sti");
 }
 
+void bitshift(int x) {
+	kprintx("", (x >> 12)<<2);
+}
+
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
 void kernel_initialize(int ebx) {
 	//paging_init();
+	k_paging_init();
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
-	paging_init();
+	
+
+
 	vga_puts("baremetal!\n");
 	irq_install_handler(1, test);
 	irq_install_handler(0, timer);
-
-
-	//char *buff = 0xC0000000;
-	char *buff = alloc(10);
-	//memset(buff, 0, 4096);
-	vga_puts(buff);
-	int d = &kernel_initialize; // position of the kernel in memory
-	kprintx("Kernel loaded to: ", d);
 
 	k_heap_init();
 		// throwing system exception when calling ftoa(atof(""))
 		//ftoa(c);
 	//intten();
 
+	//k_map(0xB8000, 0xC0000000, 3);
+
+	
+
+	uint32_t* dir = k_paging_get_dir();
+	k_paging_map_block(dir, 0xDEADBEEF, 0xDEADBEEF, 0x3);
+
+	load_page_directory(dir);
+	flush_tlb();
+
+	int* pt = dir[0xDEADBEEF >> 22];
+	int* pp = pt[(0xDEADBEEF >> 12) & 0x3FF];
+	kprintx("", pp );
+
+	char* ptr = 0xDEADBEEF;
+	*ptr = 'A';
 
 	for(;;);
 }
