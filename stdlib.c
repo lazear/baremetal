@@ -43,7 +43,9 @@ void* free(void* ptr) {
 	return ptr;
 }
 
-
+int k_p_index() {
+	return PINDEX * 0x1000;
+}
 void k_heap_init(struct KHEAPBM *master) {
 
 }

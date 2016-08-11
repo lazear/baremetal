@@ -16,7 +16,12 @@ extern void try();
 
 void timer(struct regs *r) {
 	ticks++;
-	
+	if (ticks%5) {
+		char* buf = alloc(16);
+		itoa(ticks, buf, 10);
+
+		vga_kputs(buf, 150, 0);
+	}
 }
 
 
@@ -54,11 +59,8 @@ void kernel_initialize(int ebx) {
 	uint32_t* dir = k_paging_get_dir();
 	k_paging_map_block(dir, 0xDEAD0000, 0xDEAD0000, 0x3);
 	//k_paging_map_block(dir, 0xB0000000, 0xB0000000, 0x3);
-	load_page_directory(dir);
-	//flush_tlb();
 
-
-	char* ptr = 0xDEAD1100;
+	char* ptr = 0xDEADFF00;
 	*ptr = 'A';
 	vga_puts(ptr);
 

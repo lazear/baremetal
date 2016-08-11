@@ -67,6 +67,15 @@ void vga_kputc(char c, int x, int y) {
 	*vga_address = c | (CURRENT_ATTRIB << 8);
 }
 
+void vga_kputs(char* s, int x, int y) {
+	int i = 0;
+	while (*s != 0) {
+		vga_kputc(*s, x+=2, y);
+		s++;
+
+	}
+}
+
 void vga_puts(char* s) {
 	int i = 0;
 	while (*s != 0) {

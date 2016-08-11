@@ -126,7 +126,7 @@ void k_paging_map_block( uint32_t* dir, uint32_t phys, uint32_t virt, uint8_t fl
 	pt[_pti] = (phys) | 0x3;
 
 	//dir[_pdi] = ((uint32_t)pt | PF_PRESENT | PF_RW);
-	dir[_pdi] = (0x00300000 | 0x3);
+	dir[_pdi] = (0x00300000 + k_p_index()-0x1000| 0x3);
 
 	kprintx("Page Dir Value:   ", dir[_pdi]);
 	kprintx("Page Dir Index:   ", _pdi);
@@ -142,8 +142,8 @@ void k_paging_map_block( uint32_t* dir, uint32_t phys, uint32_t virt, uint8_t fl
 	kprintx("End tab: ", (_pdi * 0x400 * 0x1000) + (_pti* 0x1000 + 0x1000));
 	kprintx("End dir: ", (_pdi * 0x400 * 0x1000) + (0x400 * 0x1000 + 0x1000));
 
-	// load_page_directory(dir);
-	// flush_tlb(virt);
+	load_page_directory(dir);
+
 }
 
 void k_paging_init() {
@@ -168,15 +168,8 @@ void k_paging_init() {
 
 	}
 
-	
-
-	//for (int i = 1; i < (1024 ); i++ )
-	//	k_paging_map_block(page_directory, i*0x1000, i*0x1000, 0x3);
-
 	// Map out the first 4 MB for the kernel
 	page_directory[0] =		((uint32_t) first_page_table | 3);
-
-
 
 	// Map the last 4 MB to the page directory
 	page_directory[1023] =	((uint32_t) page_directory | 0x3);
