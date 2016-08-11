@@ -12,6 +12,7 @@ kernel.c
 
 int ticks = 0;
 
+extern void try();
 
 void timer(struct regs *r) {
 	ticks++;
@@ -20,15 +21,16 @@ void timer(struct regs *r) {
 
 
 void test(struct regs *r) {
-
+	kprintd("Ticks: ", ticks);
+	asm volatile("sti");
 }
 
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
 void kernel_initialize(int ebx) {
-
+	//paging_init();
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
-
+	paging_init();
 	vga_puts("baremetal!\n");
 	irq_install_handler(1, test);
 	irq_install_handler(0, timer);
@@ -44,7 +46,8 @@ void kernel_initialize(int ebx) {
 	k_heap_init();
 		// throwing system exception when calling ftoa(atof(""))
 		//ftoa(c);
-	kprintx("", ebx);
+	//intten();
+
 
 	for(;;);
 }

@@ -14,7 +14,7 @@ entry:
 	call gdt_init
 	call idt_init
 	call enableA20
-	call enter_protected_mode
+	;call enter_protected_mode
 
 	sti
 	call kernel_initialize
@@ -116,6 +116,7 @@ IRQ_MACRO 13, 45
 IRQ_MACRO 14, 46
 IRQ_MACRO 15, 47
 
+
 extern irq_handler
 irqstub:
 	pusha
@@ -180,6 +181,36 @@ enter_protected_mode:
 	ret
 
 
+global read_stack_pointer
+read_stack_pointer:
+	mov eax, esp
+	add eax, 4
+	ret
+
+global load_page_directory
+load_page_directory:
+	push ebp
+	mov ebp, esp
+	mov eax, [esp+8]
+	mov cr3, eax
+	mov esp, ebp
+	pop ebp
+	ret
+
+global paging_enable
+paging_enable:
+	push ebp
+	mov ebp, esp
+	mov eax, cr0
+	or eax, 0x80000000
+	mov cr0, eax
+	mov esp, ebp
+	pop ebp
+	ret
+
+global try
+try:
+	int 0x80
 
 
 section .bss

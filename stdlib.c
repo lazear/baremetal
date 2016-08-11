@@ -23,7 +23,7 @@ struct  KHEAPBM {
 // QUICK and DIRTY alloc function
 void *HEAP = 0x00200000;
 int INDEX = 0;
-void *alloc(uint32_t bytes) {
+void *alloc(size_t bytes) {
 	
 	void* ptr = HEAP + INDEX;
 	INDEX+=bytes;
