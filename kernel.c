@@ -34,29 +34,23 @@ void test(struct regs *r) {
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
 void kernel_initialize(uint32_t kernel_end) {
 
-	k_heap_init();
 
-	//k_paging_init();
+
+
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
-	
-	vga_puts("baremetal!\n");
-	//irq_install_handler(1, test);
+	uint32_t* pagedir = k_mm_init(kernel_end);
+
+	k_paging_init_test(pagedir);
+	//vga_puts("baremetal!\n");
+
 	irq_install_handler(0, timer);
+	kprintx("dir: ", pagedir);
+	k_paging_map_block( 0xB8000, 0x00400000, 3 );
 
-	
-		
+	char* ptr = 0x00400000;
 
-	uint32_t* dir = k_paging_get_dir();
-	//k_paging_map_block(dir, 0xDEAD0000, 0xDEAD0000, 0x3);
-	//k_paging_map_block(dir, 0xB0000000, 0xB0000000, 0x3);
-
-	char* ptr = 0xDEADFF00;
-	*ptr = 'A';
-
-	kprintx("Kernel end: ", kernel_end);
-	kprintx("Aligned: ", kernel_end + 0x1000 & ~0xFFF);
-	mm_test();
+	vga_puts(ptr);
 	for(;;);
 }
 
