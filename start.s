@@ -207,9 +207,32 @@ paging_enable:
 	pop ebp
 	ret
 
-global try
-try:
-	int 0x80
+extern testc
+global testasm
+testasm:
+	push ebp		; store the address of calling function
+	mov ebp, esp	; move the current base pointer to the bottom of old read_stack_pointer
+
+	pusha
+	push ds
+	push es
+	push fs
+	push gs
+
+	mov eax, esp
+	push eax
+	call testc
+
+	pop gs
+	pop fs
+	pop es
+	pop ds
+	popa
+	
+	mov esp, ebp	; reset the base pointer
+	pop ebp
+	ret
+
 
 
 section .bss
