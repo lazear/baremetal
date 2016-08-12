@@ -6,8 +6,9 @@ paging.c
 #include <x86.h>
 #include <paging.h>
 
-extern void paging_enable();
-extern void load_page_directory(uint32_t* dir);
+extern void k_paging_enable();
+extern void k_paging_load_directory(uint32_t* dir);
+extern uint32_t* k_read_cr3();
 
 /*
 Page directory -> Page table -> Page
@@ -18,29 +19,8 @@ Page directory -> Page table -> Page
 = 4GB per page directory
 */
 
-
 uint32_t* K_CURRENT_PAGE_DIRECTORY = 0;
 
-uint32_t switch_pd(uint32_t dir)
-{
-	uint32_t cr3;
-	asm volatile("mov %%cr3, %%eax" : "=a"(cr3));
-	asm volatile("mov %%eax, %%cr3" :: "a"(dir));
-	return cr3;
-}
-
-void enable_paging(void)
-{
-	uint32_t cr0;
-	asm volatile("mov %%cr0, %%eax" : "=a"(cr0));
-	cr0 |= 0x80000000;
-	asm volatile("mov %%eax, %%cr0" :: "a"(cr0));
-}
-
-void flush_tlb(uint32_t mem)
-{
-	asm volatile("invlpg %0" :: "m"(mem));
-}
 
 void k_page_fault(struct regs* r) {
 	asm volatile("cli");
@@ -77,8 +57,8 @@ void k_paging_init(uint32_t* dir_addr) {
 	K_CURRENT_PAGE_DIRECTORY[0] = (uint32_t) table | 3;
 	K_CURRENT_PAGE_DIRECTORY[1023] = (uint32_t) K_CURRENT_PAGE_DIRECTORY | 3;
 
-	load_page_directory(K_CURRENT_PAGE_DIRECTORY);
-	paging_enable();
+	k_paging_load_directory(K_CURRENT_PAGE_DIRECTORY);
+	k_paging_enable();
 }
 
 void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
@@ -113,5 +93,6 @@ void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
 	kprintx("End tab: ", (_pdi * 0x400 * 0x1000) + (_pti* 0x1000 + 0x1000));
 	kprintx("End dir: ", (_pdi * 0x400 * 0x1000) + (0x400 * 0x1000 + 0x1000));
 */
-	load_page_directory(dir);
+	//Should be no reason to reload the directory each time.
+	//k_paging_load_directory(dir);
 }

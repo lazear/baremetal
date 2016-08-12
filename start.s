@@ -165,6 +165,12 @@ gdt_flush:
 flush:
 	ret
 
+global tss_flush
+tss_flush:
+	mov ax, 0x2B
+	ltr ax
+	ret
+
 enableA20:
 	in al, 0x92
 	or al, 2
@@ -182,12 +188,15 @@ enter_protected_mode:
 
 global read_stack_pointer
 read_stack_pointer:
-	mov eax, esp
-	add eax, 4
+	push ebp
+	mov ebp, esp
+
+	mov eax, [esp+4]
+	pop ebp
 	ret
 
-global load_page_directory
-load_page_directory:
+global k_paging_load_directory
+k_paging_load_directory:
 	push ebp
 	mov ebp, esp
 	mov eax, [esp+8]
@@ -196,8 +205,8 @@ load_page_directory:
 	pop ebp
 	ret
 
-global paging_enable
-paging_enable:
+global k_paging_enable
+k_paging_enable:
 	push ebp
 	mov ebp, esp
 	mov eax, cr0
@@ -207,33 +216,14 @@ paging_enable:
 	pop ebp
 	ret
 
-extern testc
-global testasm
-testasm:
-	push ebp		; store the address of calling function
-	mov ebp, esp	; move the current base pointer to the bottom of old read_stack_pointer
-
-	pusha
-	push ds
-	push es
-	push fs
-	push gs
-
-	mov eax, esp
-	push eax
-	call testc
-
-	pop gs
-	pop fs
-	pop es
-	pop ds
-	popa
-	
-	mov esp, ebp	; reset the base pointer
+global k_read_cr3
+k_read_cr3:
+	push ebp
+	mov ebp, esp
+	mov eax, cr3
+	mov esp, ebp
 	pop ebp
 	ret
-
-
 
 section .bss
 align 32
