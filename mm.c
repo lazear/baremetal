@@ -132,7 +132,6 @@ uint32_t* mm_page_alloc(uint32_t* PD, uint32_t* PT) {
 		uint32_t address = ((ff_PD * 0x1000 * 0x400) + (ff_PT * 0x1000));
 
 		mm_bitmap_set_bit(PT, ff_PT);	// Mark the page as no longer free
-
 		return address;
 
 	} else if (ff_PD != ERR_NO_MEM && ff_PT == ERR_NO_MEM) {
@@ -258,14 +257,12 @@ void mm_test() {
 	uint32_t* next = k_page_alloc();
 
 	if (next == first_address)
-		vga_pretty("Success!\n", 0x2);
+		vga_pretty("Success!\n", 0x0A);
 	else {
 		vga_pretty("Something went wrong\n", 0x4);
 		kprintx("Current ff_pdb: ", ff_pdb);
 		kprintb("Current bitmap value: ", MM_CURRENT_PD[1]);
 	}
-	kprintx("Next:", next);
-
 
 	for (int i = 0; i < 3; i++ ) {
 		int result = k_page_alloc();

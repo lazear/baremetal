@@ -1,16 +1,10 @@
 /*
 paging.c
-
-
-
-
 */
 
 #include <types.h>
 #include <x86.h>
 #include <paging.h>
-
-
 
 extern void paging_enable();
 extern void load_page_directory(uint32_t* dir);
@@ -43,20 +37,10 @@ void enable_paging(void)
 	asm volatile("mov %%eax, %%cr0" :: "a"(cr0));
 }
 
-/*
-Remap a virtual address to a physical address
-This will be more useful in user mode/multithreading environment
-
-We need to lookup the page for a given virtual address, 
-and then set it to the physical address + flags
-*/
-
 void flush_tlb(uint32_t mem)
 {
 	asm volatile("invlpg %0" :: "m"(mem));
 }
-
-
 
 void k_page_fault(struct regs* r) {
 	asm volatile("cli");
@@ -66,7 +50,6 @@ void k_page_fault(struct regs* r) {
 	for(;;);
 }
 
-
 uint32_t* k_paging_get_phys(uint32_t* dir, uint32_t virt) {
 	int _pdi = virt >> 22;
 	int _pti = (virt >> 12) & 0x3FF;
@@ -75,10 +58,6 @@ uint32_t* k_paging_get_phys(uint32_t* dir, uint32_t virt) {
 
 	return ((uint32_t*) pt[_pti]);
 }
-
-
-
-
 
 void k_paging_init(uint32_t* dir_addr) {
 	/* load a custom ISR14 handler for page faults */
@@ -120,8 +99,6 @@ void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
 	pt[_pti] = ((phys) | flags | PF_PRESENT);
 
 	dir[_pdi] = ((uint32_t) pt | flags | PF_PRESENT);
-
-
 /*	kprintx("Page Dir Value:   ", dir[_pdi]);
 	kprintx("Page Dir Index:   ", _pdi);
 	kprintx("Page Table Value: ", pt[_pti]);
@@ -137,5 +114,4 @@ void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
 	kprintx("End dir: ", (_pdi * 0x400 * 0x1000) + (0x400 * 0x1000 + 0x1000));
 */
 	load_page_directory(dir);
-
 }

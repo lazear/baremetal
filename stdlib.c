@@ -15,8 +15,8 @@ Quick and dirty print hexidecimal, with appended 0x
 Uses bad alloc
 */
 void kprintx(char* message, int n) {
-	char* nbuffer = alloc(12);
-	char* sbuffer = alloc(strlen(message) + 32);
+	char* nbuffer = wf_malloc(12);
+	char* sbuffer = wf_malloc(strlen(message) + 32);
 
 	itoa(n, nbuffer, 16);
 	strcpy(sbuffer, message);
@@ -34,8 +34,8 @@ Quick and dirty print base 10, with appended 0x
 Uses bad alloc
 */
 void kprintd(char* message, int n) {
-	char* nbuffer = alloc(8);
-	char* sbuffer = alloc(strlen(message) + 10);
+	char* nbuffer = wf_malloc(8);
+	char* sbuffer = wf_malloc(strlen(message) + 10);
 	itoa(n, nbuffer, 10);
 	strcpy(sbuffer, message);
 
@@ -46,8 +46,8 @@ void kprintd(char* message, int n) {
 }
 
 void kprintb(char* message, int n) {
-	char* nbuffer = alloc(32);
-	char* sbuffer = alloc(strlen(message) + 10);
+	char* nbuffer = wf_malloc(32);
+	char* sbuffer = wf_malloc(strlen(message) + 10);
 	itoa(n, nbuffer, 2);
 	strcpy(sbuffer, message);
 
@@ -107,7 +107,7 @@ char*  ftoa(double num)
    long wt =0;
 
    // String containg result
-   char* str = alloc(20);
+   char* str = wf_malloc(20);
 
    //Initilise stirng to zero
    memset(str, 0 ,20);
@@ -217,8 +217,8 @@ char* itoa(uint32_t num, char* buffer, int base) {
 		num = num / base;
 	}
 
-	//while(len-- && base != 10)
-	//	buffer[i++] = '0';
+	while(len-- && base != 10)
+		buffer[i++] = '0';
 
 	buffer[i] = '\0';
 

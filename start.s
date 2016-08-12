@@ -15,12 +15,9 @@ entry:
 	call gdt_init
 	call idt_init
 	call enableA20
-	;call enter_protected_mode
-
-;	sti
+	
 	push kernel_end
 	call kernel_initialize
-	;jmp 08h:kernel_initialize	;not sure if this is necesary?
 	jmp $
 
 

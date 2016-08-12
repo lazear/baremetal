@@ -7,6 +7,7 @@ brk()
 */
 
 #include <types.h>
+#include <vga.h> 	// for nice color definitions
 
 uint32_t PAGE_FRAME_BEGIN = 0;
 
@@ -29,17 +30,6 @@ uint32_t K_HEAP_TOP = 0;
 
 int K_HEAP_INDEX = 0;
 
-int INDEX = 0;
-uint32_t LEGACY_HEAP = 0x00300000;
-void *alloc(size_t bytes) {
-	
-	void* ptr = LEGACY_HEAP + INDEX;
-	INDEX+=bytes;
-	return ptr;
-
-}
-
-
 void* free(void* ptr) {
 	return ptr;
 }
@@ -48,7 +38,6 @@ void* free(void* ptr) {
 uint32_t k_heap_top() {
 	return K_HEAP_TOP;
 }
-
 
 /*
 Rough implementation/estimation of sbrk. It's going to increase the size 
@@ -91,4 +80,28 @@ void k_heap_init() {
 
 	K_HEAP_TOP = (uint32_t) K_HEAP_BOTTOM;
 	sbrk(0x1000);
+}
+
+void heap_test() {
+	/*
+	allocate a bunch of memory, and then scroll through it, 
+	trying to throw a page fault
+	*/
+	uint32_t* bot = k_heap_top();
+	for (int i = 0; i < 8; i++) {
+		uint32_t* t = k_page_alloc();
+		k_page_alloc();
+		k_page_alloc();
+		uint32_t* x = wf_malloc(0x900);
+
+		k_page_free(t);
+		if (t != k_page_alloc())
+			vga_pretty("Error with page_alloc() and page_free()", VGA_RED);
+	}
+	uint32_t* top = k_heap_top();
+
+	for (int i = (uint32_t) bot; i < (uint32_t) top - 8; i++) {
+		(*(uint32_t*) i) = 0;
+	}
+	vga_pretty("Heap test successful!\n", VGA_LIGHTGREEN);
 }
