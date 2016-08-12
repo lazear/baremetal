@@ -25,36 +25,44 @@ void timer(struct regs *r) {
 }
 
 
-void test(struct regs *r) {
-	kprintd("Ticks: ", ticks);
+// Disable interrupts
+void cli() {
+	asm volatile("cli");
+}
+
+// Enable interrupts
+void sti() {
 	asm volatile("sti");
 }
 
-
-//We enter into kernel initialize with the GDT and IDT already loaded, and interrupts enabled
+//We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
 void kernel_initialize(uint32_t kernel_end) {
 
+	/*
+	1.	Initialize physical memory manager, with private heap @ kernel_end to 2MB
+			- Bitmap has the first 2MB (512 bits) marked as used, will not be allocated
+			- Allows k_page_alloc()
+	2.	Initialize paging, passing the reserved first page directory address
+	3.	Initialize heap management with malloc, free, and sbrk.
+			- Utilizes both k_page_alloc() and k_paging_map() to generate a continous
+				virtual address space.
+			- Public heap starts at 3GB. This should be changed when higher half is implemented
+	4.	Todo - initialize multithreading.
+	*/
+	uint32_t* pagedir = k_mm_init(kernel_end);
+	k_paging_init(pagedir);
+	k_heap_init();
 
+	// Start timer
+	irq_install_handler(0, timer);
 
+	// Start interrupts
+	sti();
 
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
-	uint32_t* pagedir = k_mm_init(kernel_end);
+	vga_pretty("baremetal initialized\n", VGA_CYAN);
 
-	k_paging_init_test(pagedir);
-	//vga_puts("baremetal!\n");
-
-	irq_install_handler(0, timer);
-	kprintx("dir: ", pagedir);
-
-	k_paging_map_block( 0xB8000, 0x00400000, 3 );
-	k_paging_map_block( 0x8000, 0x00480000, 3 );
-	char* ptr = 0x00400000;
-
-
-	vga_puts(ptr);
-
-	mm_test();
 	for(;;);
 }
 

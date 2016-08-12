@@ -80,7 +80,7 @@ uint32_t* k_paging_get_phys(uint32_t* dir, uint32_t virt) {
 
 
 
-void k_paging_init_test(uint32_t* dir_addr) {
+void k_paging_init(uint32_t* dir_addr) {
 	/* load a custom ISR14 handler for page faults */
 	idt_set_gate(14, k_page_fault, 0x08, 0x8E);
 
@@ -102,7 +102,7 @@ void k_paging_init_test(uint32_t* dir_addr) {
 	paging_enable();
 }
 
-void k_paging_map_block( uint32_t phys, uint32_t virt, uint8_t flags) {
+void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
 	uint32_t _pdi = virt >> 22;
 	uint32_t _pti = (virt >> 12) & 0x3FF;
 	uint32_t* dir = K_CURRENT_PAGE_DIRECTORY;

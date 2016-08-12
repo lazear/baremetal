@@ -1,6 +1,10 @@
 /*
 mm.c
-Physical memory management
+Physical memory management - keep track of physical memory used,
+this will enable the usage of a virtual memory/page mapped heap.
+When the heap nears the top, sbrk() can call k_page_alloc() to get another 
+0x1000 bytes (4KB) of physical address space, that can then be mapped to a
+continous virtual memory segment.
 */
 
 #include <types.h>
@@ -204,7 +208,7 @@ void* k_mm_init(uint32_t heap) {
 
 	heap = (heap + 0x1000) & ~0xFFF;
 	K_MM_HEAP = heap;
-	kprintx("Heap@: ", heap);
+//	kprintx("Heap@: ", heap);
 	MM_CURRENT_PD = mm_bitmap_init();
 	MM_CURRENT_PT = mm_bitmap_init();
 
@@ -218,8 +222,8 @@ void* k_mm_init(uint32_t heap) {
 
 	uint32_t* addr = mm_page_alloc(MM_CURRENT_PD, MM_CURRENT_PT);
 
-	kprintx("Initial addr:", addr);
-	kprintb("PT bm:", MM_CURRENT_PT[31]);
+	//kprintx("Initial addr:", addr);
+	//kprintb("PT bm:", MM_CURRENT_PT[31]);
 	return addr;
 }
 

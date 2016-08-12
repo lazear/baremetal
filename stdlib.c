@@ -217,8 +217,8 @@ char* itoa(uint32_t num, char* buffer, int base) {
 		num = num / base;
 	}
 
-	while(len-- && base != 10)
-		buffer[i++] = '0';
+	//while(len-- && base != 10)
+	//	buffer[i++] = '0';
 
 	buffer[i] = '\0';
 
