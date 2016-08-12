@@ -85,7 +85,7 @@ void k_paging_init_test(uint32_t* dir_addr) {
 	idt_set_gate(14, k_page_fault, 0x08, 0x8E);
 
 	K_CURRENT_PAGE_DIRECTORY = dir_addr;
-
+	memset(K_CURRENT_PAGE_DIRECTORY, 0, 4096);
 	//uint32_t* table = k_heap_alloca(4096);
 
 	uint32_t* table = k_page_alloc();
@@ -107,8 +107,14 @@ void k_paging_map_block( uint32_t phys, uint32_t virt, uint8_t flags) {
 	uint32_t _pti = (virt >> 12) & 0x3FF;
 	uint32_t* dir = K_CURRENT_PAGE_DIRECTORY;
 	
-	uint32_t* pt = k_page_alloc();
-	//uint32_t* pt = k_heap_alloca(4096);
+	uint32_t* pt;
+
+	if ( dir[_pdi] & ~0x3FF ) {
+		pt = dir[_pdi] & ~0x3FF;
+	} else {
+		//vga_puts("Hmmm...\n");
+		pt = k_page_alloc();
+	}
 
 
 	pt[_pti] = ((phys) | flags | PF_PRESENT);

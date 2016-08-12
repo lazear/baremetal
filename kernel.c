@@ -46,11 +46,15 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	irq_install_handler(0, timer);
 	kprintx("dir: ", pagedir);
-	k_paging_map_block( 0xB8000, 0x00400000, 3 );
 
+	k_paging_map_block( 0xB8000, 0x00400000, 3 );
+	k_paging_map_block( 0x8000, 0x00480000, 3 );
 	char* ptr = 0x00400000;
 
+
 	vga_puts(ptr);
+
+	mm_test();
 	for(;;);
 }
 

@@ -4,6 +4,126 @@
 		"selected_items":
 		[
 			[
+				"mm",
+				"mm_bitmap_set_bit"
+			],
+			[
+				"MM",
+				"MM_CURRENT_PT"
+			],
+			[
+				"k_p",
+				"k_paging_map_block"
+			],
+			[
+				"si",
+				"size_t"
+			],
+			[
+				"K_",
+				"K_MM_HEAP_MAX"
+			],
+			[
+				"uin",
+				"uint32_t"
+			],
+			[
+				"k_pa",
+				"k_page_alloc"
+			],
+			[
+				"K",
+				"K_CURRENT_PAGE_DIRECTORY"
+			],
+			[
+				"pa",
+				"pagedir"
+			],
+			[
+				"ff_",
+				"ff_pdb"
+			],
+			[
+				"mm_p",
+				"mm_page_alloc"
+			],
+			[
+				"mm_bit",
+				"mm_bitmap_full"
+			],
+			[
+				"mm_bi",
+				"mm_bitmap_init"
+			],
+			[
+				"MM_",
+				"MM_CURRENT_PT"
+			],
+			[
+				"pd",
+				"pd_index"
+			],
+			[
+				"mm_",
+				"mm_page_free"
+			],
+			[
+				"ff",
+				"ff_pdb"
+			],
+			[
+				"ken",
+				"kernel_end"
+			],
+			[
+				"KHE",
+				"K_HEAP_PAGES"
+			],
+			[
+				"fir",
+				"first_address"
+			],
+			[
+				"firs",
+				"first_address"
+			],
+			[
+				"pt",
+				"pt_index"
+			],
+			[
+				"mm_pag",
+				"mm_page_free"
+			],
+			[
+				"kprin",
+				"kprintx"
+			],
+			[
+				"mm_bitmap",
+				"mm_bitmap_set_bit"
+			],
+			[
+				"bitm",
+				"bitmap_size"
+			],
+			[
+				"fr",
+				"free_bits"
+			],
+			[
+				"bit",
+				"bitmap"
+			],
+			[
+				"kernel",
+				"kernel_end"
+			],
+			[
+				"kern",
+				"kernel_end"
+			],
+			[
 				"int",
 				"integer_size"
 			],
@@ -18,10 +138,6 @@
 			[
 				"de",
 				"decimal"
-			],
-			[
-				"uin",
-				"uint16_t"
 			],
 			[
 				"un",
@@ -252,10 +368,6 @@
 				"distance_from_top	param"
 			],
 			[
-				"pa",
-				"parent_dict	forstmt"
-			],
-			[
 				"sort",
 				"sort_keys	param"
 			],
@@ -402,118 +514,6 @@
 			[
 				"top",
 				"top_level_mapping	statement"
-			],
-			[
-				"best",
-				"best_dict	statement"
-			],
-			[
-				"pare",
-				"parentdict	forstmt"
-			],
-			[
-				"mi",
-				"mindepth	statement"
-			],
-			[
-				"max",
-				"maxdepth	statement"
-			],
-			[
-				"T",
-				"TERMS	statement"
-			],
-			[
-				"ass",
-				"assemblePANTHER	function"
-			],
-			[
-				"new",
-				"new_ipi	statement"
-			],
-			[
-				"master",
-				"master_out	statement"
-			],
-			[
-				"wr",
-				"writeTab	function"
-			],
-			[
-				"ma",
-				"master_peptide_for_residue	statement"
-			],
-			[
-				"mast",
-				"master_peptide_for_residue	statement"
-			],
-			[
-				"mas",
-				"master_peptide_for_residue	statement"
-			],
-			[
-				"new_",
-				"new_noqps	statement"
-			],
-			[
-				"by",
-				"by_res	statement"
-			],
-			[
-				"se",
-				"sequence	statement"
-			],
-			[
-				"wri",
-				"writeJSON	function"
-			],
-			[
-				"pept",
-				"peptides"
-			],
-			[
-				"list",
-				"list_of_peptides	param"
-			],
-			[
-				"R2",
-				"R2_CUTOFF	statement"
-			],
-			[
-				"pepd",
-				"peptides	statement"
-			],
-			[
-				"result",
-				"result_table	statement"
-			],
-			[
-				"R",
-				"R2_CUTOFF	statement"
-			],
-			[
-				"i",
-				"ipis	statement"
-			],
-			[
-				"unip",
-				"uniprotIPI	function"
-			],
-			[
-				"read",
-				"readTab	function"
-			],
-			[
-				"set",
-				"set_names	param"
-			],
-			[
-				"out",
-				"output_rt_to_excel	param"
-			],
-			[
-				"h_i",
-				"h_ipi	statement"
 			]
 		]
 	},
@@ -523,15 +523,24 @@
 			"file": "paging.c",
 			"settings":
 			{
-				"buffer_size": 4507,
+				"buffer_size": 0,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "mm.c",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Windows",
+				"name": "/*"
 			}
 		},
 		{
 			"file": "stdlib.c",
 			"settings":
 			{
-				"buffer_size": 5356,
+				"buffer_size": 5072,
 				"line_ending": "Windows"
 			}
 		},
@@ -544,26 +553,19 @@
 			}
 		},
 		{
-			"file": "vga.c",
+			"file": "heap.c",
 			"settings":
 			{
-				"buffer_size": 2774,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "x86.c",
-			"settings":
-			{
-				"buffer_size": 7611,
-				"line_ending": "Windows"
+				"buffer_size": 672,
+				"line_ending": "Windows",
+				"name": "/*"
 			}
 		},
 		{
 			"file": "kernel.c",
 			"settings":
 			{
-				"buffer_size": 1130,
+				"buffer_size": 0,
 				"line_ending": "Windows"
 			}
 		},
@@ -596,6 +598,14 @@
 			"settings":
 			{
 				"buffer_size": 259,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/vga.h",
+			"settings":
+			{
+				"buffer_size": 921,
 				"line_ending": "Windows"
 			}
 		}
@@ -725,6 +735,10 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Mike/Documents/GitHub/baremetal/vga.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/x86.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/linker.ld",
+		"/C/Users/Mike/Documents/GitHub/baremetal/start.s",
 		"/C/Users/Mike/Documents/GitHub/dev/mirage/concoct.py",
 		"/C/Users/Mike/Documents/GitHub/os/libc/string.c",
 		"/C/Users/Mike/Documents/GitHub/os/libc/stdio.c",
@@ -753,12 +767,8 @@
 		"/C/Users/Mike/Documents/GitHub/os/libc/printf.c",
 		"/C/Users/Mike/Documents/GitHub/os/main.c",
 		"/C/Users/Mike/Documents/GitHub/os/core/init.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/start.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/x86.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/include/x86.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/linker.ld",
 		"/C/Users/Mike/Documents/GitHub/baremetal/include/types.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/vga.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/include/vga.h",
 		"/C/Users/Mike/Documents/GitHub/os/drivers/char/keyboard.c",
 		"/C/Users/Mike/Downloads/irq.c",
@@ -935,7 +945,157 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4507,
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "mm.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/*",
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "stdlib.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5072,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4113,
+								4113
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1026.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "string.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2422,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								224,
+								224
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "heap.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 672,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								236,
+								236
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/*",
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 5,
+					"file": "kernel.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
 						"regions":
 						{
 						},
@@ -959,157 +1119,6 @@
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "stdlib.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5356,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "string.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2422,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "vga.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2774,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "x86.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7611,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								145,
-								145
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 5,
-					"file": "kernel.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1130,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
 					"buffer": 6,
 					"file": "include/paging.h",
 					"semi_transient": false,
@@ -1122,8 +1131,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								407,
+								407
 							]
 						],
 						"settings":
@@ -1162,7 +1171,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
@@ -1190,7 +1199,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
@@ -1208,6 +1217,34 @@
 							[
 								259,
 								259
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "include/vga.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 921,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1252,7 +1289,7 @@
 		"cols":
 		[
 			0.0,
-			0.5,
+			0.453125,
 			1.0
 		],
 		"rows":
