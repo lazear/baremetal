@@ -40,10 +40,35 @@ struct gdt_ptr
 typedef struct regs
 {
     unsigned int gs, fs, es, ds;
-    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;  // pusha instruction
     unsigned int int_no, err_code;
     unsigned int eip, cs, eflags, useresp, ss;    
 };
+
+
+typedef struct regs_r {
+  uint32_t gs;    // we push gs last, so it's popped first
+  uint32_t fs;
+  uint32_t es;
+  uint32_t ds;
+  uint32_t edi;
+  uint32_t esi;
+  uint32_t ebp;
+  uint32_t esp;
+  uint32_t ebx;
+  uint32_t edx;
+  uint32_t ecx;
+  uint32_t eax;
+  uint32_t int_no;    // passed by the irq common stub
+  uint32_t err_code;  // Should always be 0
+  uint32_t eip;
+  uint32_t cs;
+  uint32_t flags;
+  uint32_t esp3;    // popped by IRET when going from PL3 to PL0
+  uint32_t ss3      // popped by IRET when going from PL3 to PL0
+
+} __attribute__((packed)) regs_t;
+
 
 // A struct describing a Task State Segment.
 struct tss_entry

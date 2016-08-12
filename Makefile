@@ -16,6 +16,8 @@ ASFLAGS = -f elf
 
 all: compile link clean
 build: compile link 
+db: compile link clean debug
+
 
 
 compile: *.c
@@ -32,7 +34,8 @@ clean:
 	rm *.o				# Delete all of the object files
 	rm *.so				# Delete
 	
-
+debug:
+	gdb
 	
 
 	

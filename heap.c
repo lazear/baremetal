@@ -73,6 +73,11 @@ void* wf_malloc(size_t n) {
 	return (uint32_t) heap_sz;
 }
 
+
+void* malloc(size_t n) {
+	return wf_malloc(n);
+}
+
 void k_heap_init() {
 	uint32_t* phys = k_page_alloc();
 

@@ -4,16 +4,76 @@
 		"selected_items":
 		[
 			[
-				"sta",
-				"stack_start"
+				"ticks",
+				"ticks_start"
 			],
 			[
-				"pointer",
-				"pointer"
+				"CURREN",
+				"CURRENT_X"
 			],
 			[
-				"stack",
-				"read_stack_pointer"
+				"CURR",
+				"CURRENT_Y"
+			],
+			[
+				"proc",
+				"process_t"
+			],
+			[
+				"pro",
+				"process_t"
+			],
+			[
+				"vga",
+				"vga_pretty"
+			],
+			[
+				"pri",
+				"print_regs"
+			],
+			[
+				"w",
+				"wf_malloc"
+			],
+			[
+				"re",
+				"regs_t"
+			],
+			[
+				"k",
+				"k_page_alloc"
+			],
+			[
+				"k_",
+				"k_heap_top"
+			],
+			[
+				"heap",
+				"heap_test"
+			],
+			[
+				"K_HEAP",
+				"K_HEAP_INDEX"
+			],
+			[
+				"K",
+				"K_HEAP_INDEX"
+			],
+			[
+				"K_",
+				"K_HEAP_TOP"
+			],
+			[
+				"siz",
+				"size_t"
+			],
+			[
+				"0x",
+				"0x1000"
+			],
+			[
+				"k_p",
+				"k_paging_map_block"
 			],
 			[
 				"mm",
@@ -24,16 +84,8 @@
 				"MM_CURRENT_PT"
 			],
 			[
-				"k_p",
-				"k_paging_map_block"
-			],
-			[
 				"si",
 				"size_t"
-			],
-			[
-				"K_",
-				"K_MM_HEAP_MAX"
 			],
 			[
 				"uin",
@@ -42,10 +94,6 @@
 			[
 				"k_pa",
 				"k_page_alloc"
-			],
-			[
-				"K",
-				"K_CURRENT_PAGE_DIRECTORY"
 			],
 			[
 				"pa",
@@ -164,16 +212,8 @@
 				"color"
 			],
 			[
-				"vga",
-				"vga_pretty"
-			],
-			[
 				"start",
 				"start_y"
-			],
-			[
-				"CURR",
-				"CURRENT_ATTRIB"
 			],
 			[
 				"CUR",
@@ -260,10 +300,6 @@
 				"dictionary	statement"
 			],
 			[
-				"re",
-				"requests	module"
-			],
-			[
 				"write",
 				"writelines	function"
 			],
@@ -334,14 +370,6 @@
 			[
 				"db",
 				"db_yayornay	statement"
-			],
-			[
-				"proc",
-				"process	function"
-			],
-			[
-				"pro",
-				"process2	function"
 			],
 			[
 				"annot",
@@ -486,34 +514,6 @@
 			[
 				"bait",
 				"bait_symbol	param"
-			],
-			[
-				"ann",
-				"annotation	statement"
-			],
-			[
-				"annota",
-				"annotation	statement"
-			],
-			[
-				"bio",
-				"getBioGridData"
-			],
-			[
-				"du",
-				"drugbank	statement"
-			],
-			[
-				"dru",
-				"drugbankfile	param"
-			],
-			[
-				"dr",
-				"drugbankfile	param"
-			],
-			[
-				"clus",
-				"clusterl	function"
 			]
 		]
 	},
@@ -523,40 +523,7 @@
 			"file": "paging.c",
 			"settings":
 			{
-				"buffer_size": 2802,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "start.s",
-			"settings":
-			{
-				"buffer_size": 3072,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "mm.c",
-			"settings":
-			{
-				"buffer_size": 7597,
-				"line_ending": "Windows",
-				"name": "/*"
-			}
-		},
-		{
-			"file": "stdlib.c",
-			"settings":
-			{
-				"buffer_size": 5100,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "string.c",
-			"settings":
-			{
-				"buffer_size": 2422,
+				"buffer_size": 2516,
 				"line_ending": "Windows"
 			}
 		},
@@ -564,19 +531,27 @@
 			"file": "heap.c",
 			"settings":
 			{
-				"buffer_size": 1988,
+				"buffer_size": 2039,
 				"line_ending": "Windows",
 				"name": "/*"
 			}
 		},
 		{
-			"contents": "// x86.h\n\n#include <types.h>\n\n#ifndef __baremetal_x86__\n#define __baremetal_x86__\n\nstruct idt_entry\n{\n    unsigned short base_lo;\n    unsigned short sel;\n    unsigned char always0;\n    unsigned char flags;\n    unsigned short base_hi;\n} __attribute__((packed));\n\nstruct idt_ptr\n{\n    unsigned short limit;\n    unsigned int base;\n} __attribute__((packed));\n\nstruct gdt_entry\n{\n    unsigned short limit_low;\n    unsigned short base_low;\n    unsigned char base_middle;\n    unsigned char access;\n    unsigned char granularity;\n    unsigned char base_high;\n} __attribute__((packed));\n\nstruct gdt_ptr\n{\n    unsigned short limit;\n    unsigned int base;\n} __attribute__((packed));\n\n\ntypedef struct regs\n{\n    unsigned int gs, fs, es, ds;\n    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;\n    unsigned int int_no, err_code;\n    unsigned int eip, cs, eflags, useresp, ss;    \n};\n\ntypedef struct regs\n{\n    unsigned int gs, fs, es, ds;\n    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;\n    unsigned int eip, cs, eflags, useresp, ss;    \n} x86_stack_t;\n\nextern void irq_handler(struct regs *r);\nextern void outportb(uint16_t port, uint16_t data);\n// The following functions are from start.s, ISR and IRQ macros\n\nextern void gdt_flush();\nextern void idt_load();\n\nextern void irq0();\nextern void irq1();\nextern void irq2();\nextern void irq3();\nextern void irq4();\nextern void irq5();\nextern void irq6();\nextern void irq7();\nextern void irq8();\nextern void irq9();\nextern void irq10();\nextern void irq11();\nextern void irq12();\nextern void irq13();\nextern void irq14();\nextern void irq15();\n\nextern void isr0();\nextern void isr1();\nextern void isr2();\nextern void isr3();\nextern void isr4();\nextern void isr5();\nextern void isr6();\nextern void isr7();\nextern void isr8();\nextern void isr9();\nextern void isr10();\nextern void isr11();\nextern void isr12();\nextern void isr13();\nextern void isr14();\nextern void isr15();\nextern void isr16();\nextern void isr17();\nextern void isr18();\nextern void isr19();\nextern void isr20();\nextern void isr21();\nextern void isr22();\nextern void isr23();\nextern void isr24();\nextern void isr25();\nextern void isr26();\nextern void isr27();\nextern void isr28();\nextern void isr29();\nextern void isr30();\nextern void isr31();\n\n#endif",
-			"file": "include/x86.h",
-			"file_size": 2184,
-			"file_write_time": 131152723421945163,
+			"contents": ";start.s\n;2007-2016, Michael Lazear\n;combine ISRs, IRQ, GDT setup into a multiboot sector\n\n[BITS 32]\n\nextern kernel_initialize\nextern gdt_init\nextern idt_init\nextern kernel_end\n\nglobal entry\nentry:\n\n	call gdt_init\n	call idt_init\n	call enableA20\n	\n	push kernel_end\n	call kernel_initialize\n	jmp $\n\n\nALIGN 4\nmultiboot:\n\n    MULTIBOOT_PAGE_ALIGN	equ 1<<0\n    MULTIBOOT_MEMORY_INFO	equ 1<<1\n    MULTIBOOT_HEADER_MAGIC	equ 0x1BADB002\n    MULTIBOOT_HEADER_FLAGS	equ MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO\n    MULTIBOOT_CHECKSUM	equ -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)\n\n	; Multiboot header\n	dd MULTIBOOT_HEADER_MAGIC\n	dd MULTIBOOT_HEADER_FLAGS\n	dd MULTIBOOT_CHECKSUM\n\nSIZE equ	0x4000\n\n%macro ISR_MACRO 1\n	global isr%1\n	isr%1:\n		cli\n		push byte %1\n		jmp irqstub\n%endmacro\n\n; No error ISR macro\n%macro ISR_NMACRO 1\n	global isr%1\n	isr%1:\n		cli\n		push byte 0\n		push byte %1\n		jmp irqstub\n%endmacro\n\n%macro IRQ_MACRO 2\n	global irq%1\n	irq%1:\n		cli\n		push byte 0\n		push byte %2\n		jmp irqstub\n%endmacro\n\nISR_NMACRO 0\nISR_NMACRO 1\nISR_NMACRO 2\nISR_NMACRO 3\nISR_NMACRO 4\nISR_NMACRO 5\nISR_NMACRO 6\nISR_NMACRO 7\nISR_NMACRO 8\n\nISR_MACRO 9\nISR_MACRO 10\nISR_MACRO 11\nISR_MACRO 12\nISR_MACRO 13\nISR_MACRO 14\nISR_MACRO 15\nISR_MACRO 16\nISR_MACRO 17\nISR_MACRO 18\nISR_MACRO 19\nISR_MACRO 20\nISR_MACRO 21\nISR_MACRO 22\nISR_MACRO 23\nISR_MACRO 24\nISR_MACRO 25\nISR_MACRO 26\nISR_MACRO 27\nISR_MACRO 28\nISR_MACRO 29\nISR_MACRO 30\nISR_MACRO 31\n\nIRQ_MACRO 0, 32\nIRQ_MACRO 1, 33\nIRQ_MACRO 2, 34\nIRQ_MACRO 3, 35\nIRQ_MACRO 4, 36\nIRQ_MACRO 5, 37\nIRQ_MACRO 6, 38\nIRQ_MACRO 7, 39\nIRQ_MACRO 8, 40\nIRQ_MACRO 9, 41\nIRQ_MACRO 10, 42\nIRQ_MACRO 11, 43\nIRQ_MACRO 12, 44\nIRQ_MACRO 13, 45\nIRQ_MACRO 14, 46\nIRQ_MACRO 15, 47\n\nextern timer\nextern system_tss\n\n# global irq0\n# irq0:\n#     cld\n#     pushad\n#     push ds\n#     push es\n#     push fs\n#     push gs\n# 	mov ax,0x10 ;load kernel segments\n# 	mov ds,ax\n# 	mov es,ax\n# 	mov fs,ax\n# 	mov gs,ax\n\n#     mov eax,[k_current_process] 	;put the adress of the struct of CURRENT PROCESS in eax.(the CONTENT of pointer p)\n#     mov [eax],esp 					;save esp in the location of esp in the CURRENT PROCESS-STRUCT.\n#     lea eax,[kstack] 			; switch to the kernels own stack.\n#     mov esp,eax\n\n#     call timer\n\n#     mov eax,[k_current_process] 	;put adress of struct of current process in eax.\n#     mov esp,[eax] 					;restore adress of esp.\n#     mov ebx,[eax+4]					;put content of the k-stack field into ebx.\n\n#  ;   mov [system_tss+4],ebx 			;update system tss.\n#     mov al,0x20\n#     out 0x20,al\n#     pop gs\n#     pop fs\n#     pop es\n#     pop ds\n#     popad\n#     iretd\n\n\n\nextern irq_handler\nirqstub:\n	pusha\n	push ds\n	push es\n	push fs\n	push gs\n\n	mov ax, 0x10\n	mov ds, ax\n	mov es, ax\n	mov fs, ax\n	mov gs, ax\n	mov eax, esp\n\n	push eax\n	mov eax, irq_handler\n	call eax\n	pop eax\n\n	pop gs\n	pop fs\n	pop es\n	pop ds\n	popa\n	add esp, 8\n	iret\n\nextern idt_pointer\nglobal idt_load\n\nidt_load:\n	lidt [idt_pointer]\n\nextern gdt_pointer\nglobal gdt_flush\n\ngdt_flush:\n	lgdt [gdt_pointer]\n	mov ax, 0x10\n	mov ds, ax\n	mov es, ax\n	mov fs, ax\n	mov gs, ax\n	mov ss, ax\n	jmp 0x08:flush\nflush:\n	ret\n\nglobal tss_flush\ntss_flush:\n	mov ax, 0x2B\n	ltr ax\n	ret\n\nenableA20:\n	in al, 0x92\n	or al, 2\n	out 0x92, al\n	ret\n\nenter_protected_mode:\n	cli\n	;lgdt [gdt_pointer]\n	mov eax, cr0\n	or al, 1\n	mov cr0, eax\n	ret\n\n\nglobal read_stack_pointer\nread_stack_pointer:\n	push ebp\n	mov ebp, esp\n\n	mov eax, esp\n	;add eax, 8\n	pop ebp\n	ret\n\nglobal k_paging_load_directory\nk_paging_load_directory:\n	push ebp\n	mov ebp, esp\n	mov eax, [esp+8]\n	mov cr3, eax\n	mov esp, ebp\n	pop ebp\n	ret\n\nglobal k_paging_enable\nk_paging_enable:\n	push ebp\n	mov ebp, esp\n	mov eax, cr0\n	or eax, 0x80000000\n	mov cr0, eax\n	mov esp, ebp\n	pop ebp\n	ret\n\nglobal k_read_cr3\nk_read_cr3:\n	push ebp\n	mov ebp, esp\n	mov eax, cr3\n	mov esp, ebp\n	pop ebp\n	ret\n\nsection .bss\nalign 32\nstack:\n	resb SIZE",
+			"file": "start.s",
+			"file_size": 4254,
+			"file_write_time": 131155097228422742,
 			"settings":
 			{
-				"buffer_size": 2259,
+				"buffer_size": 3819,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/x86.h",
+			"settings":
+			{
+				"buffer_size": 3566,
 				"line_ending": "Windows"
 			}
 		},
@@ -584,7 +559,23 @@
 			"file": "kernel.c",
 			"settings":
 			{
-				"buffer_size": 3570,
+				"buffer_size": 3932,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "vga.c",
+			"settings":
+			{
+				"buffer_size": 3053,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "x86.c",
+			"settings":
+			{
+				"buffer_size": 8358,
 				"line_ending": "Windows"
 			}
 		},
@@ -593,14 +584,6 @@
 			"settings":
 			{
 				"buffer_size": 407,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "include/stdarg.h",
-			"settings":
-			{
-				"buffer_size": 768,
 				"line_ending": "Windows"
 			}
 		},
@@ -626,6 +609,15 @@
 			{
 				"buffer_size": 921,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "task.c",
+			"settings":
+			{
+				"buffer_size": 1393,
+				"line_ending": "Windows",
+				"name": "/*"
 			}
 		}
 	],
@@ -754,7 +746,11 @@
 	},
 	"file_history":
 	[
-		"/D/Documents/GitHub/baremetal/x86.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/mm.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/stdlib.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/string.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/stdarg.h",
+		"/C/Users/Mike/Documents/GitHub/os/core/memory/malloc.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/vga.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/x86.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/linker.ld",
@@ -770,7 +766,6 @@
 		"/C/Users/Mike/Documents/GitHub/os/include/core/mutex.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/paging.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/regs.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/include/stdarg.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/tss.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/types.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/video.h",
@@ -820,7 +815,6 @@
 		"/C/Users/Mike/Documents/GitHub/os/asm/inc.asm",
 		"/C/Users/Mike/Documents/GitHub/os/drivers/clock/timer.c",
 		"/C/Users/Mike/Documents/GitHub/os/core/memory/stack.c",
-		"/C/Users/Mike/Documents/GitHub/os/core/memory/malloc.c",
 		"/C/Users/Mike/Documents/GitHub/os/asm/loader.asm",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/stdarg.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/fs.h",
@@ -879,19 +873,18 @@
 		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/elf.ld",
 		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/higherhalf.ld",
 		"/C/Users/Mike/Documents/GitHub/dev/mirage/gui.py",
-		"/C/Users/Mike/Documents/GitHub/fun/easyclone.py",
-		"/C/Users/Mike/AppData/Local/Temp/7zO43BA8A8D/HUMAN_9606_idmapping.dat",
-		"/C/Users/Mike/Documents/GitHub/dev/mirage/combine/combine_by_res.py"
+		"/C/Users/Mike/Documents/GitHub/fun/easyclone.py"
 	],
 	"find":
 	{
-		"height": 28.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 93.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
@@ -899,6 +892,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"irq_ack",
+			"alloc()",
+			"k_paging_map_block",
+			"k_heap_alloc",
 			"ISR_ERRCODE",
 			"Reverse_",
 			"Reverse",
@@ -942,20 +939,22 @@
 		"regex": false,
 		"replace_history":
 		[
+			"k_paging_map",
+			"k_paging_map_block",
 			"ISR_MACRO",
 			"",
 			"Reverse_"
 		],
 		"reverse": false,
 		"show_context": true,
-		"use_buffer2": true,
+		"use_buffer2": false,
 		"whole_word": false,
 		"wrap": true
 	},
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -964,15 +963,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2802,
+						"buffer_size": 2516,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2025,
-								2025
+								0,
+								0
 							]
 						],
 						"settings":
@@ -981,27 +980,56 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 780.0,
+						"translation.y": 342.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "start.s",
+					"file": "heap.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3072,
+						"buffer_size": 2039,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2899,
-								2899
+								1228,
+								1228
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/*",
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1063.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "start.s",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3819,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1346,
+								1346
 							]
 						],
 						"settings":
@@ -1010,180 +1038,63 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3925.0,
+						"translation.y": 1729.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "mm.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7597,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
 					"buffer": 3,
-					"file": "stdlib.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5100,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1026.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "string.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2422,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								224,
-								224
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "heap.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1988,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
 					"file": "include/x86.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2259,
+						"buffer_size": 3566,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								550,
-								550
+								1411,
+								1411
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
+							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1083.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 7,
 					"type": "text"
 				}
 			]
 		},
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
-					"buffer": 7,
+					"buffer": 4,
 					"file": "kernel.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3570,
+						"buffer_size": 3932,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								181,
-								181
+								2260,
+								2260
 							]
 						],
 						"settings":
@@ -1192,14 +1103,73 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 399.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "vga.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3053,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1237,
+								1237
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 627.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 6,
+					"file": "x86.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8358,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3332.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
 					"file": "include/paging.h",
 					"semi_transient": false,
 					"settings":
@@ -1223,39 +1193,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "include/stdarg.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 768,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
+					"buffer": 8,
 					"file": "include/stdlib.h",
 					"semi_transient": false,
 					"settings":
@@ -1279,11 +1221,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 9,
 					"file": "include/string.h",
 					"semi_transient": false,
 					"settings":
@@ -1307,11 +1249,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 10,
 					"file": "include/vga.h",
 					"semi_transient": false,
 					"settings":
@@ -1332,10 +1274,39 @@
 							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 57.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "task.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1393,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1389,
+								1389
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/*",
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 570.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -1343,7 +1314,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 28.0
+		"height": 27.0
 	},
 	"input":
 	{
@@ -1369,7 +1340,7 @@
 		"cols":
 		[
 			0.0,
-			0.453125,
+			0.4703125,
 			1.0
 		],
 		"rows":
@@ -1385,13 +1356,13 @@
 	},
 	"output.find_results":
 	{
-		"height": 0.0
+		"height": 29.0
 	},
 	"pinned_build_system": "Packages/Python/Python.sublime-build",
 	"project": "baremetal.sublime-project",
 	"replace":
 	{
-		"height": 52.0
+		"height": 50.0
 	},
 	"save_all_on_build": true,
 	"select_file":

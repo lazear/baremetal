@@ -13,7 +13,7 @@ char* VGA_MEMORY = 0x000B8000;
 
 int CURRENT_X = 0;
 int CURRENT_Y = 0;
-int CURRENT_ATTRIB = 0;
+int CURRENT_ATTRIB = VGA_COLOR(VGA_WHITE, VGA_BLACK);
 
 int vga_current_x() { return CURRENT_X; }
 int vga_current_y() { return CURRENT_Y; }
@@ -48,6 +48,20 @@ void vga_clear() {
 	}
 	CURRENT_Y = 0;
 	CURRENT_X = 0;
+}
+
+/* Scroll the screen up one line */
+void vga_scroll()
+{
+	if( CURRENT_Y >= 25)
+	{
+		uint8_t* vga_addr = VGA_MEMORY;
+		uint8_t temp = CURRENT_Y - 24;
+		memcpy(vga_addr, vga_addr + temp * 160, (25 - temp) * 160 * 2);
+		memset(vga_addr + 24 * 160, 0, 160);
+		CURRENT_Y = 24;
+	}
+	vga_update_cursor();
 }
 
 void vga_overwrite_color(int color, int start_x, int start_y, int end_x, int end_y) {
@@ -98,11 +112,7 @@ void vga_putc(char c) {
 		CURRENT_X = 0;
 		CURRENT_Y += 1;
 	}
-	if (CURRENT_Y >= 25) {
-		vga_clear();
-
-	}
-	vga_update_cursor();
+	vga_scroll();
 
 }
 

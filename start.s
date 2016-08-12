@@ -115,6 +115,48 @@ IRQ_MACRO 13, 45
 IRQ_MACRO 14, 46
 IRQ_MACRO 15, 47
 
+extern timer
+extern system_tss
+ ;save all registers in the kernel-level stack of the process and switch to the kernel stack
+extern k_current_process		; pointer to current process
+extern kstack
+
+# global irq0
+# irq0:
+#     cld
+#     pushad
+#     push ds
+#     push es
+#     push fs
+#     push gs
+# 	mov ax,0x10 ;load kernel segments
+# 	mov ds,ax
+# 	mov es,ax
+# 	mov fs,ax
+# 	mov gs,ax
+
+#     mov eax,[k_current_process] 	;put the adress of the struct of CURRENT PROCESS in eax.(the CONTENT of pointer p)
+#     mov [eax],esp 					;save esp in the location of esp in the CURRENT PROCESS-STRUCT.
+#     lea eax,[kstack] 			; switch to the kernels own stack.
+#     mov esp,eax
+
+#     call timer
+
+#     mov eax,[k_current_process] 	;put adress of struct of current process in eax.
+#     mov esp,[eax] 					;restore adress of esp.
+#     mov ebx,[eax+4]					;put content of the k-stack field into ebx.
+
+#  ;   mov [system_tss+4],ebx 			;update system tss.
+#     mov al,0x20
+#     out 0x20,al
+#     pop gs
+#     pop fs
+#     pop es
+#     pop ds
+#     popad
+#     iretd
+
+
 
 extern irq_handler
 irqstub:
@@ -191,7 +233,8 @@ read_stack_pointer:
 	push ebp
 	mov ebp, esp
 
-	mov eax, [esp+4]
+	mov eax, esp
+	;add eax, 8
 	pop ebp
 	ret
 
