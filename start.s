@@ -15,7 +15,8 @@ entry:
 	call gdt_init
 	call idt_init
 	call enableA20
-	
+	mov eax, stack_top
+	mov esp, eax
 	push kernel_end
 	call kernel_initialize
 	jmp $
@@ -228,5 +229,7 @@ k_read_cr3:
 
 section .bss
 align 32
-stack:
+
+stack_bottom:
 	resb SIZE
+stack_top:

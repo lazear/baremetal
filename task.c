@@ -5,72 +5,127 @@ task.c
 #include <types.h>
 #include <x86.h>
 
-/*
-alloc a new 4kb stack for the thread
-*/
-uint32_t* k_task_generate_stack(void (*fn)()) {
+typedef struct THREAD {
+	struct THREAD* previous;
+	char* name;
+	uint32_t pid;
+	uint32_t ebp;
+	uint32_t esp;
+	uint32_t eip;
+	uint32_t cr3;
+	uint32_t state;
 
-	uint32_t* stack = malloc(0x1000) + 0x1000;
-	kprintx("New stack@ ", stack);
-	// processor data (iret)
+	struct THREAD* next;
 
-	*--stack = 0x200;	// EFLAGS
+} thread;
+
+
+thread *k_thread = 0;
+
+thread* current_thread = 0;
+
+uint32_t K_SCHED_ACTIVE = 0;
+uint32_t K_THREAD_COUNT = 0;
+
+thread* k_create_thread(char* name, void (*fn)() ) {
+	uint32_t* stack = malloc(0x1000) + 0x1000; // point to top of stack
+
+	thread* t = (thread*) malloc(sizeof(thread));
+	memset(t, 0, sizeof(thread));
+
+	t->name = name;
+	t->pid = K_THREAD_COUNT++;
+	t->eip = (uint32_t) fn;
+	t->esp = (uint32_t) stack - 0x1000;
+	t->ebp = (uint32_t) stack;		// point to bottom of stack
+	t->state = 1;
+
+
+	*--stack = 0x202;	// EFLAGS
 	*--stack = 0x08;	// CS
 	*--stack = (uint32_t) fn;	// EIP
 	// pusha
-	*--stack = 0;		// EDI
-	*--stack = 0;		// ESI
 
-	*--stack = 0;		// EBP
-	*--stack = (uint32_t) stack;
-	*--stack = 0;		// EBX
-	*--stack = 0;		// EDX
-	*--stack = 0;		// ECX
 	*--stack = 0;		// EAX
+	*--stack = 0;		// ECX
+	*--stack = 0;		// EDX
+	*--stack = 0;		// EBX
+	*--stack = t->esp;		// ESP
+	*--stack = t->ebp;		// EBP
 
+	*--stack = 0;		// ESI
+	*--stack = 0;		// EDI
 	// data segments
 	*--stack = 0x10;	// DS
 	*--stack = 0x10;	// ES
 	*--stack = 0x10;	// FS
 	*--stack = 0x10;	// GS
-	return stack;
 }
 
-regs_t* k_new_stack(void (*fn)()) {
+void k_thread_idle() {
+	for(;;);
+}
 
-	uint32_t* stack = malloc(0x1000) + 0x1000;
-	regs_t* r = malloc(sizeof(regs_t));
+void zombie() {
+	printf("Rob Zombie\n");
+	for(;;);
+}
 
-	*--stack = 0x200;	// EFLAGS
-	*--stack = 0x08;	// CS
-	*--stack = (uint32_t) fn;	// EIP
-	// pusha
-	*--stack = 0;		// EDI
-	*--stack = 0;		// ESI
+void zombie2() {
+	printf("Zombie2\n");
+	for(;;);
+}
 
-	*--stack = 0;		// EBP
-	*--stack = (uint32_t) stack;
-	*--stack = 0;		// EBX
-	*--stack = 0;		// EDX
-	*--stack = 0;		// ECX
-	*--stack = 0;		// EAX
+void zombie3() {
+	printf("Electric BOOGALOO\n");
+	for(;;);
+}
 
-	// data segments
-	*--stack = 0x10;	// DS
-	*--stack = 0x10;	// ES
-	*--stack = 0x10;	// FS
-	*--stack = 0x10;	// GS
+thread* k_sched_next() {
+	thread* t = current_thread->next;
+	current_thread = t;
 
-	r->esp = (uint32_t) stack;
-	r->eip = (uint32_t) fn;
-	r->flags = 0x200;
-	r->cs = 0x08;
-	r->ds = 0x10;
-	r->es = 0x10;
-	r->fs = 0x10;
-	r->gs = 0x10;
+	if (t == 0)
 
+	return t;
+}
 
-	//kprintx("New stack@ ", stack);
-	return r->esp;
+/*
+Thread1 -> Current Thread (2) -> Thread 3
+Thread1 -> CT (2) -> New Thread (4) -> Thread 3 -> Thread 1
+*/
+void k_thread_add(thread* t) {
+	thread* c = current_thread;
+	t->next = c->next;
+	c->next = t;
+
+}
+
+void k_schedule(regs_t* r) {
+	current_thread->esp = r->esp;
+	current_thread->eip = r->eip;
+	current_thread->ebp = r->ebp;
+
+	thread* t = k_sched_next();
+
+	r->esp = t->esp;
+	r->eip = t->eip;
+	r->ebp = t->ebp;
+	return r;
+
+}
+
+void k_thread_init() {
+	k_thread = k_create_thread("kernel idle", k_thread_idle);
+
+	thread* kt2 = k_create_thread("zthread2", zombie2);
+	thread* kt3 = k_create_thread("zthre3", zombie3);
+	current_thread = k_thread;
+	k_thread_add(k_thread);
+	k_thread_add(kt2);
+	k_thread_add(kt3);
+	//k_thread_add(k_thread);
+
+	K_SCHED_ACTIVE = 1;
+
 }

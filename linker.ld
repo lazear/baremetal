@@ -22,6 +22,8 @@ SECTIONS
 	.bss :
 	{
 		*(.bss)
+		*(stack_bottom)
+		*(stack_top)
 		. = ALIGN(4096);
 	}
 	end = .;
