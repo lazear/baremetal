@@ -262,13 +262,13 @@ void tss_init() {
     uint32_t base = (uint32_t) &system_tss;         // address of tss
     uint32_t limit = base + sizeof(system_tss);     // limit of selector
 
-    gdt_set_gate(5, base, limit, 0xE9, 0xC0);     // setup gdt entry
+    gdt_set_gate(5, base, limit, 0xE9, 0x00);     // setup gdt entry
     memset(&system_tss, 0, sizeof(system_tss));     // clear the tss
 
     system_tss.ss0  = 0x10;
-    system_tss.esp0 = read_stack_pointer();
-  //  system_tss.cs   = 0xb;
-   // system_tss.ss   = system_tss.ds = system_tss.es = system_tss.fs = system_tss.gs = 0x13;     // RPL = 3
+    system_tss.esp0 = 0x0;
+    system_tss.cs   = 0xb;
+    system_tss.ss   = system_tss.ds = system_tss.es = system_tss.fs = system_tss.gs = 0x13;     // RPL = 3
 }
 
 void gdt_init()

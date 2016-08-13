@@ -9,6 +9,7 @@ kernel.c
 #include <x86.h>
 #include <stdlib.h>
 #include <string.h>
+#include <types.h>
 
 int ticks = 0;
 
@@ -26,8 +27,7 @@ void timer(regs_t *r) {
 
 		vga_kputs(buf, 150, 0);
 	}
-	if (ticks % 10 == 0)
-		vga_pretty("Test\n", ticks % 8);
+	
 }
 
 
@@ -95,10 +95,28 @@ void kernel_initialize(uint32_t kernel_end) {
 	vga_clear();
 	vga_pretty(logo, VGA_CYAN);
 
-	
+	STREAM* s = k_new_stream(0x1000);
 
-	heap_test();
-	mm_test();
+	char d[] = "Hello, World!";
+	//memcpy(s->data, d, 6);
+	printf("Steam object allocated to 0x%x\n", s);
+	printf("Steam pointer allocated to 0x%x\n", s->data);
+	printf("Stream is size %x\n", s->size);
+	printf("Stream offset %x\n", s->offset);
+
+	int res = k_stream_write(s, d, 10);
+	if (res < 0)
+		vga_puts("Something went wrong\n");
+	fputc(s, 'A');
+
+	k_stream_write(s, d, 10);
+	printf("Stream data test: %s\n", s->data);
+	printf("Stream offset %x\n", s->offset);
+
+	STREAM* stdout = k_new_stream(160*25);
+	stdout->data = 0xB8000;
+
+	fputs(stdout, "H E L L O W O R L D F R O M S T D O U T");
 
 	for(;;);
 }

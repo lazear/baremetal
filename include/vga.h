@@ -1,5 +1,7 @@
 /*
 vga.h
+
+header file for interfacing with VGA text drivers.
 */
 
 #ifndef __baremetal_vga__
@@ -19,6 +21,7 @@ extern void vga_puts(char* s);
 extern void vga_kputc(char c, int x, int y);
 extern void vga_putc(char c);
 extern void vga_setcolor(int color);
+extern void vga_scroll();
 
 extern int vga_current_x();
 extern int vga_current_y();

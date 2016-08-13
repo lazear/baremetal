@@ -58,7 +58,7 @@ void vga_scroll()
 		uint8_t* vga_addr = VGA_MEMORY;
 		uint8_t temp = CURRENT_Y - 24;
 		memcpy(vga_addr, vga_addr + temp * 160, (25 - temp) * 160 * 2);
-		memset(vga_addr + 24 * 160, 0, 160);
+		//memset(vga_addr + 24 * 160, 0, 160);
 		CURRENT_Y = 24;
 	}
 	vga_update_cursor();
