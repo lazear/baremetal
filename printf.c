@@ -57,19 +57,20 @@ int printf( const char *fmt, ... ) {
 				{
 				case 'd':
 				case 'i':
-					sitoa(buf, 10, va_arg(args, int));
+					sitoa(va_arg(args, int), buf, 10);
+					//sitoa(buf, 10, va_arg(args, int));
 					vga_puts(buf);
 					break;
 				case 'u':	// Unsigned
-					sitoa(buf, 16, va_arg(args, uint32_t));
+					sitoa(va_arg(args, int), buf, 16);
 					vga_puts(buf);
 					break;		
 				case 'b':	// Byte in hex
-					itoa(buf, 16, va_arg(args, uint8_t));
+					itoa(va_arg(args, uint32_t), buf, 2);
 					vga_puts(buf);
 					break;
 				case 'w':	// word
-					itoa(buf, 16, va_arg(args, uint16_t));
+					itoa(va_arg(args, uint32_t), buf, 16);
 					vga_puts(buf);
 					break;
 				case 'x':	// hex
@@ -78,28 +79,11 @@ int printf( const char *fmt, ... ) {
 					vga_puts(buf);
 					break;
 				case 'X':	// HEX
-					itoa(buf, 16, va_arg(args, uint32_t));
+					itoa(va_arg(args, uint32_t), buf, 16);
 					vga_puts(buf);
 					break;
-				case 'l':	// long hex
-					switch (*(fmt++))
-					{
-					case 'x':
-						itoa(buf, 16, va_arg(args, uint64_t));
-						vga_puts(buf);
-						break;
-					case 'd':
-						sitoa(buf, 10, va_arg(args, uint64_t));
-						vga_puts(buf);
-						break;
-					default:
-						sitoa(buf, 10, va_arg(args, uint64_t));
-						vga_puts(buf);
-						break;
-					}
-					break;
 				case 'o':	// Octal
-					sitoa(buf, 8, va_arg(args, uint32_t));
+					itoa(va_arg(args, uint32_t), buf, 8);
 					vga_puts(buf);
 					break;
 				case 's':	// string (char*)

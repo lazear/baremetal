@@ -20,8 +20,9 @@ extern uint32_t K_SCHED_ACTIVE;
 
 void timer(regs_t *r) {
 
-
+	//cli();
 	ticks++;
+
 	if (!(ticks%2)) {
 		char* buf = wf_malloc(8);
 		itoa(ticks, buf, 10);
@@ -29,15 +30,26 @@ void timer(regs_t *r) {
 		vga_kputs(buf, 150, 0);
 
 	}
+	if (ticks % 1 == 0)
 		if (K_SCHED_ACTIVE) {
 		//	asm volatile("out %%al, %%dx": :"d"(0x20), "a"(0x20)); // send EoI to master PIC
 			return k_schedule(r);
 		}
-
+	//sti();
 	return r;
 }
 
+void wait(int n) {
+	int wait_for = ticks + n;
+	while (1)
+		if (wait_for < ticks)
+			break;
+	return;
+}
 
+uint32_t get_ticks(){
+	return ticks;
+}
 
 void print_regs(regs_t* r) {
 	vga_clear();
@@ -107,9 +119,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	STREAM* s = k_new_stream(0x1000);
 	char d[] = "Michael Lazear (C) 2016";
 	int res = k_stream_write(s, d, 10);
-
 	k_thread_init();
-
 
 	for(;;);
 }
