@@ -49,14 +49,14 @@ int k_stream_seek(STREAM* stream, int p) {
 		return -1;
 
 	stream->offset = p;
-	return 1;
+	return p;
 }
 
 int k_stream_tell(STREAM* stream) {
 	return stream->offset;
 }
 
-int fputc( STREAM* stream, char c ) {
+int fputc(STREAM* stream, char c ) {
 	if (stream->size < 1 || stream->offset + 1 > stream->size)
 		return 0;
 
@@ -86,4 +86,9 @@ int fseek(STREAM* stream, int p) {
 
 int ftell(STREAM *stream) {
 	return k_stream_tell(stream);
+}
+
+int fflush(STREAM *stream) {
+	memset(stream->data, 0, stream->size);
+	return fseek(stream, 0);
 }
