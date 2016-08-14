@@ -236,9 +236,9 @@ void mm_test() {
 	uint32_t ff_pdb = mm_first_free(MM_CURRENT_PD);
 	uint32_t ff_ptb = mm_first_free(MM_CURRENT_PT);
 
-	kprintx("ff_pdb", ff_pdb);
+	printf("ff_pdb 0x%x\n", ff_pdb);
 
-	kprintx("ff_ptb", ff_ptb);
+	printf("ff_ptb 0x%x\n", ff_ptb);
 	uint32_t first_address = (ff_pdb* 0x1000 * 0x400) + (ff_ptb * 0x1000);
 
 	for (int i = 0; i < 5; i++ ) {
@@ -246,12 +246,12 @@ void mm_test() {
 		if (result == ERR_NO_MEM)
 			vga_pretty("[FAIL] no memory left", 0x4);
 		else {
-			kprintx("Testing allocation: ", result);
+			printf("Testing allocation: 0x%x", result);
 		}
 	}
 
 
-	kprintx("Trying to free first address with offset: ", first_address);
+	printf("Trying to free first address with offset: 0x%x\n", first_address);
 	k_page_free(first_address + 0x30);
 
 	uint32_t* next = k_page_alloc();
@@ -260,8 +260,8 @@ void mm_test() {
 		vga_pretty("Success!\n", 0x0A);
 	else {
 		vga_pretty("Something went wrong\n", 0x4);
-		kprintx("Current ff_pdb: ", ff_pdb);
-		kprintb("Current bitmap value: ", MM_CURRENT_PD[1]);
+		printf("Current ff_pdb: 0x%x\n", ff_pdb);
+		printf("Current bitmap value: %b\n", MM_CURRENT_PD[1]);
 	}
 
 	for (int i = 0; i < 3; i++ ) {
@@ -269,7 +269,7 @@ void mm_test() {
 		if (result == ERR_NO_MEM)
 			vga_pretty("[FAIL] no memory left", 0x4);
 		else {
-			kprintx("Testing allocation: ", result);
+			printf("Testing allocation: 0x%x\n", result);
 		}
 	}
 

@@ -1,5 +1,6 @@
 #include <x86.h>
 #include <types.h>
+#include <stdio.h>
 
 uint8_t keyboard[] =
 {

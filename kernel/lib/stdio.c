@@ -4,6 +4,7 @@ Basic stream implementation
 */
 
 #include <types.h>
+#include <stdio.h>
 
 /*
 Create a new stream of size N bytes and return a pointer to that stream

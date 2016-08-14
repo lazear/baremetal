@@ -120,7 +120,7 @@ void irq_handler(struct regs *r)
 {
 
 	if (r->int_no < 32) {
-		kprintd("Exception: ", r->int_no);
+		printf("Exception: %d", r->int_no);
 		return;
 	}
 

@@ -9,54 +9,6 @@ Implementation of stdlib for baremetal
 #include <ctype.h>
 #include <stdlib.h>
 
-
-/*
-Quick and dirty print hexidecimal, with appended 0x
-Uses bad alloc
-*/
-void kprintx(char* message, int n) {
-	char* nbuffer = wf_malloc(12);
-	char* sbuffer = wf_malloc(strlen(message) + 32);
-
-	itoa(n, nbuffer, 16);
-	strcpy(sbuffer, message);
-	strcpy(sbuffer+strlen(message), "0x");
-
-	strcat(sbuffer, nbuffer);
-	vga_puts(sbuffer);
-	vga_putc('\n');
-
-
-}
-
-/*
-Quick and dirty print base 10, with appended 0x
-Uses bad alloc
-*/
-void kprintd(char* message, int n) {
-	char* nbuffer = wf_malloc(8);
-	char* sbuffer = wf_malloc(strlen(message) + 10);
-	itoa(n, nbuffer, 10);
-	strcpy(sbuffer, message);
-
-	strcat(sbuffer, nbuffer);
-	vga_puts(sbuffer);
-	vga_putc('\n');
-
-}
-
-void kprintb(char* message, int n) {
-	char* nbuffer = wf_malloc(32);
-	char* sbuffer = wf_malloc(strlen(message) + 10);
-	itoa(n, nbuffer, 2);
-	strcpy(sbuffer, message);
-
-	strcat(sbuffer, nbuffer);
-	vga_puts(sbuffer);
-	vga_putc('\n');
-
-}
-
 double atof(char* s) {
 	double integer = 0;
 	double decimal = 0;
@@ -187,7 +139,7 @@ int atoi(char* s) {
 		sign = -1;
 
 	for (int i = 0; i < strlen(s) && s[i] != '\0'; i++) {
-		if (IS_NUMERIC_CHAR(s[i]))
+		if (isdigit(s[i]))
 			num = num*10 + (s[i] - '0');
 	}
 	return sign*num;

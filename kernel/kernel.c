@@ -8,6 +8,7 @@ kernel.c
 #include <vga.h>
 #include <x86.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <types.h>
 
@@ -60,23 +61,23 @@ uint32_t get_ticks(){
 void print_regs(regs_t* r) {
 	vga_clear();
 	vga_pretty("Register dump\n", VGA_MAGENTA);
-	kprintx("gs: ", r->gs);
-	kprintx("fs: ", r->fs);
-	kprintx("es: ", r->es);
-	kprintx("ds: ", r->ds);
-	kprintx("edi: ", r->edi);
-	kprintx("esi: ", r->esi);
-	kprintx("ebp: ", r->ebp);
-	kprintx("esp: ", r->esp);
-	kprintx("ebx: ", r->ebx);
-	kprintx("edx: ", r->edx);
-	kprintx("ecx: ", r->ecx);
-	kprintx("eax: ", r->eax);
-	kprintx("eip: ", r->eip);
-	kprintx("cs: ", r->cs);
-	kprintx("flags: ", r->flags);
-	kprintx("esp3: ", r->esp3);
-	kprintx("ss3: ", r->ss3);
+	printf("gs: 0x%x", r->gs);
+	printf("fs: 0x%x", r->fs);
+	printf("es: 0x%x", r->es);
+	printf("ds: 0x%x", r->ds);
+	printf("edi: 0x%x", r->edi);
+	printf("esi: 0x%x", r->esi);
+	printf("ebp: 0x%x", r->ebp);
+	printf("esp: 0x%x", r->esp);
+	printf("ebx: 0x%x", r->ebx);
+	printf("edx: 0x%x", r->edx);
+	printf("ecx: 0x%x", r->ecx);
+	printf("eax: 0x%x", r->eax);
+	printf("eip: 0x%x", r->eip);
+	printf("cs: 0x%x", r->cs);
+	printf("flags: 0x%x", r->flags);
+	printf("esp3: 0x%x", r->esp3);
+	printf("ss3: 0x%x", r->ss3);
 
 }
 
@@ -102,7 +103,8 @@ void event() {
 	while(1) {
 		if (ftell(kb)) {
 			lock();
-	//		sti();
+	//
+			sti();
 
 			char c = fgetc(kb);
 			if (c == '\n')
@@ -152,11 +154,8 @@ void kernel_initialize(uint32_t kernel_end) {
 	char d[] = "Michael Lazear (C) 2016";
 	int res = k_stream_write(s, d, 10);
 	k_thread_init(2);
-	printf("stdin %x, data@ %x\n", stdin, stdin->data);
 	spawn("/dev/stdin", event);
 
-	if ( ticks > 20 )
-		printf("I'm still here");
 	for(;;);
 }
 
