@@ -41,6 +41,11 @@ char* k_stream_read(STREAM* stream, size_t n) {
 	memcpy(buffer, ((uint32_t) stream->data + stream->offset), n);
 }
 
+char fgetc(STREAM* stream) {
+	char q = *(char*)((uint32_t) stream->data + stream->offset - 1);
+	return q;
+}
+
 int k_stream_seek(STREAM* stream, int p) {
 	
 	if(p < -1)
@@ -88,6 +93,7 @@ int ftell(STREAM *stream) {
 	return k_stream_tell(stream);
 }
 
+// fflush - flush buffer to file.
 int fflush(STREAM *stream) {
 	memset(stream->data, 0, stream->size);
 	return fseek(stream, 0);

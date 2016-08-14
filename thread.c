@@ -6,9 +6,10 @@ task.c
 #include <x86.h>
 #include <thread.h>
 
-uint32_t K_SCHED_TIME = 3;
+uint32_t K_SCHED_TIME = 0;
 uint32_t K_SCHED_ACTIVE = 0;
 uint32_t K_THREAD_COUNT = 0;
+
 int K_CURRENT_PID = -1;
 
 thread* current_thread = 0;
@@ -56,10 +57,13 @@ thread* k_create_thread(char* name, void (*fn)() ) {
 
 
 thread* k_sched_next() {
-	thread* t = current_thread->next;
-//	printf("Scheduling pid %d\n", t->pid);
-	current_thread = t;
-	return t;
+	if (current_thread->next->state){
+		thread* t = current_thread->next;
+			//	printf("Scheduling pid %d\n", t->pid);
+		current_thread = t;
+		return t;
+	}
+	return current_thread;
 }
 
 /*
@@ -72,6 +76,7 @@ void k_add_thread(thread* t) {
 	if (current_thread == 0) {
 	//	printf("Now the current thread\n");
 		t->next = t;
+		t->prev = t;
 		current_thread = t;
 		K_CURRENT_PID = t->pid;
 		return;
@@ -83,11 +88,14 @@ void k_add_thread(thread* t) {
 		// there is already a link found, we will insert
 	//	printf("Link found %d -> %d\n", tmp->pid, tmp_next->pid);
 		tmp->next = t;
+		t->prev = tmp;
 		t->next = tmp_next;
+		tmp_next->prev = t;
 	//	printf("New link: %d -> %d -> %d\n", tmp->pid, tmp->next->pid, tmp->next->next->pid);
 
 	} else {
 		tmp->next = t;
+		t->prev = tmp;
 	//	printf("Pid %d is now next after %d\n", tmp->next->pid, tmp->pid);
 		t->next = k_find_thread(0);
 	}
@@ -101,6 +109,7 @@ thread* k_find_thread(int pid) {
 	return tmp;
 }
 
+
 void k_schedule(regs_t* r) {
 
 	// This is where the error is... first thread won't run basically.
@@ -111,12 +120,20 @@ void k_schedule(regs_t* r) {
 
 		return r;
 	}
+	if (!K_SCHED_ACTIVE)
+		return r;
+
 	current_thread->esp = r->esp;
 	current_thread->eip = r->eip;
 	current_thread->ebp = r->ebp;
 	current_thread->time++;
 	// Switch to a new thread
 	thread* t = k_sched_next();
+	if(t->state == 0)
+		k_schedule(r);
+
+	vga_kputs(t->name, 150-strlen(t->name), 1);
+
 	K_CURRENT_PID = t->pid;
 	// load new stack values
 	r->esp = t->esp;
@@ -127,27 +144,28 @@ void k_schedule(regs_t* r) {
 
 }
 
+int i = 0;
+
 void z() {
-	printf("zombie1\n");
-	for(;;);
+	while(1) {
+
+	}
 }
-
-
 
 void z2() {
-	printf("zombie2\n");
-	while(1)
-		if (get_ticks() > 50) break;
-	list_threads();
-	for(;;);
+	while(1) {
+		if (get_ticks() > 200) {
+			die();
+		}
+	}
 
 }
-void list_threads() {
+void k_list_threads() {
 	thread* t = current_thread;
 	for (int i = 0; i < K_THREAD_COUNT; i++) {
-		printf("PID: %d Name: %s Time: %d\n", t->pid, t->name, t->time);
-
-		t = t->next;
+		printf("PID: %d Name: %s Time: %d State %d\n", t->pid, t->name, t->time, t->state);
+		if (t->next)
+			t = t->next;
 	}
 }
 
@@ -159,6 +177,39 @@ void k_gpf_handler(regs_t* r) {
 	print_regs(r);
 	vga_pretty("General Protection Fault!!!", 0x2);
 	asm volatile("hlt");
+}
+
+void die() {
+	cli();
+	k_sched_state(0);
+
+	thread* t = current_thread;
+	printf("die %s %d\n", t->name, t->pid);
+
+	t->prev->next = t->next;
+
+	t->state = 0;
+//	K_THREAD_COUNT--;
+
+
+	free(t->ebp);	
+	free(t);
+
+	k_sched_state(1);
+	sti();
+
+	for(;;);
+}
+
+void yield() {
+	k_sched_state(1);
+//	sti();
+}
+
+void lock() {
+//	cli();
+	k_sched_state(0);
+	//sti();
 }
 
 thread* k_fork(int pid) {
@@ -174,36 +225,45 @@ thread* k_fork(int pid) {
 
 }
 
-
 void fork() {
 	k_fork(current_thread->pid);
 }
 
-int kthread_add(char* name, void (*fn)()) {
+int spawn(char* name, void (*fn)()) {
 	k_add_thread(k_create_thread(name, fn));
 }
 
-void k_thread_init() {
+extern int keypress;
+
+void event_loop() {
+	printf("Event loo\n");
+	die();
+	printf("Can you see this?");
+}
+
+void k_sched_state(int state) {
+	K_SCHED_ACTIVE = state;
+}
+
+
+
+void k_thread_init(int timing) {
 
 	cli();
 
-	idt_set_gate(6, k_gpf_handler , 0x08, 0x8E);
+	idt_set_gate(6, k_gpf_handler , 0x08, 0x8E);	// invalid opcode
+	idt_set_gate(13, k_gpf_handler , 0x08, 0x8E);	// gpf
 
-/*	thread* k_thread = k_create_thread("idle", null_thread);	// 0
-	thread *two = k_create_thread("z2", z2);
 
-	k_add_thread(k_thread);
-
-	k_add_thread(two);*/
-
-	kthread_add("Idle", null_thread);
-	//kthread_add("Zombie thread", z2);
-	printf("Active thread count: %d\n", K_THREAD_COUNT);
-	list_threads();
-	k_fork(1);
+	spawn("Idle", null_thread);
+	//spawn("Main", event_loop);
+	//spawn("Zom2", z2);
+	//spawn("Zom1", z);
+	k_list_threads();
 	//current_thread = k_thread;
 	//K_CURRENT_PID = 1;
 	K_SCHED_ACTIVE = 1;
+	K_SCHED_TIME = timing;
 	sti();
 
 }

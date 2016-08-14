@@ -14,13 +14,25 @@ typedef struct THREAD {
 	uint32_t cr3;
 	int state;
 	uint32_t time;
+	struct THREAD* prev;
 	struct THREAD* next;
 
 } thread;
 
 void k_add_thread(thread* t);
 thread* k_find_thread(int pid);
+
+/* List active threads */
+void k_list_thread();
+
 void k_schedule(regs_t* r) ;
+void k_sched_state(int state);
+
+
+void lock();
+void die();
 void fork();
+
+
 
 #endif

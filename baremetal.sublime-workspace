@@ -4,108 +4,88 @@
 		"selected_items":
 		[
 			[
-				"k",
-				"k_new_stream"
-			],
-			[
-				"k_",
-				"k_stream_tell"
-			],
-			[
-				"k_st",
-				"k_stream_seek"
-			],
-			[
-				"size",
-				"size_t"
-			],
-			[
-				"k_stream",
-				"k_stream_write"
-			],
-			[
-				"fo",
-				"formatted"
-			],
-			[
-				"vga",
-				"vga_puts"
-			],
-			[
-				"fm",
-				"formatted"
-			],
-			[
-				"u",
-				"uint32_t"
-			],
-			[
-				"sched",
-				"sched_active"
-			],
-			[
-				"syste",
-				"system_tss"
-			],
-			[
-				"ticks",
-				"ticks_start"
-			],
-			[
-				"CURREN",
-				"CURRENT_X"
-			],
-			[
-				"CURR",
-				"CURRENT_Y"
-			],
-			[
-				"proc",
-				"process_t"
-			],
-			[
-				"pro",
-				"process_t"
-			],
-			[
-				"pri",
-				"print_regs"
-			],
-			[
-				"w",
-				"wf_malloc"
-			],
-			[
-				"re",
-				"regs_t"
-			],
-			[
-				"heap",
-				"heap_test"
-			],
-			[
-				"K_HEAP",
-				"K_HEAP_INDEX"
+				"curr",
+				"current_thread"
 			],
 			[
 				"K",
-				"K_HEAP_INDEX"
+				"K_CURRENT_PID"
+			],
+			[
+				"wait",
+				"wait_for"
+			],
+			[
+				"k",
+				"k_thread"
+			],
+			[
+				"null",
+				"null_thread"
+			],
+			[
+				"zombie",
+				"zombie2"
+			],
+			[
+				"cur",
+				"current_thread"
+			],
+			[
+				"cu",
+				"current_thread"
+			],
+			[
+				"k_T",
+				"K_THREAD_COUNT"
+			],
+			[
+				"k_",
+				"k_thread_add"
 			],
 			[
 				"K_",
-				"K_HEAP_TOP"
+				"K_MAX_THREADS"
 			],
 			[
-				"siz",
-				"size_t"
+				"ke",
+				"kernel_initialize"
 			],
 			[
-				"0x",
-				"0x1000"
+				"read",
+				"read_stack_pointer"
 			],
 			[
-				"k_p",
-				"k_paging_map_block"
+				"read_",
+				"read_base_pointer"
+			],
+			[
+				"re",
+				"read_stack_pointer"
+			],
+			[
+				"tss",
+				"tss_init"
+			],
+			[
+				"gdt",
+				"gdt_flush"
+			],
+			[
+				"uint",
+				"uint32_t"
+			],
+			[
+				"sta",
+				"stack_start"
+			],
+			[
+				"pointer",
+				"pointer"
+			],
+			[
+				"stack",
+				"read_stack_pointer"
 			],
 			[
 				"mm",
@@ -114,6 +94,10 @@
 			[
 				"MM",
 				"MM_CURRENT_PT"
+			],
+			[
+				"k_p",
+				"k_paging_map_block"
 			],
 			[
 				"si",
@@ -244,8 +228,16 @@
 				"color"
 			],
 			[
+				"vga",
+				"vga_pretty"
+			],
+			[
 				"start",
 				"start_y"
+			],
+			[
+				"CURR",
+				"CURRENT_ATTRIB"
 			],
 			[
 				"CUR",
@@ -274,10 +266,6 @@
 			[
 				"ent",
 				"enter_protected_mode"
-			],
-			[
-				"gdt",
-				"gdt_init"
 			],
 			[
 				"idt",
@@ -404,6 +392,14 @@
 				"db_yayornay	statement"
 			],
 			[
+				"proc",
+				"process	function"
+			],
+			[
+				"pro",
+				"process2	function"
+			],
+			[
 				"annot",
 				"annotation	statement"
 			],
@@ -514,109 +510,56 @@
 			[
 				"acual",
 				"actual_count"
+			],
+			[
+				"fasta",
+				"fastasearch	function"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "paging.c",
-			"settings":
-			{
-				"buffer_size": 2516,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "heap.c",
-			"settings":
-			{
-				"buffer_size": 2039,
-				"line_ending": "Windows",
-				"name": "/*"
-			}
-		},
-		{
-			"file": "start.s",
-			"settings":
-			{
-				"buffer_size": 2920,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "printf.c",
 			"settings":
 			{
-				"buffer_size": 2455,
+				"buffer_size": 2133,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "stdlib.c",
+			"file": "task.c",
 			"settings":
 			{
-				"buffer_size": 5100,
+				"buffer_size": 4284,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "string.c",
+			"file": "include/thread.h",
 			"settings":
 			{
-				"buffer_size": 2422,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "include/stdarg.h",
-			"settings":
-			{
-				"buffer_size": 768,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "stream.c",
-			"settings":
-			{
-				"buffer_size": 1947,
+				"buffer_size": 377,
 				"line_ending": "Windows",
-				"name": "/*"
+				"name": "// thread.h"
 			}
 		},
 		{
-			"file": "include/types.h",
+			"file": "include/x86.h",
 			"settings":
 			{
-				"buffer_size": 772,
+				"buffer_size": 3566,
 				"line_ending": "Windows"
 			}
 		},
 		{
+			"contents": "/*\nMichael Lazear, (C) 2007-2016\n\nkernel.c\n*/\n\n#include <kernel.h>\n#include <vga.h>\n#include <x86.h>\n#include <stdlib.h>\n#include <string.h>\n#include <types.h>\n\nint ticks = 0;\n\nchar logo[] = {0x5f,0x5f,0x5f,0x2e,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x5f,0x5f,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x2e,0x5f,0x5f,0x20,0x20,0x20,0x0a,0x5c,0x5f,0x20,0x7c,0x5f,0x5f,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x20,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x2f,0x20,0x20,0x7c,0x5f,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x7c,0x20,0x20,0x7c,0x20,0x20,0x0a,0x20,0x7c,0x20,0x5f,0x5f,0x20,0x5c,0x5c,0x5f,0x5f,0x20,0x20,0x5c,0x5c,0x5f,0x20,0x20,0x5f,0x5f,0x20,0x5c,0x5f,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x20,0x2f,0x20,0x20,0x20,0x20,0x20,0x5c,0x5f,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x20,0x20,0x20,0x5f,0x5f,0x5c,0x5f,0x5f,0x20,0x20,0x5c,0x20,0x7c,0x20,0x20,0x7c,0x20,0x20,0x0a,0x20,0x7c,0x20,0x5c,0x5f,0x5c,0x20,0x5c,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x7c,0x20,0x20,0x7c,0x20,0x5c,0x2f,0x5c,0x20,0x20,0x5f,0x5f,0x5f,0x2f,0x7c,0x20,0x20,0x59,0x20,0x59,0x20,0x20,0x5c,0x20,0x20,0x5f,0x5f,0x5f,0x2f,0x7c,0x20,0x20,0x7c,0x20,0x20,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x7c,0x20,0x20,0x7c,0x5f,0x5f,0x0a,0x20,0x7c,0x5f,0x5f,0x5f,0x20,0x20,0x28,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x2f,0x5f,0x5f,0x7c,0x20,0x20,0x20,0x20,0x5c,0x5f,0x5f,0x5f,0x20,0x20,0x3e,0x5f,0x5f,0x7c,0x5f,0x7c,0x20,0x20,0x2f,0x5c,0x5f,0x5f,0x5f,0x20,0x20,0x3e,0x5f,0x5f,0x7c,0x20,0x28,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x2f,0x5f,0x5f,0x5f,0x5f,0x2f,0x0a,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20, '\\n'};\n\nextern struct tss_entry system_tss;\nextern uint32_t K_SCHED_ACTIVE;\nextern uint32_t K_SCHED_TIME;\n\n\nvoid timer(regs_t *r) {\n\n	//cli();\n	ticks++;\n\n	if (!(ticks%2)) {\n		char* buf = wf_malloc(8);\n		itoa(ticks, buf, 10);\n\n		vga_kputs(buf, 150, 0);\n\n	}\n	if (ticks % K_SCHED_TIME == 0)\n		if (K_SCHED_ACTIVE) {\n		//	asm volatile(\"out %%al, %%dx\": :\"d\"(0x20), \"a\"(0x20)); // send EoI to master PIC\n			return k_schedule(r);\n		}\n	//sti();\n	return r;\n}\n\nvoid wait(int n) {\n	int wait_for = ticks + n;\n	while (1)\n		if (wait_for < ticks)\n			break;\n	return;\n}\n\nuint32_t get_ticks(){\n	return ticks;\n}\n\nvoid print_regs(regs_t* r) {\n	vga_clear();\n	vga_pretty(\"Register dump\\n\", VGA_MAGENTA);\n	kprintx(\"gs: \", r->gs);\n	kprintx(\"fs: \", r->fs);\n	kprintx(\"es: \", r->es);\n	kprintx(\"ds: \", r->ds);\n	kprintx(\"edi: \", r->edi);\n	kprintx(\"esi: \", r->esi);\n	kprintx(\"ebp: \", r->ebp);\n	kprintx(\"esp: \", r->esp);\n	kprintx(\"ebx: \", r->ebx);\n	kprintx(\"edx: \", r->edx);\n	kprintx(\"ecx: \", r->ecx);\n	kprintx(\"eax: \", r->eax);\n	kprintx(\"eip: \", r->eip);\n	kprintx(\"cs: \", r->cs);\n	kprintx(\"flags: \", r->flags);\n	kprintx(\"esp3: \", r->esp3);\n	kprintx(\"ss3: \", r->ss3);\n\n}\n\n\n// Disable interrupts\nvoid cli() {\n	asm volatile(\"cli\");\n}\n\n// Enable interrupts\nvoid sti() {\n	asm volatile(\"sti\");\n}\n\n\n\n\n\n//We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled\nvoid kernel_initialize(uint32_t kernel_end) {\n\n	/*\n	1.	Initialize physical memory manager, with private heap @ kernel_end to 2MB\n			- Bitmap has the first 2MB (512 bits) marked as used, will not be allocated\n			- Allows k_page_alloc()\n	2.	Initialize paging, passing the reserved first page directory address\n	3.	Initialize heap management with malloc, free, and sbrk.\n			- Utilizes both k_page_alloc() and k_paging_map() to generate a continous\n				virtual address space.\n			- Public heap starts at 3GB. This should be changed when higher half is implemented\n	4.	Todo - initialize multithreading.\n	*/\n	uint32_t* pagedir = k_mm_init(kernel_end);\n	k_paging_init(pagedir);\n	k_heap_init();\n	// Start timer\n	irq_install_handler(0, timer);\n\n	// Start interrupts\n	sti();\n\n	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));\n	vga_clear();\n	vga_pretty(logo, VGA_CYAN);\n\n	STREAM* s = k_new_stream(0x1000);\n	char d[] = \"Michael Lazear (C) 2016\";\n	int res = k_stream_write(s, d, 10);\n	k_thread_init();\n\n	for(;;);\n}\n\n",
 			"file": "kernel.c",
+			"file_size": 4487,
+			"file_write_time": 131155895220086829,
 			"settings":
 			{
-				"buffer_size": 3978,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "vga.c",
-			"settings":
-			{
-				"buffer_size": 3055,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "/*\nvga.c\nMichael Lazear, 2007-2016\n\nImplementation of x86 interrupts and inline assembly for baremetal\nAdapted/taken from Bran's Kernel Dev tutorial.\n*/\n\n\n\n#include <types.h>\n#include <x86.h>\n\n/****************************************\n*		        ASM Template			*\n* asm (\"operands, %%reg, val\"	    	*\n*			:outputs					*\n*			:inputs)					*\n* outputs example: \"=r\"(val)			*\n* inputs example: \"r\"(10)				*\n*****************************************/\nint set_eflags(int val) {\n	int flags;\n	asm volatile(\"			\\\n				 pushf;		\\\n				 pop %%eax;	\\\n				 mov %%eax, %0;	\" : \"=r\"(flags));\n	flags |= val;\n	asm volatile(\"				\\\n				 mov %0, %%eax;	\\\n				 push %%eax;	\\\n				 popf;\" : :\"r\"(flags));\n	return flags;\n}\n\nint get_eflags(void) {\n	int flags;\n	asm volatile(\"			\\\n				 pushf;		\\\n				 pop %%eax;	\\\n				 mov %%eax, %0;	\" : \"=r\"(flags));\n	return flags;\n}\n\n\nuint8_t inportb(uint16_t port) {\n  // \"=a\" (result) means: put AL register in variable result when finished\n  // \"d\" (_port) means: load EDX with _port\n  unsigned char result;\n   asm volatile(\"inb %1, %0\" : \"=a\" (result) : \"dN\" (port));\n  return result;\n}\n\nvoid outportb(uint16_t port, uint16_t data) {\n	asm volatile (\"outb %1, %0\" : : \"dN\" (port), \"a\" (data));\n}\n\nuint16_t inportw(uint16_t port) {\n	unsigned short result;\n	asm volatile (\"inw %1, %0\" : \"=a\" (result) : \"dN\" (port));\n	return result;\n}\n\nvoid outportw(uint16_t port, uint16_t data) {\n	asm volatile(\"outw %1, %0\" : :\"dN\"(port), \"a\"(data));\n}\n\nvoid outportl(uint16_t port, uint32_t data) {\n	asm volatile(\"outl %1, %0\" : :\"dN\"(port), \"a\"(data));\n}\n\nuint64_t inportl(uint16_t port) {\n	uint32_t ret;\n	asm volatile(\"inl %1, %0\" : \"=a\"(ret) : \"dN\"(port));\n}\n\n\nstruct idt_entry idt[256];\nstruct idt_ptr idt_pointer;\n\nstruct gdt_entry gdt[8];\nstruct gdt_ptr gdt_pointer;\n\n\n/* This array is actually an array of function pointers. We use\n*  this to handle custom IRQ handlers for a given IRQ */\nvoid *irq_routines[16] =\n{\n    0, 0, 0, 0, 0, 0, 0, 0,\n    0, 0, 0, 0, 0, 0, 0, 0\n};\n\n/* This installs a custom IRQ handler for the given IRQ */\nvoid irq_install_handler(int irq, void (*handler)(struct regs *r))\n{\n    irq_routines[irq] = handler;\n}\n\n/* This clears the handler for a given IRQ */\nvoid irq_uninstall_handler(int irq)\n{\n    irq_routines[irq] = 0;\n}\n\nvoid irq_remap(void)\n{\n    outportb(0x20, 0x11);\n    outportb(0xA0, 0x11);\n    outportb(0x21, 0x20);\n    outportb(0xA1, 0x28);\n    outportb(0x21, 0x04);\n    outportb(0xA1, 0x02);\n    outportb(0x21, 0x01);\n    outportb(0xA1, 0x01);\n    outportb(0x21, 0x0);\n    outportb(0xA1, 0x0);\n}\n\nvoid irq_handler(struct regs *r)\n{\n\n	if (r->int_no < 32) {\n		kprintd(\"Exception: \", r->int_no);\n		return;\n	}\n\n    /* This is a blank function pointer */\n    void (*handler)(struct regs *r);\n\n    /* Find out if we have a custom handler to run for this\n    *  IRQ, and then finally, run it */\n    handler = irq_routines[r->int_no - 32];\n\n    if (handler)\n    {\n		//printf(\"IRQ Calling handler: 0x%x\\n\", handler);\n        handler(r);\n    }\n\n    /* If the IDT entry that was invoked was greater than 40\n    *  (meaning IRQ8 - 15), then we need to send an EOI to\n    *  the slave controller */\n    if (r->int_no >= 40)\n    {\n        outportb(0xA0, 0x20);\n    }\n\n    /* In either case, we need to send an EOI to the master\n    *  interrupt controller too */\n    outportb(0x20, 0x20);\n}\n\nvoid idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {\n	/* The interrupt routine's base address */\n	idt[num].base_lo = (base & 0xFFFF);\n	idt[num].base_hi = (base >> 16) & 0xFFFF;\n\n	/* The segment or 'selector' that this IDT entry will use\n	*  is set here, along with any access flags */\n	idt[num].sel = sel;\n	idt[num].always0 = 0;\n	idt[num].flags = flags;\n}\n\nvoid idt_init() {\n	/* Sets the special IDT pointer up, just like in 'gdt.c' */\n	idt_pointer.limit = (sizeof (struct idt_entry) * 256) - 1;\n	idt_pointer.base = &idt;\n\n	/* Clear out the entire IDT, initializing it to zeros */\n//	memset(&idt, 0, sizeof(struct idt_entry) * 256);\n\n/*\n	for (int i = 0; i < sizeof(struct idt_entry) * 256; i++) {\n		int* pointer = &idt;\n		pointer[i] = 0;\n	}\n*/\n	/* Add any new ISRs to the IDT here using idt_set_gate */\n    idt_set_gate(0, (unsigned)isr0, 0x08, 0x8E);\n    idt_set_gate(1, (unsigned)isr1, 0x08, 0x8E);\n    idt_set_gate(2, (unsigned)isr2, 0x08, 0x8E);\n    idt_set_gate(3, (unsigned)isr3, 0x08, 0x8E);\n    idt_set_gate(4, (unsigned)isr4, 0x08, 0x8E);\n    idt_set_gate(5, (unsigned)isr5, 0x08, 0x8E);\n    idt_set_gate(6, (unsigned)isr6, 0x08, 0x8E);\n    idt_set_gate(7, (unsigned)isr7, 0x08, 0x8E);\n\n    idt_set_gate(8, (unsigned)isr8, 0x08, 0x8E);\n    idt_set_gate(9, (unsigned)isr9, 0x08, 0x8E);\n    idt_set_gate(10, (unsigned)isr10, 0x08, 0x8E);\n    idt_set_gate(11, (unsigned)isr11, 0x08, 0x8E);\n    idt_set_gate(12, (unsigned)isr12, 0x08, 0x8E);\n    idt_set_gate(13, (unsigned)isr13, 0x08, 0x8E);\n    idt_set_gate(14, (unsigned)isr14, 0x08, 0x8E);\n    idt_set_gate(15, (unsigned)isr15, 0x08, 0x8E);\n\n    idt_set_gate(16, (unsigned)isr16, 0x08, 0x8E);\n    idt_set_gate(17, (unsigned)isr17, 0x08, 0x8E);\n    idt_set_gate(18, (unsigned)isr18, 0x08, 0x8E);\n    idt_set_gate(19, (unsigned)isr19, 0x08, 0x8E);\n    idt_set_gate(20, (unsigned)isr20, 0x08, 0x8E);\n    idt_set_gate(21, (unsigned)isr21, 0x08, 0x8E);\n    idt_set_gate(22, (unsigned)isr22, 0x08, 0x8E);\n    idt_set_gate(23, (unsigned)isr23, 0x08, 0x8E);\n\n    idt_set_gate(24, (unsigned)isr24, 0x08, 0x8E);\n    idt_set_gate(25, (unsigned)isr25, 0x08, 0x8E);\n    idt_set_gate(26, (unsigned)isr26, 0x08, 0x8E);\n    idt_set_gate(27, (unsigned)isr27, 0x08, 0x8E);\n    idt_set_gate(28, (unsigned)isr28, 0x08, 0x8E);\n    idt_set_gate(29, (unsigned)isr29, 0x08, 0x8E);\n    idt_set_gate(30, (unsigned)isr30, 0x08, 0x8E);\n    idt_set_gate(31, (unsigned)isr31, 0x08, 0x8E);\n\n    // call an IRQ re-map\n\n    irq_remap();\n\n    idt_set_gate(32, (unsigned)irq0, 0x08, 0x8E);\n    idt_set_gate(33, (unsigned)irq1, 0x08, 0x8E);\n    idt_set_gate(34, (unsigned)irq2, 0x08, 0x8E);\n    idt_set_gate(35, (unsigned)irq3, 0x08, 0x8E);\n    idt_set_gate(36, (unsigned)irq4, 0x08, 0x8E);\n    idt_set_gate(37, (unsigned)irq5, 0x08, 0x8E);\n    idt_set_gate(38, (unsigned)irq6, 0x08, 0x8E);\n    idt_set_gate(39, (unsigned)irq7, 0x08, 0x8E);\n\n    idt_set_gate(40, (unsigned)irq8, 0x08, 0x8E);\n    idt_set_gate(41, (unsigned)irq9, 0x08, 0x8E);\n    idt_set_gate(42, (unsigned)irq10, 0x08, 0x8E);\n    idt_set_gate(43, (unsigned)irq11, 0x08, 0x8E);\n    idt_set_gate(44, (unsigned)irq12, 0x08, 0x8E);\n    idt_set_gate(45, (unsigned)irq13, 0x08, 0x8E);\n    idt_set_gate(46, (unsigned)irq14, 0x08, 0x8E);\n    idt_set_gate(47, (unsigned)irq15, 0x08, 0x8E);\n	/* Points the processor's internal register to the new IDT */\n	idt_load();\n}\n\nvoid gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran)\n{\n    /* Setup the descriptor base address */\n    gdt[num].base_low = (base & 0xFFFF);\n    gdt[num].base_middle = (base >> 16) & 0xFF;\n    gdt[num].base_high = (base >> 24) & 0xFF;\n\n    /* Setup the descriptor limits */\n    gdt[num].limit_low = (limit & 0xFFFF);\n    gdt[num].granularity = ((limit >> 16) & 0x0F);\n\n    /* Finally, set up the granularity and access flags */\n    gdt[num].granularity |= (gran & 0xF0);\n    gdt[num].access = access;\n}\n\n// Statically allocate, since we just need one entry\nstruct tss_entry system_tss;\nextern uint32_t* read_stack_pointer();\n\nvoid tss_init() {\n    uint32_t base = (uint32_t) &system_tss;         // address of tss\n    uint32_t limit = base + sizeof(system_tss);     // limit of selector\n\n    gdt_set_gate(5, base, limit, 0xE9, 0xC0);     // setup gdt entry\n    memset(&system_tss, 0, sizeof(system_tss));     // clear the tss\n\n    system_tss.ss0  = 0x10;\n    system_tss.esp0 = 0x0;\n    system_tss.cs   = 0xb;\n    system_tss.ss   = system_tss.ds = system_tss.es = system_tss.fs = system_tss.gs = 0x13;     // RPL = 3\n}\n\nvoid gdt_init()\n{\n    gdt_pointer.limit = (sizeof(struct gdt_entry) * 6) - 1;\n    gdt_pointer.base = &gdt;\n\n    gdt_set_gate(0, 0, 0, 0, 0);					// 0x00\n    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);		// 0x08 Code, PL0\n    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);		// 0x10 Data, PL0\n	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);		// 0x18 Code, PL3\n	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);		// 0x20 Data, PL3\n\n	tss_init();\n    gdt_flush();\n\n    tss_flush();\n}\n\n\n",
-			"file": "x86.c",
-			"file_size": 8628,
-			"file_write_time": 131155135603171001,
-			"settings":
-			{
-				"buffer_size": 8337,
+				"buffer_size": 4403,
 				"line_ending": "Windows"
 			}
 		},
@@ -625,6 +568,14 @@
 			"settings":
 			{
 				"buffer_size": 407,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/stdarg.h",
+			"settings":
+			{
+				"buffer_size": 768,
 				"line_ending": "Windows"
 			}
 		},
@@ -778,14 +729,13 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Mike/Documents/GitHub/baremetal/task.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/sched.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/include/x86.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/mm.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/stdlib.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/string.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/include/stdarg.h",
-		"/C/Users/Mike/Documents/GitHub/os/core/memory/malloc.c",
+		"/D/Documents/GitHub/baremetal/string.c",
+		"/D/Documents/GitHub/baremetal/paging.c",
+		"/D/Documents/GitHub/baremetal/start.s",
+		"/D/Documents/GitHub/baremetal/stdlib.c",
+		"/D/Documents/GitHub/baremetal/x86.c",
+		"/D/Documents/GitHub/baremetal/mm.c",
+		"/D/Documents/GitHub/baremetal/heap.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/vga.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/x86.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/linker.ld",
@@ -801,6 +751,7 @@
 		"/C/Users/Mike/Documents/GitHub/os/include/core/mutex.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/paging.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/regs.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/stdarg.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/tss.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/types.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/video.h",
@@ -817,6 +768,7 @@
 		"/C/Users/Mike/Documents/GitHub/os/libc/printf.c",
 		"/C/Users/Mike/Documents/GitHub/os/main.c",
 		"/C/Users/Mike/Documents/GitHub/os/core/init.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/x86.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/include/types.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/include/vga.h",
 		"/C/Users/Mike/Documents/GitHub/os/drivers/char/keyboard.c",
@@ -849,6 +801,7 @@
 		"/C/Users/Mike/Documents/GitHub/os/asm/inc.asm",
 		"/C/Users/Mike/Documents/GitHub/os/drivers/clock/timer.c",
 		"/C/Users/Mike/Documents/GitHub/os/core/memory/stack.c",
+		"/C/Users/Mike/Documents/GitHub/os/core/memory/malloc.c",
 		"/C/Users/Mike/Documents/GitHub/os/asm/loader.asm",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/stdarg.h",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/fs.h",
@@ -903,20 +856,17 @@
 		"/C/Users/Mike/Downloads/ko03041.keg",
 		"/C/Users/Mike/Downloads/br08904.keg",
 		"/C/Users/Mike/Downloads/br08902.keg",
-		"/C/Users/Mike/Documents/Cravatt/Pin1/4TNS_out/4TNS_PYMOL.sh",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/elf.ld",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/higherhalf.ld"
+		"/C/Users/Mike/Documents/Cravatt/Pin1/4TNS_out/4TNS_PYMOL.sh"
 	],
 	"find":
 	{
-		"height": 36.0
+		"height": 28.0
 	},
 	"find_in_files":
 	{
-		"height": 93.0,
+		"height": 0.0,
 		"where_history":
 		[
-			""
 		]
 	},
 	"find_state":
@@ -924,12 +874,6 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"putc",
-			"puts",
-			"irq_ack",
-			"alloc()",
-			"k_paging_map_block",
-			"k_heap_alloc",
 			"ISR_ERRCODE",
 			"Reverse_",
 			"Reverse",
@@ -973,129 +917,66 @@
 		"regex": false,
 		"replace_history":
 		[
-			"vga_putc",
-			"vga_puts",
-			"k_paging_map",
-			"k_paging_map_block",
 			"ISR_MACRO",
 			"",
 			"Reverse_"
 		],
 		"reverse": false,
 		"show_context": true,
-		"use_buffer2": false,
+		"use_buffer2": true,
 		"whole_word": false,
 		"wrap": true
 	},
 	"groups":
 	[
 		{
-			"selected": 7,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "paging.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2516,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 360.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 14,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "heap.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2039,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1228,
-								1228
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1118.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 15,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "start.s",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2920,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1216,
-								1216
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/R/R.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1640.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "printf.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2455,
+						"buffer_size": 2133,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								454,
-								454
+								1870,
+								1870
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 840.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "task.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4284,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								258,
+								258
 							]
 						],
 						"settings":
@@ -1107,86 +988,95 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "stdlib.c",
+					"buffer": 2,
+					"file": "include/thread.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5100,
+						"buffer_size": 377,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								289,
+								289
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C.sublime-syntax"
+							"auto_name": "// thread.h",
+							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
-						"translation.x": -0.0,
-						"translation.y": 1080.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 3,
+					"file": "include/x86.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3566,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2171,
+								2171
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1740.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "string.c",
+					"buffer": 4,
+					"file": "kernel.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2422,
+						"buffer_size": 4403,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								2148,
+								2148
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C.sublime-syntax",
 							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1140.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "include/stdarg.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 768,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								239,
-								239
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1196,158 +1086,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "stream.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1947,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1947,
-								1947
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"syntax": "Packages/C++/C.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1100.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "include/types.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 772,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								567,
-								567
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 60.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 9,
-					"file": "kernel.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3978,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3964,
-								3964
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1560.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "vga.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3055,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								912,
-								912
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 360.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "x86.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8337,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								7456,
-								7456
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4587.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
+					"buffer": 5,
 					"file": "include/paging.h",
 					"semi_transient": false,
 					"settings":
@@ -1371,11 +1110,39 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 6,
+					"file": "include/stdarg.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 768,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
 					"file": "include/stdlib.h",
 					"semi_transient": false,
 					"settings":
@@ -1399,11 +1166,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 8,
 					"file": "include/string.h",
 					"semi_transient": false,
 					"settings":
@@ -1427,11 +1194,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 15,
+					"buffer": 9,
 					"file": "include/vga.h",
 					"semi_transient": false,
 					"settings":
@@ -1443,8 +1210,8 @@
 						"selection":
 						[
 							[
-								60,
-								60
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1455,7 +1222,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -1489,7 +1256,7 @@
 		"cols":
 		[
 			0.0,
-			0.4703125,
+			0.453125,
 			1.0
 		],
 		"rows":
@@ -1505,13 +1272,13 @@
 	},
 	"output.find_results":
 	{
-		"height": 29.0
+		"height": 0.0
 	},
 	"pinned_build_system": "Packages/Python/Python.sublime-build",
 	"project": "baremetal.sublime-project",
 	"replace":
 	{
-		"height": 66.0
+		"height": 52.0
 	},
 	"save_all_on_build": true,
 	"select_file":

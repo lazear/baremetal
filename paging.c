@@ -25,10 +25,19 @@ uint32_t* K_CURRENT_PAGE_DIRECTORY = 0;
 void k_page_fault(struct regs* r) {
 	asm volatile("cli");
 	uint32_t cr2;
+
 	asm volatile("mov %%cr2, %%eax" : "=a"(cr2));
-	kprintx("Page fault occured at: ", cr2);
-	for(;;);
+
+	printf("Page fault @ 0x%X\n", cr2);
+	if (cr2 & 1) printf("\tPage Not Present\n");
+	if (cr2 & 2) printf("\tPage Not Writeable\n");
+	if (cr2 & 4) printf("\tPage Supervisor Mode\n");
+
+	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
+	asm volatile("hlt");
 }
+
+
 
 uint32_t* k_paging_get_phys(uint32_t* dir, uint32_t virt) {
 	int _pdi = virt >> 22;

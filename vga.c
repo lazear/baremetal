@@ -7,6 +7,7 @@ Implementation of vga driver for baremetal
 
 #include <vga.h>
 #include <types.h>
+#include <ctype.h>
 
 char* VGA_MEMORY = 0x000B8000;
 
@@ -78,7 +79,8 @@ void vga_overwrite_color(int color, int start_x, int start_y, int end_x, int end
 // kernel level putc, designate x and y position
 void vga_kputc(char c, int x, int y) {
 	char *vga_address = VGA_MEMORY + (x + y * 160);
-	*vga_address = c | (CURRENT_ATTRIB << 8);
+	if (isascii(c))
+		*vga_address = c | (CURRENT_ATTRIB << 8);
 }
 
 void vga_kputs(char* s, int x, int y) {
@@ -104,6 +106,15 @@ void vga_putc(char c) {
 	if (c == '\n') {
 		CURRENT_Y += 1;
 		CURRENT_X = 0;
+		return;
+	}
+	if (c == '\b') {
+		CURRENT_X -= 2;
+		vga_kputc(' ', CURRENT_X, CURRENT_Y);
+		return;
+	}
+	if (c == '\t') {
+		CURRENT_X += 8;
 		return;
 	}
 	vga_kputc(c, CURRENT_X, CURRENT_Y);

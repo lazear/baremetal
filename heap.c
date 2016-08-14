@@ -14,12 +14,9 @@ uint32_t PAGE_FRAME_BEGIN = 0;
 struct  KHEAPBLOCK {
 	struct KHEAPBLOCK	*next;
 	uint32_t	size;
-	uint8_t		used;
-} __attribute__((__packed__));
+	uint8_t		used : 1
+} __attribute__((__packed__)) block;
 
-struct  KHEAPBM {
-	struct KHEAPBLOCK 	*block;
-} __attribute__((__packed__));
 
 // QUICK and DIRTY alloc function
 
@@ -29,6 +26,7 @@ const uint32_t K_HEAP_MAX = 0xF0000000;
 uint32_t K_HEAP_TOP = 0;
 
 int K_HEAP_INDEX = 0;
+
 
 void* free(void* ptr) {
 	return ptr;
@@ -46,7 +44,10 @@ by 0x1000 only for right now.
 void* sbrk(size_t n) {
 	if (!n)
 		return NULL;
-
+	if (n + K_HEAP_TOP >= K_HEAP_MAX) {
+		printf("HEAP FULL\n");
+		return NULL;
+	}
 
 	int num_of_blocks = 1;
 	if (n > 0x1000)
@@ -75,7 +76,9 @@ void* wf_malloc(size_t n) {
 
 
 void* malloc(size_t n) {
-	return wf_malloc(n);
+	void* r = wf_malloc(n);
+//	printf("Allocating %d bytes @ 0x%x\n", n, r);
+	return r;
 }
 
 void k_heap_init() {
@@ -85,6 +88,7 @@ void k_heap_init() {
 
 	K_HEAP_TOP = (uint32_t) K_HEAP_BOTTOM;
 	sbrk(0x1000);
+	printf("Block size: %d bytes", sizeof(block));
 }
 
 void heap_test() {
