@@ -59,7 +59,7 @@ char*  ftoa(double num)
    long wt =0;
 
    // String containg result
-   char* str = wf_malloc(20);
+   char* str = malloc(20);
 
    //Initilise stirng to zero
    memset(str, 0 ,20);

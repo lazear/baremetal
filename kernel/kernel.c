@@ -29,10 +29,12 @@ void timer(regs_t *r) {
 	ticks++;
 
 	if (!(ticks%1)) {
-		if (!buffer_set)
+		if (!buffer_set) {
 			timer_buf = malloc(8);
+			memset(timer_buf, 0, 8);
+		}
 		buffer_set=1;
-		memset(timer_buf, 0, 8);
+
 		itoa(ticks, timer_buf, 10);
 
 		vga_kputs(timer_buf, 150, 0);
@@ -98,13 +100,14 @@ int keypress = 0;
 STREAM* stdin = 0;
 extern STREAM* kb;
 
+
+// keyboard loop thread
 int kb_tell = 0;
 void event() {
 	while(1) {
 		if (ftell(kb)) {
 			lock();
-	//
-			sti();
+//			sti();
 
 			char c = fgetc(kb);
 			if (c == '\n')
@@ -148,13 +151,15 @@ void kernel_initialize(uint32_t kernel_end) {
 	vga_clear();
 	vga_pretty(logo, VGA_CYAN);
 
-	STREAM* s = k_new_stream(0x1000);
-	stdin = k_new_stream(0x200);
+	STREAM* s = k_new_stream(62);
+	//stdin = k_new_stream(0x200);
 
 	char d[] = "Michael Lazear (C) 2016";
 	int res = k_stream_write(s, d, 10);
-	k_thread_init(2);
+	
+	k_thread_init(3);
 	spawn("/dev/stdin", event);
+	k_heap_test();
 
 	for(;;);
 }

@@ -26,7 +26,7 @@ compile:
 	$(CC) $(CCFLAGS) */*/*.c
 	#$(CC) $(CCFLAGS) */*/*/*.c
 	#Assembly
-	$(AS) $(ASFLAGS) start.s -o start.so
+	$(AS) $(ASFLAGS) kernel/arch/start.s -o start.so
 	
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain

@@ -21,6 +21,8 @@ uint8_t keyboard_shift[] =
   0, 0,
 };
 
+
+//char buffer[400];
 char *buffer;	// we want to dynamically alloc this
 uint32_t idx = 0;	// keep track of where we are
 int key_wait = 0;
@@ -30,7 +32,6 @@ STREAM *kb;
 
 void keyboard_handler(regs_t *r)
 {
-//	cli();
 	uint8_t scancode;
 	uint8_t key;
 	if (idx >= 0x400)
@@ -65,7 +66,7 @@ void keyboard_handler(regs_t *r)
 		else
 			key = keyboard[scancode];
 
-			//vga_putc(key);
+		//	vga_putc(key);
 			fputc(kb, key);
 			if (key == '\n')	// line return
 			{
@@ -98,7 +99,7 @@ int key_state(void)
 /* Installs the keyboard handler into IRQ1 */
 void keyboard_install()
 {
-	kb = k_new_stream(0x400);
+	kb = k_new_stream(0x1000);
 	buffer = (char*)malloc(0x400);		// allocate and zero the buffer
     irq_install_handler(1, keyboard_handler);
 }

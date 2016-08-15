@@ -19,9 +19,9 @@ uint32_t* MM_CURRENT_PD = 0;
 uint32_t* MM_CURRENT_PT = 0;
 
 // k_MM_HEAP will be set to the end of the kernel ~1mb
-uint32_t* K_MM_HEAP = 0;
+uint32_t* MM_HEAP = 0;
 // K_MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.
-uint32_t* K_MM_HEAP_MAX = 0x00200000;
+uint32_t* MM_HEAP_MAX = 0x00200000;
 
 /*
 This function should ONLY be used to set up the initial memory manager tables.
@@ -29,13 +29,16 @@ Going to alloc some blocks right at the end of the kernel
 
 Memory allocated by this function will NEVER be freed.
 */
-uint32_t* k_heap_alloc(size_t n) {
-	if (K_MM_HEAP == 0)
+uint32_t* mm_alloc(size_t n) {
+	if (MM_HEAP == 0)
 		return NULL;
 
-	if (K_MM_HEAP + n < K_MM_HEAP_MAX) {
-		uint32_t* addr = K_MM_HEAP;
-		K_MM_HEAP += n;
+	if (MM_HEAP + n < MM_HEAP_MAX) {
+		uint32_t* addr = MM_HEAP;
+		if (n >= 0x1000)
+			MM_HEAP += (n & ~0xFFF);		// Make sure we stay 0x1000 aligned.
+		else
+			MM_HEAP += 0x1000;			// Even if n is small, increment by 0x1000
 		return addr;
 	} else
 		return NULL;
@@ -78,15 +81,8 @@ Set every entry to 0 (free)
 */
 uint32_t* mm_bitmap_init() {
 	size_t bitmap_size = sizeof(uint32_t) * 32;
-	uint32_t* b = k_heap_alloc(bitmap_size);
+	uint32_t* b = mm_alloc(bitmap_size);
 	memset(b, 0, bitmap_size);
-	return b;
-}
-// This is for testing purposes, could be left in for practical reasons I suppose
-uint32_t* mm_bitmap_full() {
-	size_t bitmap_size = sizeof(uint32_t) * 32;
-	uint32_t* b = k_heap_alloc(bitmap_size);
-	memset(b, ~0x0, bitmap_size);
 	return b;
 }
 
@@ -206,7 +202,7 @@ Initialize the page heap; and then allocate the first two new bitmaps.
 void* k_mm_init(uint32_t heap) {
 
 	heap = (heap + 0x1000) & ~0xFFF;
-	K_MM_HEAP = heap;
+	MM_HEAP = heap;
 //	kprintx("Heap@: ", heap);
 	MM_CURRENT_PD = mm_bitmap_init();
 	MM_CURRENT_PT = mm_bitmap_init();
@@ -215,6 +211,8 @@ void* k_mm_init(uint32_t heap) {
 	/*First 2 mb are reserved as used.
 	~1Mb to 2Mb are for the K_MM_HEAP, but that shouldn't use more than a couple kb
 	This allows us the benefit of calling k_page_alloc for actual paging.
+
+	TODO: Change this to actual end-of-kernel space, so everything can be in agreement.
 	*/
 	for (int i = 0; i < 512; i++)
 		mm_bitmap_set_bit(MM_CURRENT_PT, i);	
