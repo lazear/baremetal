@@ -63,23 +63,23 @@ uint32_t get_ticks(){
 void print_regs(regs_t* r) {
 	vga_clear();
 	vga_pretty("Register dump\n", VGA_MAGENTA);
-	printf("gs: 0x%x", r->gs);
-	printf("fs: 0x%x", r->fs);
-	printf("es: 0x%x", r->es);
-	printf("ds: 0x%x", r->ds);
-	printf("edi: 0x%x", r->edi);
-	printf("esi: 0x%x", r->esi);
-	printf("ebp: 0x%x", r->ebp);
-	printf("esp: 0x%x", r->esp);
-	printf("ebx: 0x%x", r->ebx);
-	printf("edx: 0x%x", r->edx);
-	printf("ecx: 0x%x", r->ecx);
-	printf("eax: 0x%x", r->eax);
-	printf("eip: 0x%x", r->eip);
-	printf("cs: 0x%x", r->cs);
-	printf("flags: 0x%x", r->flags);
-	printf("esp3: 0x%x", r->esp3);
-	printf("ss3: 0x%x", r->ss3);
+	printf("gs: 0x%x\n\n", r->gs);
+	printf("fs: 0x%x\n", r->fs);
+	printf("es: 0x%x\n", r->es);
+	printf("ds: 0x%x\n", r->ds);
+	printf("edi: 0x%x\n", r->edi);
+	printf("esi: 0x%x\n", r->esi);
+	printf("ebp: 0x%x\n", r->ebp);
+	printf("esp: 0x%x\n", r->esp);
+	printf("ebx: 0x%x\n", r->ebx);
+	printf("edx: 0x%x\n", r->edx);
+	printf("ecx: 0x%x\n", r->ecx);
+	printf("eax: 0x%x\n", r->eax);
+	printf("eip: 0x%x\n", r->eip);
+	printf("cs: 0x%x\n", r->cs);
+	printf("flags: 0x%x\n", r->flags);
+	printf("esp3: 0x%x\n", r->esp3);
+	printf("ss3: 0x%x\n", r->ss3);
 
 }
 
@@ -114,7 +114,6 @@ void event() {
 				yield();
 			fflush(kb);
 			vga_putc(c);
-
 //			fflush(kb);
 //			yield();
 		}
@@ -157,8 +156,15 @@ void kernel_initialize(uint32_t kernel_end) {
 	char d[] = "Michael Lazear (C) 2016";
 	int res = k_stream_write(s, d, 10);
 	
+
+
 	k_thread_init(3);
 	spawn("/dev/stdin", event);
+
+	//k_heap_test();
+
+	//mm_test();
+	mm_debug();
 	k_heap_test();
 
 	for(;;);

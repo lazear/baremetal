@@ -11,12 +11,31 @@ Bits 0:31 represent the size of the block.
 b++; increments to the next block in the chain. 
 Some simple math allows us to translate blockchain position to pointer address and vice-versa
 
+The idea here is to alloc a static region of physical memory to store dynamic heap memory
+The current memory layout is as follows:
+0x00000000 - Bios data, we don't go here
+0x00100000 - Start of kernel data and MM permanent heap (1MB)
+0x00200000 - End of MM permanent heap (2MB)
+Everything up to 4MB has been linearly mapped by paging for now,
+so no need to map anything if we call mm_alloc() for block data - k_page_alloc maybe?
+
+If we store the initial location of the mm_alloc call in a global variable and don't touch it,
+we can know where the bottom of the block data starts, since we're not using linked lists
+
+We can also store the top of the block data/how many blocks have been allocated total, 
+this provides a maximum limit
+
+We will not be storing the actual address of the memory allocated, we're gonna do some fancy 
+tricks for that.
+
+Since there is no buffer or randomness involved, this is a TRUST dependent malloc.
+Do NOT use it for sensitive applications due to the high probability of overflow.
+
 */
 
 #include <types.h>
 
 const uint32_t MAX_BLOCKS				= 1024;
-const uint32_t ARBITRARY_SEARCH_CUTOFF = 1024;		// Byte size to switch from find_best_block to find_first_block
 
 uint32_t BLOCKCHAIN_START	= 0;
 uint32_t BLOCKS_ALLOCATED 	= 0;
@@ -115,7 +134,7 @@ loop:
 		int size = (block_value & ~(1<<31));
 		total_size += size;
 		if (size >= n && size <= smallest_sz && !used) {
-			printf("found free block (%d) with size %d matching request for %d\n", i, size, n);
+		//	printf("found free block (%d) with size %d matching request for %d\n", i, size, n);
 			smallest = block++;
 			smallest_sz = size;
 			goto loop;
@@ -224,7 +243,7 @@ void* malloc(size_t n) {
 		/* We found a free block */
 		*block |= (1<<31);
 		ptr = translate(block);
-		printf("Reuse, reduce, recycle %d bytes: @ 0x%x\n", n, ptr);
+		//printf("Reuse, reduce, recycle %d bytes: @ 0x%x\n", n, ptr);
 	} else {
 		/* We couldn't find a free block, allocate a new one */
 		
@@ -255,10 +274,14 @@ void* realloc(void* ptr, size_t n) {
 
 	uint32_t* new = malloc(n);
 	uint32_t* b = find_block(ptr);
+	if (!b) {
+		printf("Not in malloc? %x\n", ptr);
+		return NULL;
+	}
+
 	uint32_t bv = *b;
 	*b = (bv & ~(1<<31));
 	uint32_t sz = ( bv & ~(1<<31));
-
 	if (n <= sz)
 		memcpy(new, ptr, n);
 	else
@@ -269,25 +292,7 @@ void* realloc(void* ptr, size_t n) {
 	//(block_value 
 }
 
-/*
-The idea here is to alloc a static region of physical memory to store dynamic heap memory
-The current memory layout is as follows:
-0x00000000 - Bios data, we don't go here
-0x00100000 - Start of kernel data and MM permanent heap (1MB)
-0x00200000 - End of MM permanent heap (2MB)
-Everything up to 4MB has been linearly mapped by paging for now,
-so no need to map anything if we call mm_alloc() for block data
 
-If we store the initial location of the mm_alloc call in a global variable and don't touch it,
-we can know where the bottom of the block data starts, since we're not using linked lists
-
-We can also store the top of the block data/how many blocks have been allocated total, 
-this provides a maximum limit
-
-We will not be storing the actual address of the memory allocated, we're gonna do some fancy 
-tricks for that.
-
-*/
 void k_heap_init() {
 
 	blockchain = mm_alloc(MAX_BLOCKS * sizeof(uint32_t));	// this should give us 1024 blocks in the 1MB-2MB range
@@ -303,7 +308,20 @@ void k_heap_init() {
 
 void k_heap_test() {
 
-
+	/*
+	Malloc() exact string length and then reallocing immediately
+	causes some buffer overflow issues.
+	Perhaps should add in an extra 4 bytes of buffer between malloc()s
+	automatically? Should help prevent some accidentall overflows.
+	*/
+	char d[] = "Welcome to baremetal - Michael Lazear";
+	char* name = malloc(strlen(d)-1);
+	char* r = malloc(4);
+	printf("%s, %d chars\n", d, strlen(d));
+	strcpy(name, d);
+	char* two = realloc(name, 50);
+	printf("%s] -> [%s\n", name, two);
+	printf("%s\n", r);
 //	printf("New: %s\n", new);
 	traverse_blockchain();
 

@@ -132,8 +132,6 @@ void k_schedule(regs_t* r) {
 	if(t->state == 0)
 		k_schedule(r);
 
-	vga_kputs(t->name, 150-strlen(t->name), 1);
-
 	K_CURRENT_PID = t->pid;
 	// load new stack values
 	r->esp = t->esp;

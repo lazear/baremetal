@@ -152,12 +152,16 @@ uint32_t* mm_page_alloc(uint32_t* PD, uint32_t* PT) {
 		Then we switch to the next one.
 		*/
 		PT = mm_bitmap_init();
-		MM_CURRENT_PT = PT;
+		
 
-		vga_pretty("Swapping page table bitmap\n", 0x05);
+		vga_pretty("\nSwapping page table bitmap\n", 0x05);
+
+		MM_CURRENT_PT = PT;
 		mm_bitmap_set_bit(PD, ff_PD);
 		// Now recursively try again
+
 		mm_page_alloc(PD, PT);
+
 
 	} else {
 		// This means both the PT and the PD are full
@@ -181,6 +185,13 @@ uint32_t* k_page_free(uint32_t* addr) {
 	return mm_page_free(MM_CURRENT_PD, MM_CURRENT_PT, addr);
 }
 
+void mm_debug() {
+	printf("Physical Memory Management Debug:\n");
+	int ptidx = mm_first_free(MM_CURRENT_PT)/32;
+	int pdidx = mm_first_free(MM_CURRENT_PD)/32;
+	printf("PT (%d): %b\n", ptidx, MM_CURRENT_PT[ptidx]);
+	printf("PD (%d): %b\n", pdidx, MM_CURRENT_PD[pdidx]);
+}
 
 
 /*
@@ -229,14 +240,14 @@ void* k_mm_init(uint32_t heap) {
 Function to play around with and test the physical mem manager.
 */
 void mm_test() {
-
 	// each bit in the pdb represents 4mb of address space
 	uint32_t ff_pdb = mm_first_free(MM_CURRENT_PD);
 	uint32_t ff_ptb = mm_first_free(MM_CURRENT_PT);
 
-	printf("ff_pdb 0x%x\n", ff_pdb);
+	printf("PD @ %x | PT @ %x\n", MM_CURRENT_PD, MM_CURRENT_PT);
+	printf("ff_pdb %d\n", ff_pdb);
+	printf("ff_ptb %d\n", ff_ptb);
 
-	printf("ff_ptb 0x%x\n", ff_ptb);
 	uint32_t first_address = (ff_pdb* 0x1000 * 0x400) + (ff_ptb * 0x1000);
 
 	for (int i = 0; i < 5; i++ ) {
@@ -244,14 +255,14 @@ void mm_test() {
 		if (result == ERR_NO_MEM)
 			vga_pretty("[FAIL] no memory left", 0x4);
 		else {
-			printf("Testing allocation: 0x%x", result);
+			printf("Testing allocation: 0x%x : PT$ %b\n", result, MM_CURRENT_PT[mm_first_free(MM_CURRENT_PT)/32]);
 		}
 	}
 
 
-	printf("Trying to free first address with offset: 0x%x\n", first_address);
+	
 	k_page_free(first_address + 0x30);
-
+	printf("Testing free offset: 0x%x :PT$ %b\n", first_address, MM_CURRENT_PT[mm_first_free(MM_CURRENT_PT)/32]);
 	uint32_t* next = k_page_alloc();
 
 	if (next == first_address)

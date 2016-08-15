@@ -45,7 +45,8 @@ int printf( const char *fmt, ... ) {
 	va_list args;
 	va_start(args, fmt);
 	int count;
-	char buf[20];
+	char *buf = malloc(32 * sizeof(char));
+	memset(buf, 0, 32);
 	int len = 8;
 	
 	while ( *fmt != 0 )
@@ -104,6 +105,7 @@ int printf( const char *fmt, ... ) {
 	}
 	vga_scroll();
 	va_end(args);
+	free(buf);
 	return count;
 }
 
