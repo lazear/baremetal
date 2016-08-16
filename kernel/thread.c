@@ -4,7 +4,7 @@ task.c
 
 #include <types.h>
 #include <x86.h>
-#include <thread.h>
+#include <threads.h>
 
 uint32_t K_SCHED_TIME = 0;
 uint32_t K_SCHED_ACTIVE = 0;
@@ -14,6 +14,11 @@ int K_CURRENT_PID = -1;
 
 thread* current_thread = 0;
 
+
+uint32_t* getstack() {
+	return current_thread->esp;
+}
+
 thread* k_create_thread(char* name, void (*fn)() ) {
 	cli();
 	uint32_t* stack = malloc(0x1000) + 0x1000; // point to top of stack
@@ -21,10 +26,11 @@ thread* k_create_thread(char* name, void (*fn)() ) {
 	thread* t = (thread*) malloc(sizeof(thread));
 	memset(t, 0, sizeof(thread));
 
+	t->regs = (regs_t*) malloc(sizeof(regs_t));
 	t->name = name;
 	t->pid = K_THREAD_COUNT++;
 	t->eip = (uint32_t) fn;
-	t->esp = (uint32_t) stack - 0x1000;		// point to lowest address
+	t->esp = (uint32_t) stack;// - 0x100;		// point to lowest address
 	t->ebp = (uint32_t) stack;				// point to highest address of stack
 	t->state = 0;							// Task is created but not running
 	t->next = NULL;
@@ -49,7 +55,22 @@ thread* k_create_thread(char* name, void (*fn)() ) {
 	*--stack = 0x10;	// ES
 	*--stack = 0x10;	// FS
 	*--stack = 0x10;	// GS
+	//t->esp = stack;
+	printf("Thread (%s | %d) spawned.\nESP %x\nEBP %x\nEIP %x\n", t->name, t->pid, t->esp, t->ebp, t->eip);
+	t->regs->esp = stack;
+	t->regs->eip = t->eip;
+	t->regs->ebp = t->ebp;
+	//t->regs->eax = t->esp;
+	t->regs->cs = 0x08;
+	t->regs->gs = 0x10;
+	t->regs->fs = 0x10;
+	t->regs->es = 0x10;
+	t->regs->ds = 0x10;
+	t->regs->flags = 0x202;
 
+	printf("Stack %x\n", stack);
+	while(stack < t->ebp)
+		printf("%x\n", *stack++);
 	//printf("Thread %s created, with PID= %d\n", t->name, t->pid);
 	sti();
 	return t;
@@ -109,6 +130,11 @@ thread* k_find_thread(int pid) {
 	return tmp;
 }
 
+void thread_add_ticks() {
+	current_thread->time++;
+}
+
+int active = 0;
 
 void k_schedule(regs_t* r) {
 
@@ -123,22 +149,35 @@ void k_schedule(regs_t* r) {
 	if (!K_SCHED_ACTIVE)
 		return r;
 
-	current_thread->esp = r->esp;
-	current_thread->eip = r->eip;
-	current_thread->ebp = r->ebp;
-	current_thread->time++;
+	if(active) {	
+		current_thread->esp = r->esp;
+		current_thread->eip = r->eip;
+		current_thread->ebp = r->ebp;
+	} 
+	active = 1;
+	//memcpy(current_thread->regs, r, sizeof(regs_t));
+	//current_thread->time++;
 	// Switch to a new thread
+
+	//current_thread->time += 1;
 	thread* t = k_sched_next();
+
+
 	if(t->state == 0)
 		k_schedule(r);
 
 	K_CURRENT_PID = t->pid;
+	//memcpy(r, t->regs, sizeof(regs_t));
 	// load new stack values
+	//r->eax = 0xCAFEB00B;
+	//r->ebx = 0xDEADBEEF;
+	//r->edx = 0xD00D000D;
 	r->esp = t->esp;
 	r->eip = t->eip;
 	r->ebp = t->ebp;
-
-	return r;
+	
+	//outportb(0x20, 0x20);
+//	return r;
 
 }
 
@@ -187,16 +226,19 @@ void die() {
 	t->prev->next = t->next;
 
 	t->state = 0;
-//	K_THREAD_COUNT--;
-
+	//K_THREAD_COUNT--;
 
 	free(t->ebp);	
 	free(t);
 
 	k_sched_state(1);
 	sti();
-
+	preempt();
 	for(;;);
+}
+
+int getpid() {
+	return current_thread->pid;
 }
 
 void yield() {
@@ -223,6 +265,10 @@ thread* k_fork(int pid) {
 
 }
 
+
+typedef int (*threadfn) (void* arg);
+
+
 void fork() {
 	k_fork(current_thread->pid);
 }
@@ -243,7 +289,16 @@ void k_sched_state(int state) {
 	K_SCHED_ACTIVE = state;
 }
 
+void container(threadfn f, void* arg) {
+	int i = (*f)(arg);
+	die();
+}
 
+void preempt() {
+	//printf("PID %d has volunteered!\n", getpid());
+    asm volatile("int $0x2f");
+
+}
 
 void k_thread_init(int timing) {
 
@@ -251,9 +306,10 @@ void k_thread_init(int timing) {
 
 	idt_set_gate(6, k_gpf_handler , 0x08, 0x8E);	// invalid opcode
 	idt_set_gate(13, k_gpf_handler , 0x08, 0x8E);	// gpf
-
-
+	irq_install_handler(15, k_schedule);
+	
 	spawn("Idle", null_thread);
+
 	//spawn("Main", event_loop);
 	//spawn("Zom2", z2);
 	//spawn("Zom1", z);

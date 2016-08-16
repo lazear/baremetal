@@ -116,6 +116,36 @@ IRQ_MACRO 13, 45
 IRQ_MACRO 14, 46
 IRQ_MACRO 15, 47
 
+# extern preempt_handler
+# preempt_handler:
+# 	cli
+# 	push 0
+# 	push 0
+# 	pusha
+# 	push ds
+# 	push es
+# 	push fs
+# 	push gs
+
+# 	mov ax, 0x10
+# 	mov ds, ax
+# 	mov es, ax
+# 	mov fs, ax
+# 	mov gs, ax
+# 	mov eax, esp
+
+# 	push eax
+# 	call k_schedule
+# 	pop eax
+
+# 	pop gs
+# 	pop fs
+# 	pop es
+# 	pop ds
+# 	popa
+# 	add esp, 8
+# 	iret
+
 
 extern irq_handler
 irqstub:
@@ -135,7 +165,9 @@ irqstub:
 	push eax
 	mov eax, irq_handler
 	call eax
+
 	pop eax
+;	mov esp, eax
 
 	pop gs
 	pop fs

@@ -16,6 +16,7 @@ typedef struct THREAD {
 	uint32_t time;
 	struct THREAD* prev;
 	struct THREAD* next;
+	regs_t *regs;
 
 } thread;
 

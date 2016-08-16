@@ -46,6 +46,7 @@ int printf( const char *fmt, ... ) {
 	va_start(args, fmt);
 	int count;
 	char *buf = malloc(32 * sizeof(char));
+	//char buf[32];
 	memset(buf, 0, 32);
 	int len = 8;
 	

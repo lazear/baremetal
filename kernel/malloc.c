@@ -218,7 +218,6 @@ free() finds the block referenced by the pointer and sets bit 31 to 0.
 */
 void* free(void* ptr) {
 	uint32_t* block = find_block(ptr);
-	//printf("Trying to free address %x, block data %x\n", ptr, *block);
 	*block &= ~(1<<31);
 	return ptr;
 }

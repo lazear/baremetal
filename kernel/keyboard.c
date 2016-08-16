@@ -1,6 +1,7 @@
 #include <x86.h>
 #include <types.h>
 #include <stdio.h>
+#include <mutex.h>
 
 uint8_t keyboard[] =
 {
@@ -29,6 +30,8 @@ int key_wait = 0;
 int shift = 0;
 
 STREAM *kb;
+
+extern mutex test;
 
 void keyboard_handler(regs_t *r)
 {
@@ -70,7 +73,8 @@ void keyboard_handler(regs_t *r)
 			fputc(kb, key);
 			if (key == '\n')	// line return
 			{
-
+				k_list_threads();
+				printf("%d ESP: %x\n", getpid(), r->esp);
 				idx = 0;
 				
 			} 

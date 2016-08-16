@@ -289,3 +289,36 @@ void gdt_init()
 }
 
 
+// Disable interrupts
+void cli() {
+    asm volatile("cli");
+}
+
+// Enable interrupts
+void sti() {
+    asm volatile("sti");
+}
+
+
+void print_regs(regs_t* r) {
+    //vga_clear();
+    printf("Register dump\n");
+    printf("gs: 0x%x\n", r->gs);
+    printf("fs: 0x%x\n", r->fs);
+    printf("es: 0x%x\n", r->es);
+    printf("ds: 0x%x\n", r->ds);
+    printf("edi: 0x%x\n", r->edi);
+    printf("esi: 0x%x\n", r->esi);
+    printf("ebp: 0x%x\n", r->ebp);
+    printf("esp: 0x%x\n", r->esp);
+    printf("ebx: 0x%x\n", r->ebx);
+    printf("edx: 0x%x\n", r->edx);
+    printf("ecx: 0x%x\n", r->ecx);
+    printf("eax: 0x%x\n", r->eax);
+    printf("eip: 0x%x\n", r->eip);
+    printf("cs: 0x%x\n", r->cs);
+    printf("flags: 0x%x\n", r->flags);
+    printf("esp3: 0x%x\n", r->esp3);
+    printf("ss3: 0x%x\n", r->ss3);
+
+}

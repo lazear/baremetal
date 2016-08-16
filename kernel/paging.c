@@ -32,6 +32,7 @@ void k_page_fault(struct regs* r) {
 	if (cr2 & 1) printf("\tPage Not Present\n");
 	if (cr2 & 2) printf("\tPage Not Writeable\n");
 	if (cr2 & 4) printf("\tPage Supervisor Mode\n");
+	print_regs(r);
 
 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
 	asm volatile("hlt");
