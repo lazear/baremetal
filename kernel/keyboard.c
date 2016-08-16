@@ -69,12 +69,13 @@ void keyboard_handler(regs_t *r)
 		else
 			key = keyboard[scancode];
 
-		//	vga_putc(key);
+			vga_putc(key);
 			fputc(kb, key);
 			if (key == '\n')	// line return
 			{
-				k_list_threads();
-				printf("%d ESP: %x\n", getpid(), r->esp);
+				sched();
+			//	printf("%d ESP: %x\n", getpid(), r->esp);
+			
 				idx = 0;
 				
 			} 

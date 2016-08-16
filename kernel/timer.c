@@ -23,10 +23,8 @@ void timer(regs_t *r) {
 	if (!(ticks%1)) {
 		itoa(ticks, timer_buf, 10);
 		vga_kputs(timer_buf, 150, 0);
-	}
 
-	if (ticks % K_SCHED_TIME == 0)
-		return k_schedule(r);
+	}
 	return r;
 }
 
@@ -45,7 +43,7 @@ void wait(int n) {
 	spin_lock(&timer_lock);
 	int wait_for = ticks + n;
 	while (wait_for > ticks) {
-		preempt();	
+		sched();	
 	}
 	spin_unlock(&timer_lock);
 	return;

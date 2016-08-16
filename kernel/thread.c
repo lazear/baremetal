@@ -26,7 +26,6 @@ thread* k_create_thread(char* name, void (*fn)() ) {
 	thread* t = (thread*) malloc(sizeof(thread));
 	memset(t, 0, sizeof(thread));
 
-	t->regs = (regs_t*) malloc(sizeof(regs_t));
 	t->name = name;
 	t->pid = K_THREAD_COUNT++;
 	t->eip = (uint32_t) fn;
@@ -40,16 +39,16 @@ thread* k_create_thread(char* name, void (*fn)() ) {
 	*--stack = 0x08;	// CS
 	*--stack = (uint32_t) fn;	// EIP
 	// pusha
-
 	*--stack = 0;		// EAX
 	*--stack = 0;		// ECX
 	*--stack = 0;		// EDX
 	*--stack = 0;		// EBX
-	*--stack = t->esp;		// ESP
+	//*--stack = t->esp;		// ESP
+		*--stack = 0;		// ESI
+	*--stack = 0;		// EDI
 	*--stack = t->ebp;		// EBP
 
-	*--stack = 0;		// ESI
-	*--stack = 0;		// EDI
+
 	// data segments
 	*--stack = 0x10;	// DS
 	*--stack = 0x10;	// ES
@@ -60,13 +59,6 @@ thread* k_create_thread(char* name, void (*fn)() ) {
 	t->regs->esp = stack;
 	t->regs->eip = t->eip;
 	t->regs->ebp = t->ebp;
-	//t->regs->eax = t->esp;
-	t->regs->cs = 0x08;
-	t->regs->gs = 0x10;
-	t->regs->fs = 0x10;
-	t->regs->es = 0x10;
-	t->regs->ds = 0x10;
-	t->regs->flags = 0x202;
 
 	printf("Stack %x\n", stack);
 	while(stack < t->ebp)
@@ -175,10 +167,28 @@ void k_schedule(regs_t* r) {
 	r->esp = t->esp;
 	r->eip = t->eip;
 	r->ebp = t->ebp;
-	
+	return r;
 	//outportb(0x20, 0x20);
 //	return r;
 
+}
+
+void schedule(uint32_t* esp) {
+	printf("SCHED");
+	if (K_CURRENT_PID < 0){
+		printf("ERR - NO SCHED, CURRENT PID %x\n", K_CURRENT_PID);
+		return;
+	}
+	
+	if (!K_SCHED_ACTIVE)
+		return;
+	thread* c = current_thread;
+	c->esp = esp;
+	printf("ESP %x\n", esp);
+	c = k_sched_next();
+	printf("%s | %x\n", c->name, c->esp);
+	*esp = c->esp;
+	return c->esp;
 }
 
 int i = 0;
@@ -296,7 +306,7 @@ void container(threadfn f, void* arg) {
 
 void preempt() {
 	//printf("PID %d has volunteered!\n", getpid());
-    asm volatile("int $0x2f");
+    asm volatile("int $0x90");
 
 }
 
@@ -319,5 +329,6 @@ void k_thread_init(int timing) {
 	K_SCHED_ACTIVE = 1;
 	K_SCHED_TIME = timing;
 	sti();
+//	asm volatile("iret");
 
 }

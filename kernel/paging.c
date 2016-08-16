@@ -21,7 +21,7 @@ Page directory -> Page table -> Page
 
 uint32_t* K_CURRENT_PAGE_DIRECTORY = 0;
 
-
+/* We are going to try and fix PF's by increasing heap if that's the issue */
 void k_page_fault(struct regs* r) {
 	asm volatile("cli");
 	uint32_t cr2;
@@ -32,7 +32,18 @@ void k_page_fault(struct regs* r) {
 	if (cr2 & 1) printf("\tPage Not Present\n");
 	if (cr2 & 2) printf("\tPage Not Writeable\n");
 	if (cr2 & 4) printf("\tPage Supervisor Mode\n");
-	print_regs(r);
+
+	if (cr2 == heap_brk()) {
+		printf("Heap is out of memory\n");
+		sbrk(0x1000);
+		asm volatile("sti");
+		return;
+	}
+
+	printf("Calling func: %x\n", r->eip);
+	//print_regs(r);
+	traverse_blockchain();
+	mm_debug();
 
 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
 	asm volatile("hlt");

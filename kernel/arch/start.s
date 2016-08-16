@@ -116,37 +116,6 @@ IRQ_MACRO 13, 45
 IRQ_MACRO 14, 46
 IRQ_MACRO 15, 47
 
-# extern preempt_handler
-# preempt_handler:
-# 	cli
-# 	push 0
-# 	push 0
-# 	pusha
-# 	push ds
-# 	push es
-# 	push fs
-# 	push gs
-
-# 	mov ax, 0x10
-# 	mov ds, ax
-# 	mov es, ax
-# 	mov fs, ax
-# 	mov gs, ax
-# 	mov eax, esp
-
-# 	push eax
-# 	call k_schedule
-# 	pop eax
-
-# 	pop gs
-# 	pop fs
-# 	pop es
-# 	pop ds
-# 	popa
-# 	add esp, 8
-# 	iret
-
-
 extern irq_handler
 irqstub:
 	pusha
@@ -257,6 +226,47 @@ k_read_cr3:
 	mov eax, cr3
 	mov esp, ebp
 	pop ebp
+	ret
+
+
+global switch_context
+switch_context:
+
+	mov eax, [esp+4]	; a
+	mov edx, [esp+8]	; b
+
+	push ebp
+	push ebx
+	push esi
+	push edi
+
+
+	mov [eax], esp
+	mov esp, edx
+
+	pop edi
+	pop esi
+	pop ebx
+	pop ebp
+
+	ret
+
+global get_context
+get_context:
+
+	;mov eax, [esp+4]	; Store the address of arg1 in eax
+	push ebp
+	push ebx
+	push esi
+	push edi
+	
+	mov [eax], esp		; Move the stack pointer to the address of eax?
+
+	pop edi
+	pop esi
+	pop ebx
+	pop ebp
+	mov eax, esp
 	ret
 
 section .bss

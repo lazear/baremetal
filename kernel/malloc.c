@@ -154,6 +154,10 @@ void blockinfo(uint32_t* block) {
 	printf("Block (%d) 0x%x | Used: %d | Size: %d | Link 0x%x\n", i, block, used, size, translate(block));
 }
 
+uint32_t heap_brk() {
+	return K_HEAP_TOP;
+}
+
 void traverse_blockchain() {
 	uint32_t* block = (uint32_t*)BLOCKCHAIN_START;		// Reset the heap to the bottom
 	uint32_t total_size = 0;
@@ -167,6 +171,7 @@ void traverse_blockchain() {
 		block++;
 	}
 	printf("%d bytes allocated across %d blocks\n", (K_LAST_ALLOC - K_HEAP_BOTTOM), BLOCKS_ALLOCATED);
+	printf("%x HEAP_BRK, %x LAST_ALLOC\n", K_HEAP_TOP, K_LAST_ALLOC);
 }
 
 /* Determines the location of an address in the blockchain */
