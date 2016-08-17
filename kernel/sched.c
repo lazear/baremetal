@@ -31,7 +31,7 @@ process** ptable;
 
 void backup() {
 	printf("WOAHHHH! PID %d has left the building\n", getpid());
-	sched();
+	for(;;) sched();
 	printf("Whats happening?\n");
 	for(;;);
 }
@@ -83,7 +83,7 @@ void fn2() {
 	}
 	fn1();
 	printf("Back to %d\n",getpid());
-	yield();
+//	yield();
 //	for(;;);
 //	yield();
 //	printf("After yeild!\n");
@@ -109,7 +109,7 @@ int getpid() { return current_pid; }
 
 
 uint32_t swap(uint32_t* esp) {
-
+	printf("Current pid: %d ", current_pid);
 	if (!first) {
 		ptable[0]->stack = esp;
 		first = 1;
@@ -119,8 +119,22 @@ uint32_t swap(uint32_t* esp) {
 	} else
 		ptable[current_pid]->stack = esp;
 	
+	current_pid++;
+	if (current_pid == nextpid)		// round robin style
+		current_pid = 0;
+	while (!ptable[current_pid]->state) {
+		printf("%d state %d", current_pid, ptable[current_pid]->state);
+		current_pid++;
+		if (current_pid == nextpid)		// round robin style
+			current_pid = 0;
 
-	if (ptable[current_pid]->state)
+	}
+	printf("Swap to %d\n", current_pid);
+	return ptable[current_pid]->stack;
+
+
+
+/*	if (ptable[current_pid]->state)
 		if (current_pid == nextpid - 1) {
 		//	printf("Round robin\n");
 			current_pid = 0;
@@ -135,9 +149,9 @@ uint32_t swap(uint32_t* esp) {
 		return swap(esp);
 	}
 
-	printf("Swap to %d\n", current_pid);
+	
 
-	return ptable[current_pid]->stack;
+	return ptable[current_pid]->stack;*/
 }
 
 void scheduler(uint32_t esp) {
@@ -161,6 +175,12 @@ void procinfo(process* p) {
 	printf("%s, pid %d, stack @ %x, state: %d\n", p->name, p->pid, p->stack, p->state);
 }
 
+void list_procs() {
+	
+	for (int i = 0; i < nextpid; i++)
+		procinfo(ptable[i]);
+}
+
 void sched_init() {
 	ptable = (process*) malloc(sizeof(process) * 16);
 
@@ -176,6 +196,4 @@ void sched_init() {
 
 	printf("Hullo?");
 
-	for (int i = 0; i < nextpid; i++)
-		procinfo(ptable[i]);
 }

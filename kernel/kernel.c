@@ -49,8 +49,10 @@ void kernel_initialize(uint32_t kernel_end) {
 	sti();
 
 	printf("Back in kernel-init\n");
-	sched();
-	sched();
+	//sched();
+	//sched();
+
+	list_procs();
 	for(;;);
 }
 
