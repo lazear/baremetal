@@ -231,12 +231,12 @@ k_read_cr3:
 extern sched
 global sched_asm
 sched_asm:
-	;pushf
+
 	push ebp
 	push ebx
 	push esi
 	push edi
-	pushf
+
 	mov ax, 0x10
 	mov ds, ax
 	mov es, ax
@@ -245,16 +245,15 @@ sched_asm:
 
 	mov eax, esp
 	push eax
+	
 	call sched
 	mov esp, eax
 
-	popf
 	pop edi
 	pop esi
 	pop ebx
 	pop ebp
 
-	;popf
 	ret
 
 

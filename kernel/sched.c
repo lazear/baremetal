@@ -57,10 +57,10 @@ context* proc_spawn(void (*fn)() ) {
 
 	*--stack = (uint32_t) fn;
 	*--stack = top;
-	*--stack = 0x9500; //t->ebx;
+	*--stack = 0; //t->ebx;
 	*--stack = 0; //t->esi;
 	*--stack = 0; //t->edi;
-	*--stack = 0x202;
+
 
 	uint32_t* ptr = stack;
 
@@ -80,24 +80,22 @@ int iq = 0;
 
 void fn1() {
 	printf("FN1\n");
-	printf("Hello FN1 %d\n", iq++);
-	for(;;);
+	if (iq < 200) {
+		printf("Hello FN1 %d\n", iq++);
+		sched_asm();
+	}
+	//for(;;);
 }
 
 void fn2() {
 	printf("FN2\n");
 	printf("Hello FN2\n");
-	sched_asm();
+	//fn1();
 	printf("WE MADE IT");
 	for(;;);
 }
 
 
-
-
-uint32_t slock = 0;
-	context* a = 0;
-	context* b = 0;
 
 uint32_t* get_context() {
 	uint32_t* esp;
@@ -133,14 +131,21 @@ void set_context(uint32_t* esp) {
 int running = 0;
 uint32_t* current = 0;
 uint32_t* saved = 0;
-
+uint32_t* a = 0;
+uint32_t* b = 0;
 
 uint32_t swap(uint32_t* esp) {
-	if (saved == esp) {
-		saved = current;
-		current = esp;
-	} else {
+	if (running == 0) {
 		saved = esp;
+		running = 1;
+	}
+
+	if (saved == a) {
+		a = saved;
+		return b;
+	} else {
+		b = saved;
+		return a;
 	}
 	return saved;
 }
@@ -148,7 +153,7 @@ uint32_t swap(uint32_t* esp) {
 void sched(uint32_t esp) {
 	//cli();
 	printf("%x\n", esp);
-	//set_eflags(0x202);
+	set_eflags(0x202);
 	return swap(esp);
 	//return esp;
 }
@@ -157,11 +162,12 @@ extern void sched_handler();
 
 void sched_init() {
 
-	current = proc_spawn(fn2);
+	a = proc_spawn(fn2);
+	b = proc_spawn(fn1);
 	printf("Made stack @ %x\n", current);
 	sched_asm();
 
-
+	printf("Hullo?");
 //	sched_asm();
 //	saved = get_context();
 //	idt_set_gate(32, (uint32_t) sched_handler, 0x08, 0x8E);

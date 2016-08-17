@@ -73,7 +73,7 @@ void keyboard_handler(regs_t *r)
 			//fputc(kb, key);
 			if (key == '\n')	// line return
 			{
-				sched_asm();
+			//	sched_asm();
 			//	printf("%d ESP: %x\n", getpid(), r->esp);
 			
 				idx = 0;
