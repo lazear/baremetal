@@ -228,10 +228,40 @@ k_read_cr3:
 	pop ebp
 	ret
 
+extern sched
+global sched_asm
+sched_asm:
+	;pushf
+	push ebp
+	push ebx
+	push esi
+	push edi
+	pushf
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	mov eax, esp
+	push eax
+	call sched
+	mov esp, eax
+
+	popf
+	pop edi
+	pop esi
+	pop ebx
+	pop ebp
+
+	;popf
+	ret
+
+
 
 global switch_context
 switch_context:
-
+	
 	mov eax, [esp+4]	; a
 	mov edx, [esp+8]	; b
 
@@ -239,7 +269,6 @@ switch_context:
 	push ebx
 	push esi
 	push edi
-
 
 	mov [eax], esp
 	mov esp, edx
@@ -249,25 +278,10 @@ switch_context:
 	pop ebx
 	pop ebp
 
+;	mov ebp, ecx
+
 	ret
 
-global get_context
-get_context:
-
-	;mov eax, [esp+4]	; Store the address of arg1 in eax
-	push ebp
-	push ebx
-	push esi
-	push edi
-	
-	mov [eax], esp		; Move the stack pointer to the address of eax?
-
-	pop edi
-	pop esi
-	pop ebx
-	pop ebp
-	mov eax, esp
-	ret
 
 section .bss
 align 32

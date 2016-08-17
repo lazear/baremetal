@@ -19,7 +19,7 @@ extern uint32_t K_SCHED_TIME;
 
 void timer(regs_t *r) {
 	ticks++;
-	thread_add_ticks();
+//	thread_add_ticks();
 	if (!(ticks%1)) {
 		itoa(ticks, timer_buf, 10);
 		vga_kputs(timer_buf, 150, 0);
@@ -39,14 +39,6 @@ uint32_t get_ticks(){
 	return ticks;
 }
 
-void wait(int n) {
-	spin_lock(&timer_lock);
-	int wait_for = ticks + n;
-	while (wait_for > ticks) {
-		sched();	
-	}
-	spin_unlock(&timer_lock);
-	return;
-}
+
 
 

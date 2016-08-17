@@ -7,6 +7,35 @@ sched.c
 #include <threads.h>
 
 
+uint32_t* make_stack(void (*fn)() ) {
+	cli();
+	uint32_t* stack = malloc(0x1000) + 0x1000; // point to top of stack
+	uint32_t* top = (uint32_t) stack;
+
+	*--stack = 0x202;	// EFLAGS
+	*--stack = 0x10;
+	*--stack = (uint32_t) fn;	// EIP
+	// pusha
+	*--stack = 0;		// EAX
+	*--stack = 0;		// ECX
+	*--stack = 0;		// EDX
+	*--stack = 0;		// EBX
+	*--stack = top;		// ESP
+	*--stack = top;		// EBP
+	*--stack = 0;		// ESI
+	*--stack = 0;		// EDI
+	// data segments
+	*--stack = 0x10;	// DS
+	*--stack = 0x10;	// ES
+	*--stack = 0x10;	// FS
+	*--stack = 0x10;	// GS
+	//t->esp = stack;
+
+	//printf("Thread %s created, with PID= %d\n", t->name, t->pid);
+	sti();
+	return stack;
+}
+
 typedef struct context_t {
 //	uint32_t ecx, edx, eax;
 	uint32_t edi;
@@ -16,113 +45,124 @@ typedef struct context_t {
 	uint32_t eip;
 } __attribute__((packed)) context;
 
-
+extern uint32_t* get_context();
 
 context* proc_spawn(void (*fn)() ) {
 	//cli();
-	uint32_t* stack = (uint32_t*) malloc(sizeof(context));
-	memset(stack, 0, sizeof(context));
+	uint32_t* stack = (uint32_t*) (malloc(0x1000));
+	uint32_t top = ((uint32_t) stack + 0x1000);
+	memset(stack, 0, 0x1000);
 
-//	uint32_t* test = (uint32_t*) malloc(0x1000) + 0x1000;
-	//uint32_t* ts = (uint32_t) test
+	stack = top;
 
-	context* t = (context*) stack;
-	t->eip = (uint32_t) fn;
-	t->ebp = (uint32_t) stack;				// point to highest address of stack
-	t->ebx = 0;
-	t->esi = 0;
-	t->edi = 0;
+	*--stack = (uint32_t) fn;
+	*--stack = top;
+	*--stack = 0x9500; //t->ebx;
+	*--stack = 0; //t->esi;
+	*--stack = 0; //t->edi;
+	*--stack = 0x202;
+
+	uint32_t* ptr = stack;
+
+	for (int i = 0; i < 5; i++)
+		printf("(frame %d) %x\n", i,*ptr++);
+	printf("Stack top: %x\n Bottom: %x\n", top, stack);
 	//sti();
-	printf("malloc %x\n", stack);
-	//blockinfo(find_block(stack));
-	return t;
+		//blockinfo(find_block(stack));
+	return stack;
 }
 
 extern void switch_context(context* a, context* b);
-extern uint32_t get_context(context* current);
 
 
-void pwait(int n) {
-	int waitfor = get_ticks() + n;
-	while (waitfor > get_ticks) sched();
-}
+
 int iq = 0;
 
 void fn1() {
 	printf("FN1\n");
 	printf("Hello FN1 %d\n", iq++);
-	
-	sched();
-	return;
+	for(;;);
 }
 
 void fn2() {
 	printf("FN2\n");
 	printf("Hello FN2\n");
-	sched();
-	return;
+	sched_asm();
+	printf("WE MADE IT");
+	for(;;);
 }
 
-int intena = 0;
 
 
-void acquire(uint32_t* lock) {
-	while(*lock);
-	*lock = 1;
-	printf("%x locked\n", lock);
-}
-
-void release(uint32_t* lock) {
-	*lock = 0;
-	printf("%x released\n", lock);
-}
-
-int holding(uint32_t* lock) {
-	return *lock;
-}
 
 uint32_t slock = 0;
 	context* a = 0;
 	context* b = 0;
-void sched(void) {
-	//cli();
-	if (!holding(&slock))
-		acquire(&slock);
 
-	printf("sched\n");
-	if (intena) {
-		intena = 0;
-		release(&slock);
-		switch_context(b, a);
-		printf("loop0\n");
-	
-	} else {
-		intena = 1;
-		release(&slock);
-		switch_context(a, b);	
-		printf("loop1\n");	
-	}
+uint32_t* get_context() {
+	uint32_t* esp;
+	asm volatile("push %ebp");
+	asm volatile("push %ebx");
+	asm volatile("push %esi");
+	asm volatile("push %edi");
 
-	//sti();
+	asm volatile("movl %%esp, %0" : "=r" (esp));
+
+	printf("esp from context %x\n", esp);
+
+	asm volatile ("pop %edi; pop %esi; pop %ebx; pop %ebp");
+
+	//context* c = (context*) esp;
+	// printf("eip %x\n", c->eip);
+	// printf("ebp %x\n", c->ebp);
+	// printf("ebx %x\n", c->ebx);
+	// printf("esi %x\n", c->esi);
+	// printf("edi %x\n", c->edi);
+	return esp;
 }
+
+
+void set_context(uint32_t* esp) {
+	asm volatile ( "movl %0, %%esp; \
+					pop %%edi; \
+					pop %%esi; \
+					pop %%ebx; \
+					pop %%ebp; " : : "r"(esp));
+}
+
+int running = 0;
+uint32_t* current = 0;
+uint32_t* saved = 0;
+
+
+uint32_t swap(uint32_t* esp) {
+	if (saved == esp) {
+		saved = current;
+		current = esp;
+	} else {
+		saved = esp;
+	}
+	return saved;
+}
+
+void sched(uint32_t esp) {
+	//cli();
+	printf("%x\n", esp);
+	//set_eflags(0x202);
+	return swap(esp);
+	//return esp;
+}
+
+extern void sched_handler();
 
 void sched_init() {
 
-	a = proc_spawn(fn1);
-	b = proc_spawn(fn2);
-	context* c = malloc(sizeof(context));
-	context* esp = get_context(c);
-	uint32_t *i = (uint32_t) esp;
-	printf("get-context %x, %x\n", esp, c);
-	for (int q = 0; q < sizeof(context)/2; q++)
-		printf("(%d frame) %x\n", q, *i++);
+	current = proc_spawn(fn2);
+	printf("Made stack @ %x\n", current);
+	sched_asm();
 
-	i = (uint32_t) esp;
-	printf("%x\n", esp->eip);
 
-	printf("%x\n", esp->ebp);
-	printf("%x\n", esp->ebx);
-	printf("%x\n", esp->esi);
-	printf("%x\n", esp->edi);
-
+//	sched_asm();
+//	saved = get_context();
+//	idt_set_gate(32, (uint32_t) sched_handler, 0x08, 0x8E);
 }

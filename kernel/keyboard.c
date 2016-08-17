@@ -32,7 +32,7 @@ int shift = 0;
 STREAM *kb;
 
 extern mutex test;
-
+extern void sched_asm();
 void keyboard_handler(regs_t *r)
 {
 	uint8_t scancode;
@@ -70,10 +70,10 @@ void keyboard_handler(regs_t *r)
 			key = keyboard[scancode];
 
 			vga_putc(key);
-			fputc(kb, key);
+			//fputc(kb, key);
 			if (key == '\n')	// line return
 			{
-				sched();
+				sched_asm();
 			//	printf("%d ESP: %x\n", getpid(), r->esp);
 			
 				idx = 0;
