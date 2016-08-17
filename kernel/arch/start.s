@@ -228,9 +228,10 @@ k_read_cr3:
 	pop ebp
 	ret
 
-extern sched
-global sched_asm
-sched_asm:
+extern scheduler
+global sched
+sched:
+	
 
 	push ebp
 	push ebx
@@ -246,7 +247,7 @@ sched_asm:
 	mov eax, esp
 	push eax
 	
-	call sched
+	call scheduler
 	mov esp, eax
 
 	pop edi
@@ -257,29 +258,6 @@ sched_asm:
 	ret
 
 
-
-global switch_context
-switch_context:
-	
-	mov eax, [esp+4]	; a
-	mov edx, [esp+8]	; b
-
-	push ebp
-	push ebx
-	push esi
-	push edi
-
-	mov [eax], esp
-	mov esp, edx
-
-	pop edi
-	pop esi
-	pop ebx
-	pop ebp
-
-;	mov ebp, ecx
-
-	ret
 
 
 section .bss

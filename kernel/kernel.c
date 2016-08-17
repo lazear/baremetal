@@ -46,7 +46,10 @@ void kernel_initialize(uint32_t kernel_end) {
 	vga_pretty(logo, VGA_CYAN);
 
 	sched_init();
-		sti();
+	sti();
+
+	printf("Back in kernel-init\n");
+	sched();
 	for(;;);
 }
 

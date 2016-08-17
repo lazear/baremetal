@@ -25,6 +25,8 @@ void timer(regs_t *r) {
 		vga_kputs(timer_buf, 150, 0);
 
 	}
+
+
 	return r;
 }
 

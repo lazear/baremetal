@@ -4,16 +4,160 @@
 		"selected_items":
 		[
 			[
-				"t",
-				"t"
+				"pro",
+				"procinfo"
 			],
 			[
-				"sched",
-				"sched_handler"
+				"swa",
+				"swap_to"
 			],
 			[
-				"print",
-				"print_context"
+				"ne",
+				"nextpid"
+			],
+			[
+				"iq",
+				"iqlock"
+			],
+			[
+				"K_",
+				"K_HEAP_TOP"
+			],
+			[
+				"K",
+				"K_HEAP_TOP"
+			],
+			[
+				"get",
+				"get_context"
+			],
+			[
+				"contxt",
+				"context"
+			],
+			[
+				"con",
+				"context"
+			],
+			[
+				"curre",
+				"current_thread"
+			],
+			[
+				"k_",
+				"k_sched_next"
+			],
+			[
+				"MM",
+				"MM_CURRENT_PT"
+			],
+			[
+				"ff",
+				"ff_PD"
+			],
+			[
+				"vga",
+				"vga_kputs"
+			],
+			[
+				"ptr",
+				"ptr200"
+			],
+			[
+				"fi",
+				"find_best_free"
+			],
+			[
+				"find",
+				"find_block"
+			],
+			[
+				"sma",
+				"smallest"
+			],
+			[
+				"sm",
+				"smallest"
+			],
+			[
+				"small",
+				"smallest_sz"
+			],
+			[
+				"size",
+				"size_t"
+			],
+			[
+				"BLO",
+				"BLOCKS_ALLOCATED"
+			],
+			[
+				"tr",
+				"traverse_blockchain"
+			],
+			[
+				"block",
+				"blockinfo"
+			],
+			[
+				"BLOC",
+				"BLOCKCHAIN_START"
+			],
+			[
+				"siz",
+				"size_t"
+			],
+			[
+				"BL",
+				"BLOCKCHAIN_START"
+			],
+			[
+				"BLOCK",
+				"BLOCKCHAIN_START"
+			],
+			[
+				"TK_",
+				"TK_LAST_ALLOC"
+			],
+			[
+				"TK",
+				"TK_LAST_ALLOC"
+			],
+			[
+				"to",
+				"to_traverse"
+			],
+			[
+				"total",
+				"total_size"
+			],
+			[
+				"blo",
+				"block_value"
+			],
+			[
+				"MAX",
+				"MAX_BLOCKS"
+			],
+			[
+				"TK_HEAP",
+				"TK_HEAP_BOTTOM"
+			],
+			[
+				"heap",
+				"heapb"
+			],
+			[
+				"k_a",
+				"k_add_block"
+			],
+			[
+				"BLOCk",
+				"BLOCKS_ALLOCATED"
+			],
+			[
+				"uin",
+				"uint32_t"
 			],
 			[
 				"CU",
@@ -22,10 +166,6 @@
 			[
 				"kb",
 				"kb_tell"
-			],
-			[
-				"uin",
-				"uint8_t"
 			],
 			[
 				"k_pa",
@@ -60,10 +200,6 @@
 				"k_sched_state"
 			],
 			[
-				"K_",
-				"K_SCHED_ACTIVE"
-			],
-			[
 				"state",
 				"state"
 			],
@@ -92,10 +228,6 @@
 				"current_thread"
 			],
 			[
-				"K",
-				"K_CURRENT_PID"
-			],
-			[
 				"wait",
 				"wait_for"
 			],
@@ -118,10 +250,6 @@
 			[
 				"k_T",
 				"K_THREAD_COUNT"
-			],
-			[
-				"k_",
-				"k_thread_add"
 			],
 			[
 				"read",
@@ -164,10 +292,6 @@
 				"mm_bitmap_set_bit"
 			],
 			[
-				"MM",
-				"MM_CURRENT_PT"
-			],
-			[
 				"k_p",
 				"k_paging_map_block"
 			],
@@ -206,10 +330,6 @@
 			[
 				"mm_",
 				"mm_page_free"
-			],
-			[
-				"ff",
-				"ff_pdb"
 			],
 			[
 				"ken",
@@ -292,10 +412,6 @@
 				"color"
 			],
 			[
-				"vga",
-				"vga_pretty"
-			],
-			[
 				"start",
 				"start_y"
 			],
@@ -348,10 +464,6 @@
 				"KERNEL_VIRTUAL_BASE"
 			],
 			[
-				"get",
-				"get_brite_terms	function"
-			],
-			[
 				"ge",
 				"geneid	statement"
 			],
@@ -402,131 +514,11 @@
 			[
 				"ca",
 				"catgories	statement"
-			],
-			[
-				"cou",
-				"counts_cat	statement"
-			],
-			[
-				"json",
-				"json_dict"
-			],
-			[
-				"json_",
-				"json_dict	statement"
-			],
-			[
-				"res",
-				"res_names	statement"
-			],
-			[
-				"res_sites_",
-				"res_sites_rev	statement"
-			],
-			[
-				"pr",
-				"process3	function"
-			],
-			[
-				"h",
-				"h_name	statement"
-			],
-			[
-				"proce",
-				"process3	function"
-			],
-			[
-				"drugb",
-				"drugbank_enrich	function"
-			],
-			[
-				"count",
-				"counts_indb	statement"
-			],
-			[
-				"db",
-				"db_yayornay	statement"
-			],
-			[
-				"proc",
-				"process	function"
-			],
-			[
-				"pro",
-				"process2	function"
-			],
-			[
-				"annot",
-				"annotation	statement"
-			],
-			[
-				"pep",
-				"peptide	param"
-			],
-			[
-				"seq",
-				"sequence"
-			],
-			[
-				"uni",
-				"uniprotID	param"
-			],
-			[
-				"find",
-				"findresidue	function"
-			],
-			[
-				"con",
-				"conserved	statement"
-			],
-			[
-				"align",
-				"aligned	statement"
-			],
-			[
-				"go",
-				"go_dict	statement"
-			],
-			[
-				"dis",
-				"distance_from_top	param"
-			],
-			[
-				"sort",
-				"sort_keys	param"
-			],
-			[
-				"h_",
-				"h_sequence	statement"
-			],
-			[
-				"chi",
-				"chi_dict	statement"
-			],
-			[
-				"fly",
-				"fly_unlabelled	statement"
-			],
-			[
-				"flc",
-				"flyc	statement"
-			],
-			[
-				"head",
-				"headers	statement"
 			]
 		]
 	},
 	"buffers":
 	[
-		{
-			"file": "Makefile",
-			"settings":
-			{
-				"buffer_size": 983,
-				"line_ending": "Windows"
-			}
-		},
 		{
 			"file": "kernel/lib/string.c",
 			"settings":
@@ -539,64 +531,12 @@
 			"file": "kernel/kernel.c",
 			"settings":
 			{
-				"buffer_size": 3061,
+				"buffer_size": 3105,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "kernel/timer.c",
-			"settings":
-			{
-				"buffer_size": 577,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/arch/start.s",
-			"settings":
-			{
-				"buffer_size": 3513,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/arch/x86.c",
-			"settings":
-			{
-				"buffer_size": 9136,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/keyboard.c",
-			"settings":
-			{
-				"buffer_size": 2374,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/sched.c",
-			"settings":
-			{
-				"buffer_size": 3153,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "/*\nstdio.h\n*/\n\n#ifndef __baremetal_stdio__\n#define __baremetal_stdio__\n\ntypedef struct k_stream_object {\n	char* data;\n	int size;\n	int offset;\n	int status : 1;		// 1 is good\n} STREAM;\n\n/*\nAllows asynchronous (is that the right term?) reading and writing\ni.e. the writer and reader have their own offsets, eliminating the need\nto call fseek() on the stream.\n*/\ntypedef struct k_async_stream_object {\n	char* data;\n	int size;\n	int write_offset;\n	int read_offset;\n} ASYNC_STREAM;\n\n#endif",
-			"file": "include/stdio.h",
-			"file_size": 508,
-			"file_write_time": 131156750109131981,
-			"settings":
-			{
-				"buffer_size": 482,
-				"line_ending": "Windows",
-				"name": "/*"
-			}
-		},
-		{
-			"file": "kernel/lib/stdio/stdio.c",
+			"file": "kernel/lib/stdio.c",
 			"settings":
 			{
 				"buffer_size": 2109,
@@ -604,13 +544,119 @@
 			}
 		},
 		{
-			"contents": "/*\ntypes.h\n*/\n\n#ifndef __baremetal_types__\n#define __baremetal_types__\n\ntypedef unsigned char uint8_t;			// 1 byte\ntypedef unsigned short uint16_t;		// 2 bytes\ntypedef unsigned long uint32_t;			// 4 bytes\ntypedef unsigned long long uint64_t;	// 8 bytes\n\ntypedef unsigned long size_t;			// 4 bytes\n\n\n\n\ntypedef int bool;\n#define true	1\n#define false	0\n\n#define NULL	((void*) 0)\n\n\n#endif",
-			"file": "include/types.h",
-			"file_size": 408,
-			"file_write_time": 131156727624751344,
+			"file": "kernel/keyboard.c",
 			"settings":
 			{
-				"buffer_size": 384,
+				"buffer_size": 2412,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/vfs.c",
+			"settings":
+			{
+				"buffer_size": 126,
+				"line_ending": "Windows",
+				"name": "/*"
+			}
+		},
+		{
+			"file": "kernel/arch/start.s",
+			"settings":
+			{
+				"buffer_size": 3231,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Makefile",
+			"settings":
+			{
+				"buffer_size": 983,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/timer.c",
+			"settings":
+			{
+				"buffer_size": 532,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/paging.c",
+			"settings":
+			{
+				"buffer_size": 3014,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/malloc.c",
+			"settings":
+			{
+				"buffer_size": 8890,
+				"line_ending": "Windows",
+				"name": "/*"
+			}
+		},
+		{
+			"file": "kernel/lib/stdlib.c",
+			"settings":
+			{
+				"buffer_size": 4301,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/thread.c",
+			"settings":
+			{
+				"buffer_size": 6281,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/sched.c",
+			"settings":
+			{
+				"buffer_size": 2428,
+				"line_ending": "Windows",
+				"name": "/*"
+			}
+		},
+		{
+			"file": "/D/Downloads/snapshot.06.10.09/core/task/sched.c",
+			"settings":
+			{
+				"buffer_size": 1230,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Searching 47 files for \"idle\"\n\nD:\\Documents\\GitHub\\baremetal\\bin\\kernel.bin:\n    <binary>\n\nD:\\Documents\\GitHub\\baremetal\\bin\\kernel.flat:\n    <binary>\n\nD:\\Documents\\GitHub\\baremetal\\kernel\\sched.c:\n   79  process* ptable\n   80  \n   81: process* idle = NULL;\n   82  process* a = 0;\n   83  process* b = 0;\n   ..\n   97  extern void sched_handler();\n   98  \n   99: void sysidle() { for(;;); }\n  100  \n  101  void sched_init() {\n  102: 	idle = spawn(\"Idle\", sysidle);\n  103  	a = spawn(\"A\", fn2);\n  104  	b = spawn(\"B\", fn1);\n\nD:\\Documents\\GitHub\\baremetal\\kernel\\thread.c:\n  319  	irq_install_handler(15, k_schedule);\n  320  	\n  321: 	spawn(\"Idle\", null_thread);\n  322  \n  323  	//spawn(\"Main\", event_loop);\n\nD:\\Documents\\GitHub\\baremetal\\tools\\i686-elf-as:\n    <binary>\n\nD:\\Documents\\GitHub\\baremetal\\tools\\i686-elf-gcc:\n    <binary>\n\n10 matches across 6 files\n",
+			"settings":
+			{
+				"buffer_size": 858,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "/D/Downloads/snapshot.06.10.09/core/task/task.c",
+			"settings":
+			{
+				"buffer_size": 2285,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Downloads/snapshot.06.10.09/core/task/taskapi.c",
+			"settings":
+			{
+				"buffer_size": 2315,
 				"line_ending": "Windows"
 			}
 		}
@@ -740,6 +786,14 @@
 	},
 	"file_history":
 	[
+		"/D/Documents/GitHub/baremetal/kernel/arch/pswitch.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/pswith.s",
+		"/D/Documents/GitHub/baremetal/kernel/lib/printf.c",
+		"/D/Documents/GitHub/baremetal/kernel/include/x86.h",
+		"/D/Documents/GitHub/baremetal/include/types.h",
+		"/D/Documents/GitHub/baremetal/include/stdio.h",
+		"/D/Documents/GitHub/baremetal/kernel/lib/stdio/stdio.c",
+		"/D/Documents/GitHub/baremetal/Makefile",
 		"/D/Documents/GitHub/baremetal/heap.c",
 		"/D/Documents/GitHub/baremetal/include/string.h",
 		"/D/Documents/GitHub/baremetal/x86.c",
@@ -751,7 +805,6 @@
 		"/D/Documents/GitHub/baremetal/include/x86.h",
 		"/D/Documents/GitHub/baremetal/include/ctype.h",
 		"/D/Documents/GitHub/baremetal/include/kernel.h",
-		"/D/Documents/GitHub/baremetal/include/types.h",
 		"/D/Documents/GitHub/baremetal/include/signal.h",
 		"/D/Documents/GitHub/baremetal/include/assert.h",
 		"/D/Documents/GitHub/baremetal/include/stdlib.h",
@@ -860,14 +913,7 @@
 		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/libc/string.c",
 		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/include/lib/api.h",
 		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/libc/printf.c",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/drivers/char/text.c",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/drivers/disk/fs.c",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/higherhalf.s",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/loader.asm",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/gdt.asm",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/module.c",
-		"/C/Users/Mike/Documents/GitHub/kegg/parse_brite.py",
-		"/C/Users/Mike/Documents/GitHub/kegg/autobrite"
+		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/drivers/char/text.c"
 	],
 	"find":
 	{
@@ -875,9 +921,11 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 102.0,
 		"where_history":
 		[
+			"D:\\Documents\\GitHub\\baremetal",
+			""
 		]
 	},
 	"find_state":
@@ -885,6 +933,15 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"idle",
+			"iret",
+			"%x",
+			"TK",
+			"heap \n",
+			"heap\n",
+			"|\n",
+			"block",
+			"k_heap_alloc",
 			"kprintx",
 			"getch",
 			"ISR_ERRCODE",
@@ -930,6 +987,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"%x\\n",
+			"K",
 			"printf",
 			"ISR_MACRO",
 			"",
@@ -944,39 +1003,11 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "Makefile",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 983,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "kernel/lib/string.c",
 					"semi_transient": false,
 					"settings":
@@ -988,66 +1019,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 1518.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "kernel/kernel.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3061,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2799,
-								2799
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "kernel/timer.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 577,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								390,
-								390
+								1856,
+								1856
 							]
 						],
 						"settings":
@@ -1056,167 +1029,44 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 240.0,
+						"translation.y": 1188.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "kernel/kernel.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3105,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3105,
+								3105
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 536.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "kernel/arch/start.s",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3513,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3107,
-								3107
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/R/R.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 4589.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "kernel/arch/x86.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 9136,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1240,
-								1240
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4285.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "kernel/keyboard.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2374,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1755,
-								1755
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1620.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 7,
-					"file": "kernel/sched.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3153,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2387,
-								2387
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2700.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "include/stdio.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 482,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								71,
-								71
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "kernel/lib/stdio/stdio.c",
+					"buffer": 2,
+					"file": "kernel/lib/stdio.c",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1227,8 +1077,8 @@
 						"selection":
 						[
 							[
-								972,
-								972
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1237,38 +1087,457 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 528.0,
+						"translation.y": 1045.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 16,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
-					"file": "include/types.h",
+					"buffer": 3,
+					"file": "kernel/keyboard.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 384,
+						"buffer_size": 2412,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								318,
-								318
+								1877,
+								1877
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax"
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1055.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "kernel/vfs.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 126,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								126,
+								126
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/*",
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "kernel/arch/start.s",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3231,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2870,
+								2870
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/R/R.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3942.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Makefile",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 983,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								46,
+								46
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "kernel/timer.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 532,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								357,
+								357
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 8,
+					"file": "kernel/paging.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3014,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								907,
+								907
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1242.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "kernel/malloc.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8890,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7240,
+								7240
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/*",
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 2556.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "kernel/lib/stdlib.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4301,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								139,
+								139
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3240.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "kernel/thread.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6281,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5395,
+								5395
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "kernel/sched.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2428,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1568,
+								1568
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/*",
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1211.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "/D/Downloads/snapshot.06.10.09/core/task/sched.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1230,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 270.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 858,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										245,
+										249
+									],
+									[
+										369,
+										373
+									],
+									[
+										432,
+										436
+									],
+									[
+										446,
+										450
+									],
+									[
+										456,
+										460
+									],
+									[
+										638,
+										642
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ 	].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 108.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "/D/Downloads/snapshot.06.10.09/core/task/task.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2285,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1836.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "/D/Downloads/snapshot.06.10.09/core/task/taskapi.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2315,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
 					"type": "text"
 				}
 			]
@@ -1302,7 +1571,7 @@
 		"cols":
 		[
 			0.0,
-			0.51875,
+			0.434895833334,
 			1.0
 		],
 		"rows":

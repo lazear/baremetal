@@ -75,7 +75,7 @@ void keyboard_handler(regs_t *r)
 			{
 			//	sched_asm();
 			//	printf("%d ESP: %x\n", getpid(), r->esp);
-			
+			sched();
 				idx = 0;
 				
 			} 

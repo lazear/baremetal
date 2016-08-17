@@ -5,7 +5,7 @@ mutex.c
 #include <types.h>
 #include <mutex.h>
 
-void spin_lock (mutex* m) {
+/*void spin_lock (mutex* m) {
 	while(m->lock);
 		preempt();
 	m->lock = 1;
@@ -18,5 +18,5 @@ void spin_unlock(mutex* m) {
 	//	k_sched_state(1);
 		printf("Mutex (%x) unlocked by PID %d\n", m, getpid());
 	}
-}
+}*/
 
