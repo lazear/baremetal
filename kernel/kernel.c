@@ -50,6 +50,7 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	printf("Back in kernel-init\n");
 	sched();
+	sched();
 	for(;;);
 }
 

@@ -29,6 +29,13 @@ typedef struct process_t {
 int nextpid = 0;
 process** ptable;
 
+void backup() {
+	printf("WOAHHHH! PID %d has left the building\n", getpid());
+	sched();
+	printf("Whats happening?\n");
+	for(;;);
+}
+
 process* spawn(char* name, void (*fn)() ) {
 
 	process* p = (process*) malloc(sizeof(process));
@@ -45,6 +52,7 @@ process* spawn(char* name, void (*fn)() ) {
 
 	stack = top;
 	stack -= sizeof(regs_t);
+	*--stack = (uint32_t) backup;
 	*--stack = (uint32_t) fn;	// EIP
 	*--stack = top;				// EBP
 	*--stack = 0; 				// EBX
@@ -63,7 +71,6 @@ int iq = 0;
 void fn1() {
 	printf("FN1\n");
 	sched();
-//	for(;;);
 }
 
 void fn2() {
@@ -75,8 +82,9 @@ void fn2() {
 		;
 	}
 	fn1();
+	printf("Back to %d\n",getpid());
 	yield();
-	for(;;);
+//	for(;;);
 //	yield();
 //	printf("After yeild!\n");
 }
@@ -93,6 +101,7 @@ process* b = 0;
 
 void yield() {
 	ptable[current_pid]->state = 0;
+	procinfo(ptable[current_pid]);
 	sched();
 }
 
@@ -116,10 +125,15 @@ uint32_t swap(uint32_t* esp) {
 		//	printf("Round robin\n");
 			current_pid = 0;
 		}
-		else
+		else {
 			current_pid++;
-	else
-		return esp;
+		}
+	else {
+		printf("PID %d state 0\n", current_pid);
+		current_pid++;
+
+		return swap(esp);
+	}
 
 	printf("Swap to %d\n", current_pid);
 
@@ -144,7 +158,7 @@ extern void sched_handler();
 void sysidle() { for(;;); }
 
 void procinfo(process* p) {
-	printf("%s, pid %d, stack @ %x, next: %d\n", p->name, p->pid, p->stack, p->next);
+	printf("%s, pid %d, stack @ %x, state: %d\n", p->name, p->pid, p->stack, p->state);
 }
 
 void sched_init() {
@@ -156,9 +170,12 @@ void sched_init() {
 	spawn("A3", fn2);
 	
 	running = 1;
-		printf("Cur pid %d, Nextpid %d\n", current_pid, nextpid);
+	printf("Cur pid %d, Nextpid %d\n", current_pid, nextpid);
 	sched();
 
 
 	printf("Hullo?");
+
+	for (int i = 0; i < nextpid; i++)
+		procinfo(ptable[i]);
 }
