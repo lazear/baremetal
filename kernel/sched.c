@@ -6,38 +6,38 @@ sched.c
 #include <x86.h>
 #include <threads.h>
 
-typedef struct context_t {
-//	uint32_t ecx, edx, eax;
-	uint32_t edi;
-	uint32_t esi;
-	uint32_t ebx;
-	uint32_t ebp;
-	uint32_t eip;
-} __attribute__((packed)) context;
-
-typedef struct process_t {
-	char name[16];
-	int state;
-	int pid;
-	int quantum;
-	int spins;
-	uint32_t* stack;
-	uint32_t* pagedir;
-	struct process_t* next;
-} process;
 
 int nextpid = 0;
 process** ptable;
 
+
+void kill(int pid) {
+
+	process* p = ptable[pid];
+	p->state = -1;
+	free(p->stack);
+	memset(p, 0, sizeof(process));
+	free(p);
+	ptable[pid] = NULL;
+	sched();
+
+}
+
+void die() {
+	kill(getpid());
+}
+
 void backup() {
-	printf("WOAHHHH! PID %d has left the building\n", getpid());
-	for(;;) sched();
-	printf("Whats happening?\n");
-	for(;;);
+	int pid = getpid();
+	printf("WOAHHHH! PID %d has left the building\n", pid);
+	kill(pid);
+	while(1)
+		sched();
+
 }
 
 process* spawn(char* name, void (*fn)() ) {
-
+	pushcli();
 	process* p = (process*) malloc(sizeof(process));
 	memset(p, 0, sizeof(process));
 	strcpy(p->name, name, 16);
@@ -61,7 +61,7 @@ process* spawn(char* name, void (*fn)() ) {
 
 	p->stack = stack;
 	ptable[p->pid] = p;
-
+	popcli();
 	return p;
 }
 
@@ -81,7 +81,7 @@ void fn2() {
 	while(get_ticks() < waitfor) {
 		;
 	}
-	fn1();
+//	fn1();
 	printf("Back to %d\n",getpid());
 //	yield();
 //	for(;;);
@@ -109,11 +109,13 @@ int getpid() { return current_pid; }
 
 
 uint32_t swap(uint32_t* esp) {
+	pushcli();
 	printf("Current pid: %d ", current_pid);
 	if (!first) {
 		ptable[0]->stack = esp;
 		first = 1;
 		printf("Saving CPU state in ptable[0], %x\n", esp);
+		popcli();
 		return ptable[++current_pid]->stack;
 
 	} else
@@ -130,28 +132,10 @@ uint32_t swap(uint32_t* esp) {
 
 	}
 	printf("Swap to %d\n", current_pid);
+	popcli();
 	return ptable[current_pid]->stack;
 
 
-
-/*	if (ptable[current_pid]->state)
-		if (current_pid == nextpid - 1) {
-		//	printf("Round robin\n");
-			current_pid = 0;
-		}
-		else {
-			current_pid++;
-		}
-	else {
-		printf("PID %d state 0\n", current_pid);
-		current_pid++;
-
-		return swap(esp);
-	}
-
-	
-
-	return ptable[current_pid]->stack;*/
 }
 
 void scheduler(uint32_t esp) {
@@ -159,10 +143,10 @@ void scheduler(uint32_t esp) {
 
 	if (!running) return esp;
 //	printf("%x\n", esp);
-	cli();
-	set_eflags(0x202);
+	//cli();
+//	set_eflags(0x202);
 	uint32_t ret = swap(esp);
-	sti();
+	//sti();
 	return ret;
 	//return esp;
 }

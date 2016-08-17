@@ -179,14 +179,6 @@ enableA20:
 	out 0x92, al
 	ret
 
-enter_protected_mode:
-	cli
-	;lgdt [gdt_pointer]
-	mov eax, cr0
-	or al, 1
-	mov cr0, eax
-	ret
-
 
 global read_stack_pointer
 read_stack_pointer:

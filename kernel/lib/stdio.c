@@ -1,5 +1,8 @@
 /*
 stream.c
+
+Michael Lazear, 2016
+
 Basic stream implementation
 */
 

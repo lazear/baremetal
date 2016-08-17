@@ -6,16 +6,8 @@ timer.c
 #include <x86.h>
 #include <mutex.h>
 
-
-mutex timer_lock = { .lock = 0 };
 uint32_t ticks = 0;
 char* timer_buf = 0;
-
-
-extern uint32_t K_SCHED_ACTIVE;
-extern uint32_t K_SCHED_TIME;
-
-
 
 void timer(regs_t *r) {
 	ticks++;
@@ -23,10 +15,7 @@ void timer(regs_t *r) {
 	if (!(ticks%1)) {
 		itoa(ticks, timer_buf, 10);
 		vga_kputs(timer_buf, 150, 0);
-
 	}
-
-
 	return r;
 }
 

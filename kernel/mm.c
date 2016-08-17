@@ -95,7 +95,6 @@ uint32_t* mm_page_free(uint32_t* PD, uint32_t* PT, uint32_t* address) {
 
 	uint32_t pd_index = (uint32_t) aligned >> 22;
 	uint32_t pt_index = (uint32_t) aligned >> 12 & 0x3ff;
-
 	mm_bitmap_unset_bit(PT, pt_index);
 
 	/*	

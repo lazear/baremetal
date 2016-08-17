@@ -23,7 +23,7 @@ uint32_t* K_CURRENT_PAGE_DIRECTORY = 0;
 
 /* We are going to try and fix PF's by increasing heap if that's the issue */
 void k_page_fault(struct regs* r) {
-	asm volatile("cli");
+	pushcli();
 	uint32_t cr2;
 
 	asm volatile("mov %%cr2, %%eax" : "=a"(cr2));
@@ -33,16 +33,16 @@ void k_page_fault(struct regs* r) {
 	if (cr2 & 2) printf("\tPage Not Writeable\n");
 	if (cr2 & 4) printf("\tPage Supervisor Mode\n");
 
-	if (cr2 == heap_brk()) {
+	if (cr2 >= heap_brk() && cr2 < heap_brk() + 0x1000){
 		printf("Heap is out of memory\n");
 		sbrk(0x1000);
-		asm volatile("sti");
+		popcli();
 		return;
 	}
 
 	printf("Calling func: %x\n", r->eip);
 	//print_regs(r);
-	traverse_blockchain();
+	//traverse_blockchain();
 	mm_debug();
 
 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
@@ -51,12 +51,12 @@ void k_page_fault(struct regs* r) {
 
 
 
-uint32_t* k_paging_get_phys(uint32_t* dir, uint32_t virt) {
+uint32_t* k_paging_get_phys(uint32_t virt) {
+	uint32_t* dir = K_CURRENT_PAGE_DIRECTORY;
 	int _pdi = virt >> 22;
 	int _pti = (virt >> 12) & 0x3FF;
 
-	uint32_t* pt = (uint32_t*) dir[_pdi];
-
+	uint32_t* pt = dir[_pdi] & ~0x3FF;
 	return ((uint32_t*) pt[_pti]);
 }
 
@@ -82,7 +82,12 @@ void k_paging_init(uint32_t* dir_addr) {
 	k_paging_enable();
 }
 
-void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
+/* 
+For some reason, k_paging_map seems to work
+without reloading the PD into CR3, however,
+unmapping a page requires remapping
+*/
+void k_paging_map(uint32_t phys, uint32_t virt, uint8_t flags) {
 	uint32_t _pdi = virt >> 22;
 	uint32_t _pti = (virt >> 12) & 0x3FF;
 	uint32_t* dir = K_CURRENT_PAGE_DIRECTORY;
@@ -92,7 +97,6 @@ void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
 	if ( dir[_pdi] & ~0x3FF ) {
 		pt = dir[_pdi] & ~0x3FF;
 	} else {
-		//vga_puts("Hmmm...\n");
 		pt = k_page_alloc();
 	}
 
@@ -100,20 +104,23 @@ void k_paging_map( uint32_t phys, uint32_t virt, uint8_t flags) {
 	pt[_pti] = ((phys) | flags | PF_PRESENT);
 
 	dir[_pdi] = ((uint32_t) pt | flags | PF_PRESENT);
-/*	kprintx("Page Dir Value:   ", dir[_pdi]);
-	kprintx("Page Dir Index:   ", _pdi);
-	kprintx("Page Table Value: ", pt[_pti]);
-	kprintx("Page Table Index: ", _pti);
-	kprintx("Virtual Address:  ", virt);
-	kprintx("Physical Address: ", phys);
+}
 
-	// Each page table  (directory entry) represents 4MB (0x400 * 0x1000 * 0x400) of address space
-	// Each page entry (table index) represents 
-	kprintx("Begin dir:",  (_pdi * 0x400 * 0x1000));
-	kprintx("Begin tab: ", (_pdi * 0x400 * 0x1000) + (_pti * 0x1000));
-	kprintx("End tab: ", (_pdi * 0x400 * 0x1000) + (_pti* 0x1000 + 0x1000));
-	kprintx("End dir: ", (_pdi * 0x400 * 0x1000) + (0x400 * 0x1000 + 0x1000));
-*/
-	//Should be no reason to reload the directory each time.
-	//k_paging_load_directory(dir);
+int k_paging_unmap(uint32_t virt) {
+	uint32_t _pdi = virt >> 22;
+	uint32_t _pti = (virt >> 12) & 0x3FF;
+	uint32_t* dir = K_CURRENT_PAGE_DIRECTORY;
+	
+	uint32_t* pt;
+
+	if ( dir[_pdi] & ~0x3FF )
+		pt = dir[_pdi] & ~0x3FF;
+	else 
+		return 0;	// This address was never mapped in the first place
+	pt[_pti] = 0;	// Reset all flags.
+
+	//k_paging_load_directory(K_CURRENT_PAGE_DIRECTORY);
+	// Invalidate the old page.
+	asm volatile("invlpg (%0);" : : "b"(virt) : "memory");
+	return 1;
 }

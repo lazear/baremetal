@@ -3,20 +3,29 @@ malloc.c
 
 Michael Lazear, 2016
 
-Experimental psuedo-bitmap dynamic memory management
-32bit integer is used as the blockchain. Bit 32 is used (1) or free (0)
+Experimental psuedo-bitmap "blockchain" memory allocator
+
+32bit integer is used for a  blockchain entry. 
+Bit 32 is used (1) or free (0)
 Bits 0:31 represent the size of the block.
-*b = (1<<31); should set it to used
+
+*b = (1<<31); sets a block to used
 *b |= (size & ~(1<<31)); sets the size
 b++; increments to the next block in the chain. 
+
 Some simple math allows us to translate blockchain position to pointer address and vice-versa
 
 The idea here is to alloc a static region of physical memory to store dynamic heap memory
 The current memory layout is as follows:
 0x00000000 - Bios data, we don't go here
-0x00100000 - Start of kernel data and MM permanent heap (1MB)
-0x00200000 - End of MM permanent heap (2MB)
-Everything up to 4MB has been linearly mapped by paging for now,
+0x00100000 - Start of kernel data and MM static heap (1MB) [mm_alloc()]
+0x001XXXXX - Blockchain resides somewhere between 1-2 MB
+0x00200000 - End of MM permanent heap (2MB), begin of k_page_alloc()
+0x00400000 - End of linear paging
+
+K_HEAP_BOTTOM 	- Beginning of dynamic allocation
+K_HEAP_MAX		- End of dynamic allocation space
+
 so no need to map anything if we call mm_alloc() for block data - k_page_alloc maybe?
 
 If we store the initial location of the mm_alloc call in a global variable and don't touch it,
@@ -28,9 +37,13 @@ this provides a maximum limit
 We will not be storing the actual address of the memory allocated, we're gonna do some fancy 
 tricks for that.
 
-Since there is no buffer or randomness involved, this is a TRUST dependent malloc.
-Do NOT use it for sensitive applications due to the high probability of overflow.
-
+Pros:
+	Minimum overhead possible (4 bytes per malloc)
+	Fast free/malloc calls and searching
+Cons:
+	Once an address has been allocated, cannot easily re-size
+	Aligning memory produces higher fragmentation
+	Cannot free individual pages? Unless they are page aligned with HEAP_TOP
 */
 
 #include <types.h>
@@ -65,7 +78,7 @@ uint32_t K_LAST_ALLOC =  0;
 
 int blockchain_add(uint32_t size) {
 	if (BLOCKS_ALLOCATED > MAX_BLOCKS)
-		return -1;
+		return 0;
 
 	blockchain = BLOCKCHAIN_START + (BLOCKS_ALLOCATED * sizeof(uint32_t));
 	*blockchain = (1 << 31) | (size & ~(1<<31));
@@ -76,7 +89,7 @@ int blockchain_add(uint32_t size) {
 
 /*
 Rough implementation/estimation of sbrk. It's going to increase the size 
-by 0x1000 only for right now. 
+in 0x1000 blocks.
 */
 void* sbrk(size_t n) {
 	if (!n)
@@ -91,11 +104,31 @@ void* sbrk(size_t n) {
 		num_of_blocks = (n/0x1000);
 
 	for (int i = 0; i < num_of_blocks; i++) {
+		/*
+		Allocate a page of physical memory
+		Map that page to the top of the heap,
+		and increase the top of the heap by 4KB.
+		*/
+
 		uint32_t* phys = k_page_alloc();
 		k_paging_map(phys, K_HEAP_TOP, 0x3);
+		//printf("Mapping phys %x to virt %x\n", phys, K_HEAP_TOP);
 		K_HEAP_TOP += 0x1000;
 	}
 	return K_HEAP_TOP;
+}
+
+/*
+Free the corresponding virtual page,
+and unmap it from the page table.
+Should only be used with caution.
+*/
+void free_vpage(uint32_t* addr) {
+	//sbrk(1);
+	uint32_t phys = k_paging_get_phys(addr);
+	k_paging_unmap(addr);			// Unmap and invalidate the page in CR3
+	k_page_free(phys);				// Return the page to the PMM
+
 }
 
 /* 
@@ -158,6 +191,7 @@ uint32_t heap_brk() {
 	return K_HEAP_TOP;
 }
 
+/* Display information about the blockchain */
 void traverse_blockchain() {
 	uint32_t* block = (uint32_t*)BLOCKCHAIN_START;		// Reset the heap to the bottom
 	uint32_t total_size = 0;
@@ -223,6 +257,12 @@ free() finds the block referenced by the pointer and sets bit 31 to 0.
 */
 void* free(void* ptr) {
 	uint32_t* block = find_block(ptr);
+	int size = ((uint32_t) *block) & ~(1<<31);
+
+	/* Check to see if the block is page aligned */
+	if ( ((uint32_t) ptr % 0x1000) == 0 && size == 4096) {
+		//free_vpage(ptr);
+	}
 	*block &= ~(1<<31);
 	return ptr;
 }
@@ -237,10 +277,7 @@ void* malloc(size_t n) {
 
 	if (!n)
 		return ptr;
-/*	if (n < ARBITRARY_SEARCH_CUTOFF)
-		block = find_best_free(n);
-	else
-		block = find_first_free(n);*/
+
 	block = find_best_free(n);
 
 	if (block) {
@@ -252,7 +289,7 @@ void* malloc(size_t n) {
 		/* We couldn't find a free block, allocate a new one */
 		
 		int r = blockchain_add(n);
-		if (r < 0)
+		if (!r)
 			return NULL;
 
 		// Check if we need to call sbrk
@@ -262,11 +299,38 @@ void* malloc(size_t n) {
 		ptr = (void*) K_LAST_ALLOC;
 		K_LAST_ALLOC += n;
 	}
-	//printf("Allocated %d bytes\n", n);
-	//blockinfo(translate(ptr));
 	return ptr;
 }
 
+/*
+We will first allocate a block of free memory to buffer until page alignment.
+*/
+void* malloc_a(size_t n) {
+	uint32_t base = (K_LAST_ALLOC & ~0xFFF) + 0x1000;
+	uint32_t diff = (base - K_LAST_ALLOC);
+	
+	void* ptr = NULL;
+
+	if (diff != 0x1000) {
+		if(!blockchain_add(diff))
+			return NULL;
+		K_LAST_ALLOC += diff;
+
+		uint32_t* b = BLOCKCHAIN_START + (BLOCKS_ALLOCATED * sizeof(uint32_t));
+		free(translate(b - 1));
+	}
+
+	if (!blockchain_add(n))
+		return NULL;
+
+	ptr = (void*) K_LAST_ALLOC;
+	K_LAST_ALLOC += n;
+
+	if (K_LAST_ALLOC >= K_HEAP_TOP) 
+		sbrk((K_LAST_ALLOC - K_HEAP_TOP) + 0x1000);
+
+	return ptr;
+}
 
 /* 
 Since this memory model doesn't permit resizing:
@@ -307,26 +371,16 @@ void k_heap_init() {
 	K_HEAP_TOP = K_HEAP_BOTTOM;
 	K_LAST_ALLOC = K_HEAP_BOTTOM;
 
-	sbrk(0x4000);
+	sbrk(0x1000);
 }
+
+
 
 void k_heap_test() {
+	void* a= malloc_a(4096);
 
-	/*
-	Malloc() exact string length and then reallocing immediately
-	causes some buffer overflow issues.
-	Perhaps should add in an extra 4 bytes of buffer between malloc()s
-	automatically? Should help prevent some accidentall overflows.
-	*/
-	char d[] = "Welcome to baremetal - Michael Lazear";
-	char* name = malloc(strlen(d)-1);
-	char* r = malloc(4);
-	printf("%s, %d chars\n", d, strlen(d));
-	strcpy(name, d);
-	char* two = realloc(name, 50);
-	printf("%s] -> [%s\n", name, two);
-	printf("%s\n", r);
-//	printf("New: %s\n", new);
+	free(a);
+	malloc_a(4096);
 	traverse_blockchain();
-
 }
+

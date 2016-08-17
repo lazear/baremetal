@@ -37,22 +37,18 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	keyboard_install();
 	timer_init();
-
-	// Start interrupts
-
+	// Initial start interrupts.
+	sti();
 
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
 	vga_pretty(logo, VGA_CYAN);
 
+
 	sched_init();
-	sti();
 
 	printf("Back in kernel-init\n");
-	//sched();
-	//sched();
-
-	list_procs();
+	
 	for(;;);
 }
 

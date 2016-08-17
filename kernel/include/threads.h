@@ -5,6 +5,17 @@
 #define __baremetal_thread__
 
 
+typedef struct process_t {
+	char name[16];
+	int state;
+	int pid;
+	int quantum;
+	int spins;
+	uint32_t* stack;
+	uint32_t* pagedir;
+	struct process_t* next;
+} process;
+
 typedef struct THREAD {
 	char* name;
 	uint32_t pid;
