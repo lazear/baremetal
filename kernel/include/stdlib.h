@@ -10,7 +10,7 @@ stdlib.h
 extern char* itoa(uint32_t num, char* buffer, int base);
 extern int atoi(char* s);
 extern double atof(char* s);
-extern char* ftoa(double num);
+extern char* ftoa(double num, char* str);
 
 extern int dlog10(double v);
 extern int log10(int v);

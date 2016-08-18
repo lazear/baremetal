@@ -13,14 +13,21 @@ int nextpid = 0;
 int running = 0;
 int current_pid = 0;
 
+extern struct tss_entry system_tss;
+
+void set_tss_esp() {
+	system_tss.esp0 = ptable[0]->stack;
+}
 
 void kill(int pid) {
 	if (!pid) {
 		panic("Attempting to kill system process");
+		asm volatile("hlt");
 		return;
 	}
-	if (pid > nextpid) {
+	if (pid >= nextpid) {
 		panic("PID does not exist");
+		return;
 	}
 
 	pushcli();
@@ -31,7 +38,7 @@ void kill(int pid) {
 	free(p->stack);
 	memset(p, 0, sizeof(process));
 	free(p);
-	ptable[pid] = NULL;
+	//ptable[pid] = NULL;
 	printf("PID %d is kill\n", pid);
 	popcli();
 
@@ -60,7 +67,6 @@ process* spawn(char* name, void (*fn)() ) {
 	strcpy(p->name, name, 16);
 	p->pid = nextpid++;
 	p->pagedir = NULL;
-	p->next = NULL;
 	p->state = 1;
 	uint32_t* stack = (uint32_t*) (malloc(0x1000));		// stack will grow down
 	uint32_t top = ((uint32_t) stack + 0x1000);			// ebp points to top of stack
@@ -78,15 +84,6 @@ process* spawn(char* name, void (*fn)() ) {
 
 	p->stack = stack;
 	ptable[p->pid] = p;
-
-	if(!p->pid) {
-		ptable[p->pid - 1]->next = p;
-		p->next = ptable[0];
-	} else {
-		// PID 0, link to self
-		p->next = p;
-	}
-
 
 	popcli();
 	return p;
@@ -121,17 +118,30 @@ void prioritize(int pid) {
 
 int iq = 0;
 
-void wait(int t) {
-	int waitfor = get_ticks() + 35;
+/* __wait spins idly - no context changing */
+void __wait(int t) {
+	int waitfor = get_ticks() + t;
 	while(get_ticks() < waitfor) {
+		;//yield(); ;
+	}
+}
+
+/*
+wait(int ticks) calls yield once per tick, allows less time
+spent spinning through the scheduler */
+void wait(int n) {
+	while(n--) {
+		__wait(1);
 		yield();
 	}
 }
+
 
 int i = 0;
 void fn2() {
 	printf("Hello FN2 - PID %d\n", getpid());
 	wait(20);
+
 }
 
 
@@ -168,7 +178,6 @@ uint32_t swap(uint32_t* esp) {
 		of the current task */
 		ptable[current_pid]->stack = esp;
 	}
-	
 
 	current_pid++;
 	if (current_pid == nextpid)		// round robin style
@@ -188,20 +197,27 @@ uint32_t swap(uint32_t* esp) {
 
 void scheduler(uint32_t esp) {
 	if (!running) return esp;
-//	vga_putc('S');
 	return swap(esp);
 }
 
 extern void sched_handler();
 
-void sysidle() { for(;;); }
+int status(int pid) {
+	return ptable[pid]->state;
+}
+
+void sysidle() 		{ for(;;); }
+
+void schedloop() 	{ while(1) wait(1); }
+
+void douche() { for(;;); }
 
 void procinfo(process* p) {
 	printf("%s, pid %d, stack @ %x, state: %d, time %d, link %d\n", p->name, p->pid, p->stack, p->state, p->time, p->next->pid);
 }
 
 void list_procs() {
-	
+	printf("Current process is %s (%d)\n", ptable[current_pid]->name, current_pid );
 	for (int i = 0; i < nextpid; i++)
 		procinfo(ptable[i]);
 }
@@ -209,18 +225,13 @@ void list_procs() {
 void sched_init() {
 	ptable = (process*) malloc(sizeof(process) * MAX_PROCESS);
 
-	process* idle = spawn("sys-d", sysidle);
-	process* a = spawn("A1", fn2);
-	spawn("A2", fn2);
-	spawn("B1", fn1);
+	process* idle = spawn("kernel", sysidle);
+	spawn("sched", schedloop);
+//	spawn("doucher", douche);
 	auto_link();
-	list_procs();
 	
 	running = 1;
 	printf("Cur pid: %d\tNumber of threads: %d\n", current_pid, nextpid);
 	//sched();
-
-
-	printf("Hullo?");
 
 }

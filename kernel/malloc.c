@@ -47,13 +47,14 @@ Cons:
 */
 
 #include <types.h>
+#include <mutex.h>
 
-const uint32_t MAX_BLOCKS				= 1024;
+static const uint32_t MAX_BLOCKS	= 1024;
 
 uint32_t BLOCKCHAIN_START	= 0;
 uint32_t BLOCKS_ALLOCATED 	= 0;
 
-uint32_t *blockchain		= NULL;
+uint32_t *blockchain			= NULL;
 
 /*
 Define limits of the heap. Bottom and Max never change. 
@@ -69,11 +70,13 @@ LAST_ALLOC is basically the current used top, the next address allocated will be
 |_____BOTTOM_____|0xC0000000
 */
 
-const uint32_t K_HEAP_BOTTOM = 0x01000000;
-const uint32_t K_HEAP_MAX = 0xF0000000;
+static const uint32_t K_HEAP_BOTTOM = 0x01000000;
+static const uint32_t K_HEAP_MAX = 0xF0000000;
 
 uint32_t K_HEAP_TOP = 0;
 uint32_t K_LAST_ALLOC =  0;
+
+static mutex memlock = {.lock = 0};
 
 
 int blockchain_add(uint32_t size) {
@@ -180,6 +183,7 @@ loop:
 extern void* translate(uint32_t* block);
 
 void blockinfo(uint32_t* block) {
+	if (!block) return;
 	uint32_t block_value = *block;
 	int used = (block_value >> 31);
 	int size = (block_value & ~(1<<31));
@@ -256,6 +260,7 @@ void* translate(uint32_t* b) {
 free() finds the block referenced by the pointer and sets bit 31 to 0.
 */
 void* free(void* ptr) {
+	acquire(&memlock);
 	uint32_t* block = find_block(ptr);
 	int size = ((uint32_t) *block) & ~(1<<31);
 
@@ -264,6 +269,7 @@ void* free(void* ptr) {
 		//free_vpage(ptr);
 	}
 	*block &= ~(1<<31);
+	release(&memlock);
 	return ptr;
 }
 
@@ -277,7 +283,8 @@ void* malloc(size_t n) {
 
 	if (!n)
 		return ptr;
-
+	pushcli();
+	acquire(&memlock);
 	block = find_best_free(n);
 
 	if (block) {
@@ -289,8 +296,11 @@ void* malloc(size_t n) {
 		/* We couldn't find a free block, allocate a new one */
 		
 		int r = blockchain_add(n);
-		if (!r)
+		if (!r) {
+			release(&memlock);
+			popcli();
 			return NULL;
+		}
 
 		// Check if we need to call sbrk
 		if (K_LAST_ALLOC + n >= K_HEAP_TOP) 
@@ -299,6 +309,9 @@ void* malloc(size_t n) {
 		ptr = (void*) K_LAST_ALLOC;
 		K_LAST_ALLOC += n;
 	}
+
+	release(&memlock);
+	popcli();
 	return ptr;
 }
 
@@ -311,6 +324,7 @@ void* malloc_a(size_t n) {
 	
 	void* ptr = NULL;
 
+	pushcli();
 	if (diff != 0x1000) {
 		if(!blockchain_add(diff))
 			return NULL;
@@ -328,6 +342,7 @@ void* malloc_a(size_t n) {
 
 	if (K_LAST_ALLOC >= K_HEAP_TOP) 
 		sbrk((K_LAST_ALLOC - K_HEAP_TOP) + 0x1000);
+	popcli();
 
 	return ptr;
 }
@@ -371,7 +386,7 @@ void k_heap_init() {
 	K_HEAP_TOP = K_HEAP_BOTTOM;
 	K_LAST_ALLOC = K_HEAP_BOTTOM;
 
-	sbrk(0x1000);
+	sbrk(0x4000);
 }
 
 

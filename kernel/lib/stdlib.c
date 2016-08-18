@@ -9,7 +9,7 @@ Implementation of stdlib for baremetal
 #include <ctype.h>
 #include <stdlib.h>
 
-double atof(char* s) {
+/*double atof(char* s) {
 	double integer = 0;
 	double decimal = 0;
 	double divisor = 1.0;
@@ -46,20 +46,17 @@ double atof(char* s) {
 	}
 	return sign * (tot + decimal/divisor);
 
-}
+}*/
 
 
 # define PRECISION 5
 // adapted from http://stackoverflow.com/questions/2302969/how-to-implement-char-ftoafloat-num-without-sprintf-library-function-i/2303011#2303011
-char*  ftoa(double num)
+char*  ftoa(double num, char* str)
 {
    int whole_part = num;
    int digit = 0, reminder =0;
    int log_value = dlog10(num), index = log_value;
    long wt =0;
-
-   // String containg result
-   char* str = malloc(20);
 
    //Initilise stirng to zero
    memset(str, 0 ,20);

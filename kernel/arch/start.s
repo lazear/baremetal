@@ -220,35 +220,6 @@ k_read_cr3:
 	pop ebp
 	ret
 
-extern scheduler
-global sched
-sched:
-	
-
-	push ebp
-	push ebx
-	push esi
-	push edi
-
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-
-	mov eax, esp
-	push eax
-	
-	call scheduler
-	mov esp, eax
-
-	pop edi
-	pop esi
-	pop ebx
-	pop ebp
-
-	ret
-
 
 
 

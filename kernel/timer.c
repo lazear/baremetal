@@ -16,8 +16,8 @@ void timer(regs_t *r) {
 		itoa(ticks, timer_buf, 10);
 		vga_kputs(timer_buf, 150, 0);
 	}
-	if (ticks % 10 == 0)
-		sched();
+/*	if (ticks % 10 == 0)
+		sched();*/
 	return r;
 }
 

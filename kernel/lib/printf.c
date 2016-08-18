@@ -94,6 +94,8 @@ int printf( const char *fmt, ... ) {
 				case 'c':	// char
 					vga_putc(va_arg(args, char));
 					break;
+				case 'e':
+					vga_puts(ftoa(va_arg(args, double), buf));
 							
 				}
 				fmt++;

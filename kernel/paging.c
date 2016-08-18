@@ -6,9 +6,6 @@ paging.c
 #include <x86.h>
 #include <paging.h>
 
-extern void k_paging_enable();
-extern void k_paging_load_directory(uint32_t* dir);
-extern uint32_t* k_read_cr3();
 
 /*
 Page directory -> Page table -> Page
@@ -29,6 +26,7 @@ void k_page_fault(struct regs* r) {
 	asm volatile("mov %%cr2, %%eax" : "=a"(cr2));
 
 	printf("Page fault @ 0x%X\n", cr2);
+	printf("Phys: %x\n", k_paging_get_phys(cr2));
 	if (cr2 & 1) printf("\tPage Not Present\n");
 	if (cr2 & 2) printf("\tPage Not Writeable\n");
 	if (cr2 & 4) printf("\tPage Supervisor Mode\n");
@@ -71,11 +69,11 @@ void k_paging_init(uint32_t* dir_addr) {
 	uint32_t* table = k_page_alloc();
 	
 	for (int i = 0; i < 1024; i++) {
-		table[i] = (i * 0x1000) | 0x3;
+		table[i] = (i * 0x1000) | 0x3 | 0x4;
 	}
 
 
-	K_CURRENT_PAGE_DIRECTORY[0] = (uint32_t) table | 3;
+	K_CURRENT_PAGE_DIRECTORY[0] = (uint32_t) table | 3 | 4;
 	K_CURRENT_PAGE_DIRECTORY[1023] = (uint32_t) K_CURRENT_PAGE_DIRECTORY | 3;
 
 	k_paging_load_directory(K_CURRENT_PAGE_DIRECTORY);
@@ -101,7 +99,7 @@ void k_paging_map(uint32_t phys, uint32_t virt, uint8_t flags) {
 	}
 
 
-	pt[_pti] = ((phys) | flags | PF_PRESENT);
+	pt[_pti] = ((phys) | flags | PF_PRESENT );
 
 	dir[_pdi] = ((uint32_t) pt | flags | PF_PRESENT);
 }
