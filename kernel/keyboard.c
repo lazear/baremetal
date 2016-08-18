@@ -70,12 +70,12 @@ void keyboard_handler(regs_t *r)
 			key = keyboard[scancode];
 
 			vga_putc(key);
-			//fputc(kb, key);
+			fputc(kb, key);
 			if (key == '\n')	// line return
 			{
 			//	sched_asm();
 			//	printf("%d ESP: %x\n", getpid(), r->esp);
-			sched();
+			//sched();
 				idx = 0;
 				
 			} 

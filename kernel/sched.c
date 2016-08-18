@@ -32,6 +32,7 @@ void kill(int pid) {
 	memset(p, 0, sizeof(process));
 	free(p);
 	ptable[pid] = NULL;
+	printf("PID %d is kill\n", pid);
 	popcli();
 
 }
@@ -43,10 +44,10 @@ void die() {
 
 void backup() {
 	int pid = getpid();
-	printf("PID %d is kill\n", pid);
+
 	kill(pid);
 	while(1) {
-		printf("pid %d is a zombie\n", getpid());
+//		printf("pid %d is a zombie\n", getpid());
 		sched();
 
 	}
@@ -131,8 +132,6 @@ int i = 0;
 void fn2() {
 	printf("Hello FN2 - PID %d\n", getpid());
 	wait(20);
-	die();
-//	wait(10);
 }
 
 
@@ -189,7 +188,7 @@ uint32_t swap(uint32_t* esp) {
 
 void scheduler(uint32_t esp) {
 	if (!running) return esp;
-	vga_putc('S');
+//	vga_putc('S');
 	return swap(esp);
 }
 
@@ -214,6 +213,7 @@ void sched_init() {
 	process* a = spawn("A1", fn2);
 	spawn("A2", fn2);
 	spawn("B1", fn1);
+	auto_link();
 	list_procs();
 	
 	running = 1;
