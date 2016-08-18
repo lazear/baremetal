@@ -49,6 +49,13 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	printf("Back in kernel-init\n");
 	
+	int waitfor = get_ticks() + 100;
+	while(get_ticks() < waitfor) {
+		;
+	}
+	printf("HELLO\n");
+	kill(3);
+	list_procs();
 	for(;;);
 }
 

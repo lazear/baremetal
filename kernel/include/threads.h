@@ -10,7 +10,7 @@ typedef struct process_t {
 	int state;
 	int pid;
 	int quantum;
-	int spins;
+	int time;
 	uint32_t* stack;
 	uint32_t* pagedir;
 	struct process_t* next;
