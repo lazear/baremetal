@@ -7,13 +7,15 @@
 
 typedef struct process_t {
 	char name[16];
-	int state;
+	int state;						
 	int pid;
 	int quantum;
 	int time;
+	uint32_t sz;
 	uint32_t* stack;
 	uint32_t* pagedir;
 	struct process_t* next;
+	struct process_t* parent;
 } process;
 
 typedef struct THREAD {
