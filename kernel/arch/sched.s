@@ -29,14 +29,24 @@ sched:
 
 	ret
 
+extern pushcli
+extern popcli
 
-global exchange
-exchange:
-	push ebp
-	push ebx
-	mov eax, [esp+8]
-	xchg [esp+4], eax
+global acquire
+acquire:
+	call pushcli
+	mov 	ecx,	[esp+4]
+	mov 	eax,	1
+	xchg	eax,	[ecx]
+	test 	eax,	eax      
+	jnz		acquire
 
-	pop ebx
-	pop ebp
+	ret 
+
+global release
+release:
+	mov 	ecx, 	[esp+4]		; grab the first argument off the stack
+	mov     eax, 	0          	; Set the EAX register to 0.
+	xchg    eax, 	[ecx]   	; Swap *ptr with 0
+	call popcli
 	ret

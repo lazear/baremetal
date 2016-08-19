@@ -1,5 +1,8 @@
 /*
 mm.c
+
+Michael Lazear, 2016
+
 Physical memory management - keep track of physical memory used,
 this will enable the usage of a virtual memory/page mapped heap.
 When the heap nears the top, sbrk() can call k_page_alloc() to get another 
@@ -7,6 +10,7 @@ When the heap nears the top, sbrk() can call k_page_alloc() to get another
 continous virtual memory segment.
 */
 
+#include <vga.h>
 #include <types.h>
 
 #define ERR_NO_MEM	-1
@@ -18,9 +22,9 @@ and page table bitmap
 uint32_t* MM_CURRENT_PD = 0;
 uint32_t* MM_CURRENT_PT = 0;
 
-// k_MM_HEAP will be set to the end of the kernel ~1mb
+// MM_HEAP will be set to the end of the kernel ~1mb
 uint32_t* MM_HEAP = 0;
-// K_MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.
+// MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.
 uint32_t* MM_HEAP_MAX = 0x00200000;
 
 /*
@@ -153,7 +157,7 @@ uint32_t* mm_page_alloc(uint32_t* PD, uint32_t* PT) {
 		PT = mm_bitmap_init();
 		
 
-		vga_pretty("\nSwapping page table bitmap\n", 0x05);
+		//vga_pretty("\nSwapping page table bitmap\n", 0x05);
 
 		MM_CURRENT_PT = PT;
 		mm_bitmap_set_bit(PD, ff_PD);
@@ -186,10 +190,10 @@ uint32_t* k_page_free(uint32_t* addr) {
 
 void mm_debug() {
 	printf("Physical Memory Management Debug:\n");
-	int ptidx = mm_first_free(MM_CURRENT_PT)/32;
-	int pdidx = mm_first_free(MM_CURRENT_PD)/32;
-	printf("PT (%d): %b\n", ptidx, MM_CURRENT_PT[ptidx]);
-	printf("PD (%d): %b\n", pdidx, MM_CURRENT_PD[pdidx]);
+	int ptidx = mm_first_free(MM_CURRENT_PT);
+	int pdidx = mm_first_free(MM_CURRENT_PD);
+	printf("PT (%d): %b\n", ptidx%32, MM_CURRENT_PT[ptidx/32]);
+	printf("PD (%d): %b\n", pdidx%32, MM_CURRENT_PD[pdidx/32]);
 }
 
 
@@ -235,6 +239,65 @@ void* k_mm_init(uint32_t heap) {
 }
 
 
+
+void memtesttr() {
+	int i = 1;
+	int t = 0;
+	vga_pretty("Beginning physical memory test! Expect system crash\n", VGA_LIGHTGREEN);
+	vga_kputs("PT", 0, 22);
+	vga_kputs("PD", 0, 23);
+	vga_kputs("Phys addr", 0, 24);
+	vga_kputs("Cycles/tick", 110, 24);
+	void *buf = malloc(32);
+	while(1) {
+		void* ptr = k_page_alloc();
+		if (!ptr) {
+			//traverse_blockchain();
+			free(buf);
+			die();
+		}
+		
+		ftoa((double)i/t, buf);
+		vga_kputs(buf, 140, 24);
+
+
+	//	memset(buf, 0, 32);
+		itoa(ptr, buf, 16);
+		vga_kputs(buf, 20, 24);
+		
+		int _pti = mm_first_free(MM_CURRENT_PT)/32;
+		int _pdi = mm_first_free(MM_CURRENT_PD)/32;
+		uint32_t ptidx = MM_CURRENT_PT[_pti];
+		uint32_t pdidx = MM_CURRENT_PD[_pdi];
+
+	//	memset(buf, 0, 32);
+		itoa(pdidx, buf, 2);
+		vga_kputs(buf, 20, 23);
+
+	//	memset(buf, 0, 32);
+		itoa(_pdi, buf, 10);
+		vga_kputs(buf, 10, 23);
+
+	//	memset(buf, 0, 32);
+		itoa(ptidx, buf, 2);
+		vga_kputs(buf, 20, 22);
+
+	//	memset(buf, 0, 32);
+		itoa(_pti, buf, 10);
+		vga_kputs(buf, 10, 22);
+
+		//printf("%x -- %d %d (Cycles per tick: %e)\n", ptr, i, t, ((double)i/ t));
+		free(ptr);
+		t = get_ticks();
+		i++;
+		//wait(5);
+		yield();
+
+
+	}
+}
+
+
 /*
 Function to play around with and test the physical mem manager.
 */
@@ -249,7 +312,7 @@ void mm_test() {
 
 	uint32_t first_address = (ff_pdb* 0x1000 * 0x400) + (ff_ptb * 0x1000);
 
-	for (int i = 0; i < 5; i++ ) {
+	for (int i = 0; i < 3; i++ ) {
 		int result = k_page_alloc();
 		if (result == ERR_NO_MEM)
 			vga_pretty("[FAIL] no memory left", 0x4);
@@ -272,13 +335,7 @@ void mm_test() {
 		printf("Current bitmap value: %b\n", MM_CURRENT_PD[1]);
 	}
 
-	for (int i = 0; i < 3; i++ ) {
-		int result = k_page_alloc();
-		if (result == ERR_NO_MEM)
-			vga_pretty("[FAIL] no memory left", 0x4);
-		else {
-			printf("Testing allocation: 0x%x\n", result);
-		}
-	}
+
+	spawn("pmm-test", memtesttr);
 
 }

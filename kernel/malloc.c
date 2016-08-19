@@ -76,7 +76,7 @@ static const uint32_t K_HEAP_MAX = 0xF0000000;
 uint32_t K_HEAP_TOP = 0;
 uint32_t K_LAST_ALLOC =  0;
 
-static mutex memlock = {.lock = 0};
+mutex memlock = {.lock = 0};
 
 
 int blockchain_add(uint32_t size) {
@@ -283,8 +283,9 @@ void* malloc(size_t n) {
 
 	if (!n)
 		return ptr;
-	pushcli();
+//	pushcli();
 	acquire(&memlock);
+
 	block = find_best_free(n);
 
 	if (block) {
@@ -298,7 +299,7 @@ void* malloc(size_t n) {
 		int r = blockchain_add(n);
 		if (!r) {
 			release(&memlock);
-			popcli();
+		//	popcli();
 			return NULL;
 		}
 
@@ -311,7 +312,7 @@ void* malloc(size_t n) {
 	}
 
 	release(&memlock);
-	popcli();
+//	popcli();
 	return ptr;
 }
 

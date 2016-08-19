@@ -4,6 +4,62 @@
 		"selected_items":
 		[
 			[
+				"k",
+				"kernel_end"
+			],
+			[
+				"k_",
+				"k_create_pagedir"
+			],
+			[
+				"pa",
+				"page_tables_needed"
+			],
+			[
+				"k_pa",
+				"k_paging_map"
+			],
+			[
+				"_pa",
+				"_paging_map"
+			],
+			[
+				"_pag",
+				"_upaging_map"
+			],
+			[
+				"dest",
+				"dest_pt"
+			],
+			[
+				"des",
+				"dest_pt"
+			],
+			[
+				"src",
+				"src_pt"
+			],
+			[
+				"load",
+				"k_paging_load_directory"
+			],
+			[
+				"proc",
+				"process"
+			],
+			[
+				"spi",
+				"spin_unlock"
+			],
+			[
+				"spin",
+				"spin_lock"
+			],
+			[
+				"mem",
+				"memlockt"
+			],
+			[
 				"cur",
 				"current_pid"
 			],
@@ -74,10 +130,6 @@
 			[
 				"curre",
 				"current_thread"
-			],
-			[
-				"k_",
-				"k_sched_next"
 			],
 			[
 				"MM",
@@ -190,14 +242,6 @@
 			[
 				"kb",
 				"kb_tell"
-			],
-			[
-				"k_pa",
-				"k_paging_map"
-			],
-			[
-				"k",
-				"k_schedule"
 			],
 			[
 				"buf",
@@ -318,10 +362,6 @@
 			[
 				"si",
 				"size_t"
-			],
-			[
-				"pa",
-				"pagedir"
 			],
 			[
 				"ff_",
@@ -474,46 +514,6 @@
 			[
 				"vg",
 				"vga_kputc"
-			],
-			[
-				"VGA",
-				"VGA_TERMINAL"
-			],
-			[
-				"KERNE",
-				"KERNEL_VIRTUAL_BASE"
-			],
-			[
-				"a",
-				"accession	param"
-			],
-			[
-				"map",
-				"map_dict	param"
-			],
-			[
-				"inp",
-				"input_file	param"
-			],
-			[
-				"mapp",
-				"mapping_file	param"
-			],
-			[
-				"dict",
-				"dictionary	statement"
-			],
-			[
-				"write",
-				"writelines	function"
-			],
-			[
-				"dic",
-				"dictionary	statement"
-			],
-			[
-				"di",
-				"dictionary	statement"
 			]
 		]
 	},
@@ -523,7 +523,7 @@
 			"file": "Makefile",
 			"settings":
 			{
-				"buffer_size": 983,
+				"buffer_size": 1083,
 				"line_ending": "Windows"
 			}
 		},
@@ -539,7 +539,7 @@
 			"file": "kernel/kernel.c",
 			"settings":
 			{
-				"buffer_size": 3420,
+				"buffer_size": 3917,
 				"line_ending": "Windows"
 			}
 		},
@@ -552,53 +552,18 @@
 			}
 		},
 		{
-			"file": "kernel/arch/start.s",
-			"settings":
-			{
-				"buffer_size": 3141,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/arch/x86.c",
-			"settings":
-			{
-				"buffer_size": 9159,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/mutex.c",
-			"settings":
-			{
-				"buffer_size": 576,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/include/types.h",
-			"settings":
-			{
-				"buffer_size": 455,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "/*\nmm.c\n\nMichael Lazear, 2016\n\nPhysical memory management - keep track of physical memory used,\nthis will enable the usage of a virtual memory/page mapped heap.\nWhen the heap nears the top, sbrk() can call k_page_alloc() to get another \n0x1000 bytes (4KB) of physical address space, that can then be mapped to a\ncontinous virtual memory segment.\n*/\n\n#include <types.h>\n\n#define ERR_NO_MEM	-1\n\n/*\nPointers to the current page directory bitmap\nand page table bitmap\n*/\nuint32_t* MM_CURRENT_PD = 0;\nuint32_t* MM_CURRENT_PT = 0;\n\n// MM_HEAP will be set to the end of the kernel ~1mb\nuint32_t* MM_HEAP = 0;\n// MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.\nuint32_t* MM_HEAP_MAX = 0x00200000;\n\n/*\nThis function should ONLY be used to set up the initial memory manager tables.\nGoing to alloc some blocks right at the end of the kernel\n\nMemory allocated by this function will NEVER be freed.\n*/\nuint32_t* mm_alloc(size_t n) {\n	if (MM_HEAP == 0)\n		return NULL;\n\n	if (MM_HEAP + n < MM_HEAP_MAX) {\n		uint32_t* addr = MM_HEAP;\n		if (n >= 0x1000)\n			MM_HEAP += (n & ~0xFFF);		// Make sure we stay 0x1000 aligned.\n		else\n			MM_HEAP += 0x1000;			// Even if n is small, increment by 0x1000\n		return addr;\n	} else\n		return NULL;\n}\n\n\n/*\nBitmap is an array of 32 * 32 bit integers.\nSetting a bit indicates that it is in use\n*/\nvoid mm_bitmap_set_bit(uint32_t* b, uint32_t bit) {\n	b[bit/32] |= (0x1 << (bit % 32));\n}\n\n/*\nBitmap is an array of 32 * 32 bit integers.\nUnsetting a bit indicates that it is free\n*/\nvoid mm_bitmap_unset_bit(uint32_t* b, uint32_t bit) {\n	b[bit/32] &=  ~(0x1 << (bit % 32));\n}\n\n/*\nReturns the first bit position (bit number in entry ( 32 * array index))\nthat is 0 (free)\n*/\nint mm_first_free(uint32_t* b) {\n	for (int q = 0; q < 32; q++) {\n		uint32_t free_bits = (b[q] ^ ~0x0);\n		for (int i = 0; i < 32; i++ ) \n			if (free_bits & (0x1 << i)) \n				return i + (q*32);\n	}\n	return ERR_NO_MEM;\n}\n\n/*\nAllocate a bitmap (1024 bits, 128 bytes)\nSet every entry to 0 (free)\n*/\nuint32_t* mm_bitmap_init() {\n	size_t bitmap_size = sizeof(uint32_t) * 32;\n	uint32_t* b = mm_alloc(bitmap_size);\n	memset(b, 0, bitmap_size);\n	return b;\n}\n\n/*\nAlign the virtual address to the page directory and page table bitmaps,\nthen mark it as free\n*/\nuint32_t* mm_page_free(uint32_t* PD, uint32_t* PT, uint32_t* address) {\n	uint32_t aligned = (uint32_t) address & ~0x3FF;\n\n	uint32_t pd_index = (uint32_t) aligned >> 22;\n	uint32_t pt_index = (uint32_t) aligned >> 12 & 0x3ff;\n	mm_bitmap_unset_bit(PT, pt_index);\n\n	/*	\n	If the PD that this was in was full, mark it as not full now\n	DON't do this, as stated below. We need an array of pointers\n	Holding the location of the last page table.\n	*/\n	/*\n	if (mm_first_free(PD) != pd_index) {\n		kprintx(\"PAGEFREE:\", pd_index);\n		mm_bitmap_unset_bit(PD, pd_index);\n	}\n	*/\n\n	return address;\n} \n\n\n/*\nInitial implementation will be allocating one page.\nReturns the address of the page\nMarks the page as used (bit shift 1)\nReturns ERR_NO_MEM (-1) if page directory is full.\n*/\nuint32_t* mm_page_alloc(uint32_t* PD, uint32_t* PT) {\n	uint32_t ff_PD = mm_first_free(PD);\n	uint32_t ff_PT = mm_first_free(PT);\n\n	if (ff_PD != ERR_NO_MEM && ff_PT != ERR_NO_MEM) {\n		uint32_t address = ((ff_PD * 0x1000 * 0x400) + (ff_PT * 0x1000));\n\n		mm_bitmap_set_bit(PT, ff_PT);	// Mark the page as no longer free\n		return address;\n\n	} else if (ff_PD != ERR_NO_MEM && ff_PT == ERR_NO_MEM) {\n		/*\n		PT is now full, so mark the PD as full also\n		Set the bit of the PD as the entire page being full\n		Which means we should change the pointer to PT to a new page table\n		since it's full, which means we don't need to save the data for it.\n		*/\n		/*\n		ACTUALLY DON'T.... This allows the entire page table to be reset under \n		the following circumstances:\n		If the page table is completely full (which it is if we are here), we \n		want to delete that entry. But if we then free one of those pages, we\n		can unmark the PD bit for that table - but we no longer have a bitmap\n		with the memory layout for that page table. Maybe we should keep a list of \n		pointers? Or doing a bitmap for the page directory is a bad idea... but\n		the other option is doing uint32 pd[1024], which takes up a whole 4KB of memory\n\n		So working solution for now is to just not unmark a directory after it's been marked full\n		So pages can continue to be used and free()d until the entire page table is full.\n		Then we switch to the next one.\n		*/\n		PT = mm_bitmap_init();\n		\n\n		vga_pretty(\"\\nSwapping page table bitmap\\n\", 0x05);\n\n		MM_CURRENT_PT = PT;\n		mm_bitmap_set_bit(PD, ff_PD);\n		// Now recursively try again\n\n		mm_page_alloc(PD, PT);\n\n\n	} else {\n		// This means both the PT and the PD are full\n		return ERR_NO_MEM;\n	}\n}\n\n\n\n/* \nWrapper for mm_page_alloc using global pointers\nConcept is to have malloc/whatever the virtual memory manager is call\nk_page_alloc() to get the heap, and then once that heap is outgrown, call alloc again.\nOnce the entire old heap is free()d, free the page.\n*/\nuint32_t* k_page_alloc() {\n	return mm_page_alloc(MM_CURRENT_PD, MM_CURRENT_PT);\n}\n\nuint32_t* k_page_free(uint32_t* addr) {\n	return mm_page_free(MM_CURRENT_PD, MM_CURRENT_PT, addr);\n}\n\nvoid mm_debug() {\n	printf(\"Physical Memory Management Debug:\\n\");\n	int ptidx = mm_first_free(MM_CURRENT_PT)/32;\n	int pdidx = mm_first_free(MM_CURRENT_PD)/32;\n	printf(\"PT (%d): %b\\n\", ptidx, MM_CURRENT_PT[ptidx]);\n	printf(\"PD (%d): %b\\n\", pdidx, MM_CURRENT_PD[pdidx]);\n}\n\n\n/*\n8 bits per byte * 4 bytes * 32 = 128 bytes (1024 bits)\nEach bit represents whether one 4096 byte page has been allocated or not.\nThis means that one 128 byte sized bitmap holds information for 4 MB of data\nOne bitmap[32] represents one page table entry, of which there are 1024 in a \npage directory;\nEach bitmap[i] entry represents 1024 pages.\n*/\n\n/*\nWe're going to return a one-time use address for setting up virtual paging.\nIt'll be entry 1023 in the first page table in the first Page directory entry\nThat entry will then be set to full.\n\nInitialize the page heap; and then allocate the first two new bitmaps.\n*/\nvoid* k_mm_init(uint32_t heap) {\n\n	heap = (heap + 0x1000) & ~0xFFF;\n	MM_HEAP = heap;\n//	kprintx(\"Heap@: \", heap);\n	MM_CURRENT_PD = mm_bitmap_init();\n	MM_CURRENT_PT = mm_bitmap_init();\n\n\n	/*First 2 mb are reserved as used.\n	~1Mb to 2Mb are for the K_MM_HEAP, but that shouldn't use more than a couple kb\n	This allows us the benefit of calling k_page_alloc for actual paging.\n\n	TODO: Change this to actual end-of-kernel space, so everything can be in agreement.\n	*/\n	for (int i = 0; i < 512; i++)\n		mm_bitmap_set_bit(MM_CURRENT_PT, i);	\n\n	uint32_t* addr = mm_page_alloc(MM_CURRENT_PD, MM_CURRENT_PT);\n\n	//kprintx(\"Initial addr:\", addr);\n	//kprintb(\"PT bm:\", MM_CURRENT_PT[31]);\n	return addr;\n}\n\n\n/*\nFunction to play around with and test the physical mem manager.\n*/\nvoid mm_test() {\n	// each bit in the pdb represents 4mb of address space\n	uint32_t ff_pdb = mm_first_free(MM_CURRENT_PD);\n	uint32_t ff_ptb = mm_first_free(MM_CURRENT_PT);\n\n	printf(\"PD @ %x | PT @ %x\\n\", MM_CURRENT_PD, MM_CURRENT_PT);\n	printf(\"ff_pdb %d\\n\", ff_pdb);\n	printf(\"ff_ptb %d\\n\", ff_ptb);\n\n	uint32_t first_address = (ff_pdb* 0x1000 * 0x400) + (ff_ptb * 0x1000);\n\n	for (int i = 0; i < 5; i++ ) {\n		int result = k_page_alloc();\n		if (result == ERR_NO_MEM)\n			vga_pretty(\"[FAIL] no memory left\", 0x4);\n		else {\n			printf(\"Testing allocation: 0x%x : PT$ %b\\n\", result, MM_CURRENT_PT[mm_first_free(MM_CURRENT_PT)/32]);\n		}\n	}\n\n\n	\n	k_page_free(first_address + 0x30);\n	printf(\"Testing free offset: 0x%x :PT$ %b\\n\", first_address, MM_CURRENT_PT[mm_first_free(MM_CURRENT_PT)/32]);\n	uint32_t* next = k_page_alloc();\n\n	if (next == first_address)\n		vga_pretty(\"Success!\\n\", 0x0A);\n	else {\n		vga_pretty(\"Something went wrong\\n\", 0x4);\n		printf(\"Current ff_pdb: 0x%x\\n\", ff_pdb);\n		printf(\"Current bitmap value: %b\\n\", MM_CURRENT_PD[1]);\n	}\n\n	for (int i = 0; i < 3; i++ ) {\n		int result = k_page_alloc();\n		if (result == ERR_NO_MEM)\n			vga_pretty(\"[FAIL] no memory left\", 0x4);\n		else {\n			printf(\"Testing allocation: 0x%x\\n\", result);\n		}\n	}\n\n}",
-			"file": "kernel/mm.c",
-			"file_size": 8305,
-			"file_write_time": 131159335398523369,
-			"settings":
-			{
-				"buffer_size": 8041,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "kernel/timer.c",
 			"settings":
 			{
-				"buffer_size": 461,
+				"buffer_size": 394,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/mm.c",
+			"settings":
+			{
+				"buffer_size": 9034,
 				"line_ending": "Windows"
 			}
 		},
@@ -606,7 +571,15 @@
 			"file": "kernel/paging.c",
 			"settings":
 			{
-				"buffer_size": 2885,
+				"buffer_size": 5828,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/include/paging.h",
+			"settings":
+			{
+				"buffer_size": 535,
 				"line_ending": "Windows"
 			}
 		},
@@ -614,24 +587,16 @@
 			"file": "kernel/malloc.c",
 			"settings":
 			{
-				"buffer_size": 9859,
+				"buffer_size": 10122,
 				"line_ending": "Windows",
 				"name": "/*"
-			}
-		},
-		{
-			"file": "kernel/thread.c",
-			"settings":
-			{
-				"buffer_size": 7079,
-				"line_ending": "Windows"
 			}
 		},
 		{
 			"file": "kernel/sched.c",
 			"settings":
 			{
-				"buffer_size": 3943,
+				"buffer_size": 4266,
 				"line_ending": "Windows",
 				"name": "/*"
 			}
@@ -640,18 +605,8 @@
 			"file": "kernel/include/threads.h",
 			"settings":
 			{
-				"buffer_size": 689,
+				"buffer_size": 475,
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "Searching 47 files for \"idle\"\n\nD:\\Documents\\GitHub\\baremetal\\bin\\kernel.bin:\n    <binary>\n\nD:\\Documents\\GitHub\\baremetal\\bin\\kernel.flat:\n    <binary>\n\nD:\\Documents\\GitHub\\baremetal\\kernel\\sched.c:\n   79  process* ptable\n   80  \n   81: process* idle = NULL;\n   82  process* a = 0;\n   83  process* b = 0;\n   ..\n   97  extern void sched_handler();\n   98  \n   99: void sysidle() { for(;;); }\n  100  \n  101  void sched_init() {\n  102: 	idle = spawn(\"Idle\", sysidle);\n  103  	a = spawn(\"A\", fn2);\n  104  	b = spawn(\"B\", fn1);\n\nD:\\Documents\\GitHub\\baremetal\\kernel\\thread.c:\n  319  	irq_install_handler(15, k_schedule);\n  320  	\n  321: 	spawn(\"Idle\", null_thread);\n  322  \n  323  	//spawn(\"Main\", event_loop);\n\nD:\\Documents\\GitHub\\baremetal\\tools\\i686-elf-as:\n    <binary>\n\nD:\\Documents\\GitHub\\baremetal\\tools\\i686-elf-gcc:\n    <binary>\n\n10 matches across 6 files\n\n\nSearching 1 file for \"cli\"\n\nD:\\Documents\\GitHub\\baremetal:\n    ERROR: Unable to open file\n\n0 matches\n\nSearching 1 file for \"cli\"\n\nD:\\Documents\\GitHub\\baremetal\\:\n    ERROR: Unable to open file\n\n0 matches\n\nSearching 48 files for \"cli\"\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\bin\\kernel.bin:\n    <binary>\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\arch\\start.s:\n   42  	global isr%1\n   43  	isr%1:\n   44: 		cli\n   45  		push byte %1\n   46  		jmp irqstub\n   ..\n   51  	global isr%1\n   52  	isr%1:\n   53: 		cli\n   54  		push byte 0\n   55  		push byte %1\n   ..\n   60  	global irq%1\n   61  	irq%1:\n   62: 		cli\n   63  		push byte 0\n   64  		push byte %2\n   ..\n  181  \n  182  enter_protected_mode:\n  183: 	cli\n  184  	;lgdt [gdt_pointer]\n  185  	mov eax, cr0\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\arch\\x86.c:\n  292  \n  293  // Disable interrupts\n  294: void cli() {\n  295:     asm volatile(\"cli\");\n  296  }\n  297  \n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\kernel.c:\n   47  \n   48  	//sched_init();\n   49: 	popcli();\n   50  	//sched();\n   51  	//sched();\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\mutex.c:\n   27  \n   28  \n   29: int ncli = 0;\n   30  int cpuflags = 0;\n   31  \n   32: void pushcli() {\n   33  	int eflags = get_eflags();\n   34: 	cli();\n   35: 	if (ncli++ == 0)	// INT enabled flag\n   36  		cpuflags = eflags & 0x200;\n   37  }\n   38  \n   39: void popcli() {\n   40  \n   41    if(get_eflags() & 0x200)\n   42:     panic(\"popcli - interruptible\");\n   43:   if(--ncli < 0)\n   44:     panic(\"popcli without push\");\n   45:   if(ncli == 0 && cpuflags)\n   46      sti();\n   47  }\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\paging.c:\n   24  /* We are going to try and fix PF's by increasing heap if that's the issue */\n   25  void k_page_fault(struct regs* r) {\n   26: 	asm volatile(\"cli\");\n   27  	uint32_t cr2;\n   28  \n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\sched.c:\n  156  \n  157  void scheduler(uint32_t esp) {\n  158: 	//cli();\n  159  \n  160  	if (!running) return esp;\n  161  //	printf(\"%x\\n\", esp);\n  162: 	cli();\n  163  	set_eflags(0x202);\n  164  	uint32_t ret = swap(esp);\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\thread.c:\n   21  \n   22  // thread* k_create_thread(char* name, void (*fn)() ) {\n   23: // 	cli();\n   24  // 	uint32_t* stack = malloc(0x1000) + 0x1000; // point to top of stack\n   25  \n   ..\n  228  \n  229  // void die() {\n  230: // 	cli();\n  231  // 	k_sched_state(0);\n  232  \n  ...\n  258  \n  259  // void lock() {\n  260: // //	cli();\n  261  // 	k_sched_state(0);\n  262  // 	//sti();\n  ...\n  313  // void k_thread_init(int timing) {\n  314  \n  315: // 	cli();\n  316  \n  317  // 	idt_set_gate(6, k_gpf_handler , 0x08, 0x8E);	// invalid opcode\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\map.txt:\n  122   .text          0x0000000000100e74       0xb4 mutex.o\n  123                  0x0000000000100e74                acquire\n  124:                 0x0000000000100e84                pushcli\n  125:                 0x0000000000100eb7                popcli\n  126   .text          0x0000000000100f28      0x1e7 paging.o\n  127                  0x0000000000100f28                k_page_fault\n  ...\n  223                  0x0000000000102bd2                tss_init\n  224                  0x0000000000102c4f                gdt_init\n  225:                 0x0000000000102ce4                cli\n  226                  0x0000000000102ce6                sti\n  227                  0x0000000000102ce8                print_regs\n  ...\n  354   .bss           0x000000000010a02c        0x8 mutex.o\n  355                  0x000000000010a02c                cpuflags\n  356:                 0x000000000010a030                ncli\n  357   .bss           0x000000000010a034        0x4 paging.o\n  358                  0x000000000010a034                K_CURRENT_PAGE_DIRECTORY\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\tools\\i686-elf-as:\n    <binary>\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\tools\\i686-elf-gcc:\n    <binary>\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\tools\\i686-elf-ld:\n    <binary>\n\nC:\\Users\\Mike\\Documents\\GitHub\\baremetal\\tools\\i686-elf-objdump:\n    <binary>\n\n63 matches across 13 files\n",
-			"settings":
-			{
-				"buffer_size": 5012,
-				"line_ending": "Windows",
-				"name": "Find Results",
-				"scratch": true
 			}
 		}
 	],
@@ -780,10 +735,19 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/x86.c",
+		"/C/Users/Mike/Documents/GitHub/xv6-public/Makefile",
+		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
+		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/sched.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/mutex.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mutex.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/start.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/assert.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/types.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/thread.c",
 		"/C/Users/Mike/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/timer.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/x86.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/start.s",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/keyboard.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdio.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vfs.c",
@@ -898,20 +862,11 @@
 		"/C/Users/Mike/Documents/GitHub/os/include/core/task.h",
 		"/C/Users/Mike/Documents/GitHub/os/core/arch/x86.c",
 		"/C/Users/Mike/Documents/GitHub/os/include/core/exec.h",
-		"/C/Users/Mike/Documents/GitHub/os/include/lib/syscall.h",
-		"/C/Users/Mike/Documents/GitHub/os/include/lib/api.h",
-		"/C/Users/Mike/Documents/GitHub/dev/mirage/combine/mirage.py",
-		"/C/Users/Mike/Documents/GitHub/kegg/__pycache__/html.cpython-35.pyc",
-		"/C/Users/Mike/Documents/GitHub/kegg/pulldowns",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/init.c",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/main.c",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/include/lib/assert.h",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/arch/x86.c",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/core/task/malloc.c"
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/syscall.h"
 	],
 	"find":
 	{
-		"height": 36.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -929,6 +884,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"K_CURRENT_PAGE_DIRECTORY",
+			"QEMUOPTS",
+			"mm_first_free",
+			"mm",
 			"lint",
 			"}",
 			"cli",
@@ -1011,15 +970,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 983,
+						"buffer_size": 1083,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								46,
-								46
+								290,
+								197
 							]
 						],
 						"settings":
@@ -1030,7 +989,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 13,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
@@ -1059,7 +1018,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
@@ -1068,15 +1027,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3420,
+						"buffer_size": 3917,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3330,
-								3330
+								3795,
+								3795
 							]
 						],
 						"settings":
@@ -1090,10 +1049,10 @@
 							"wrap_width": 80
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1879.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -1118,49 +1077,117 @@
 							"syntax": "Packages/C++/C.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": -0.0,
-						"translation.y": 1020.0,
+						"translation.x": 0.0,
+						"translation.y": 1399.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "kernel/arch/start.s",
+					"file": "kernel/timer.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3141,
+						"buffer_size": 394,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								264,
-								264
+								394,
+								394
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/R/R.sublime-syntax",
+							"syntax": "Packages/C++/C.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 120.0,
+						"translation.y": 270.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 5,
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
 				{
 					"buffer": 5,
-					"file": "kernel/arch/x86.c",
+					"file": "kernel/mm.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9159,
+						"buffer_size": 9034,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4463,
+								4463
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2420.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "kernel/paging.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5828,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2026,
+								2026
+							]
+						],
+						"settings":
+						{
+							"rulers":
+							[
+								80
+							],
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3618.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "kernel/include/paging.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 535,
 						"regions":
 						{
 						},
@@ -1169,64 +1196,6 @@
 							[
 								0,
 								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2087.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "kernel/mutex.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 576,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								550,
-								550
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 469.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "kernel/include/types.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 455,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								419,
-								419
 							]
 						],
 						"settings":
@@ -1237,117 +1206,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "kernel/mm.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8041,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								420,
-								420
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2940.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "kernel/timer.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 461,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								112,
-								112
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 10,
-					"file": "kernel/paging.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2885,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								686,
-								686
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1660.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
 					"file": "kernel/malloc.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9859,
+						"buffer_size": 10122,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								704,
-								704
+								4607,
+								4607
 							]
 						],
 						"settings":
@@ -1357,56 +1233,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 840.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "kernel/thread.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7079,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1560.0,
+						"translation.y": 1802.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 9,
 					"file": "kernel/sched.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3943,
+						"buffer_size": 4266,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2384,
-								2384
+								1519,
+								1519
 							]
 						],
 						"settings":
@@ -1419,27 +1266,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2880.0,
+						"translation.y": 1224.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 10,
 					"file": "kernel/include/threads.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 689,
+						"buffer_size": 475,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								180,
-								180
+								466,
+								466
 							]
 						],
 						"settings":
@@ -1451,181 +1298,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5012,
-						"regions":
-						{
-							"match":
-							{
-								"flags": 112,
-								"regions":
-								[
-									[
-										245,
-										249
-									],
-									[
-										369,
-										373
-									],
-									[
-										432,
-										436
-									],
-									[
-										446,
-										450
-									],
-									[
-										456,
-										460
-									],
-									[
-										638,
-										642
-									],
-									[
-										1273,
-										1276
-									],
-									[
-										1371,
-										1374
-									],
-									[
-										1469,
-										1472
-									],
-									[
-										1567,
-										1570
-									],
-									[
-										1730,
-										1733
-									],
-									[
-										1763,
-										1766
-									],
-									[
-										1889,
-										1892
-									],
-									[
-										2020,
-										2023
-									],
-									[
-										2078,
-										2081
-									],
-									[
-										2129,
-										2132
-									],
-									[
-										2149,
-										2152
-									],
-									[
-										2249,
-										2252
-									],
-									[
-										2320,
-										2323
-									],
-									[
-										2358,
-										2361
-									],
-									[
-										2388,
-										2391
-									],
-									[
-										2421,
-										2424
-									],
-									[
-										2679,
-										2682
-									],
-									[
-										2830,
-										2833
-									],
-									[
-										2918,
-										2921
-									],
-									[
-										3127,
-										3130
-									],
-									[
-										3269,
-										3272
-									],
-									[
-										3364,
-										3367
-									],
-									[
-										3488,
-										3491
-									],
-									[
-										3815,
-										3818
-									],
-									[
-										3879,
-										3882
-									],
-									[
-										4210,
-										4213
-									],
-									[
-										4534,
-										4537
-									]
-								],
-								"scope": ""
-							}
-						},
-						"selection":
-						[
-							[
-								1065,
-								1065
-							]
-						],
-						"settings":
-						{
-							"detect_indentation": false,
-							"line_numbers": false,
-							"output_tag": 4,
-							"result_base_dir": "",
-							"result_file_regex": "^([^ 	].*):$",
-							"result_line_regex": "^ +([0-9]+):",
-							"scroll_past_end": true,
-							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 760.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 15,
+					"stack_index": 10,
 					"type": "text"
 				}
 			]
@@ -1659,7 +1332,7 @@
 		"cols":
 		[
 			0.0,
-			0.438541666667,
+			0.4546875,
 			1.0
 		],
 		"rows":
@@ -1690,6 +1363,10 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"heap.c",
+				"C:\\Users\\Mike\\Documents\\GitHub\\baremetal\\kernel\\paging.c"
+			]
 		],
 		"width": 0.0
 	},
@@ -1715,7 +1392,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 1,
+	"selected_group": 0,
 	"settings":
 	{
 	},

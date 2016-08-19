@@ -5,6 +5,7 @@ sched.c
 #include <types.h>
 #include <x86.h>
 #include <threads.h>
+#include <mutex.h>
 
 #define MAX_PROCESS		256
 
@@ -89,6 +90,19 @@ process* spawn(char* name, void (*fn)() ) {
 	return p;
 }
 
+mutex proclock = {.lock = 0};
+
+
+int fork() {
+	acquire(&proclock);
+	int parent = getpid();
+
+	process *child = (process*) malloc(sizeof(process));
+
+	release(&proclock);
+}
+
+
 /* Insert process b after process a */
 void insert_link(process* a, process* b) {
 	if (!b->next)
@@ -116,7 +130,6 @@ void prioritize(int pid) {
 	popcli();
 }
 
-int iq = 0;
 
 /* __wait spins idly - no context changing */
 void __wait(int t) {
@@ -137,26 +150,15 @@ void wait(int n) {
 }
 
 
-int i = 0;
-void fn2() {
-	printf("Hello FN2 - PID %d\n", getpid());
-	wait(20);
-
-}
-
-
-void fn1() {
-	while(1)
-		yield();	
-}
-
 
 void yield() {
 //	ptable[current_pid]->state = 0;
 	sched();
 }
 
-int getpid() { return current_pid; }
+int getpid() { 
+	return current_pid;
+}
 
 
 uint32_t swap(uint32_t* esp) {
@@ -200,17 +202,16 @@ void scheduler(uint32_t esp) {
 	return swap(esp);
 }
 
-extern void sched_handler();
-
 int status(int pid) {
 	return ptable[pid]->state;
 }
+int sched_state() {
+	return running;
+}
 
-void sysidle() 		{ for(;;); }
-
-void schedloop() 	{ while(1) wait(1); }
-
-void douche() { for(;;); }
+void sysidle() {
+	while(1) sched();
+}
 
 void procinfo(process* p) {
 	printf("%s, pid %d, stack @ %x, state: %d, time %d, link %d\n", p->name, p->pid, p->stack, p->state, p->time, p->next->pid);
@@ -226,8 +227,7 @@ void sched_init() {
 	ptable = (process*) malloc(sizeof(process) * MAX_PROCESS);
 
 	process* idle = spawn("kernel", sysidle);
-	spawn("sched", schedloop);
-//	spawn("doucher", douche);
+	spawn("sched", sysidle);
 	auto_link();
 	
 	running = 1;

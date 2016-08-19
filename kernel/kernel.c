@@ -25,72 +25,12 @@ void event_loop() {
 		acquire(&key_mutex);
 		if (ftell(kb)) {
 			fflush(kb);
-			list_procs();
+			//list_procs();
 
 		}
 		release(&key_mutex);
 
 		yield();
-	}
-}
-
-extern uint32_t* MM_CURRENT_PT;
-extern uint32_t* MM_CURRENT_PD;
-
-void memtr1() {
-	int i = 1;
-	int t = 0;
-	vga_pretty("Beginning physical memory test!\n", VGA_LIGHTGREEN);
-	vga_kputs("PT", 0, 22);
-	vga_kputs("PD", 0, 23);
-	vga_kputs("Phys addr", 0, 24);
-	vga_kputs("Cycles/tick", 110, 24);
-	while(1) {
-		void* ptr = k_page_alloc();
-		if (!ptr) {
-			//traverse_blockchain();
-
-			die();
-		}
-		void *buf = malloc(32);
-		ftoa((double)i/t, buf);
-		vga_kputs(buf, 140, 24);
-
-
-		memset(buf, 0, 32);
-		itoa(ptr, buf, 16);
-		vga_kputs(buf, 20, 24);
-		
-		int _pti = mm_first_free(MM_CURRENT_PT)/32;
-		int _pdi = mm_first_free(MM_CURRENT_PD)/32;
-		uint32_t ptidx = MM_CURRENT_PT[_pti];
-		uint32_t pdidx = MM_CURRENT_PD[_pdi];
-
-		memset(buf, 0, 32);
-		itoa(pdidx, buf, 2);
-		vga_kputs(buf, 20, 23);
-
-		memset(buf, 0, 32);
-		itoa(_pdi%32, buf, 10);
-		vga_kputs(buf, 10, 23);
-
-		memset(buf, 0, 32);
-		itoa(ptidx, buf, 2);
-		vga_kputs(buf, 20, 22);
-
-		memset(buf, 0, 32);
-		itoa(_pti%32, buf, 10);
-		vga_kputs(buf, 10, 22);
-
-		free(buf);
-		//printf("%x -- %d %d (Cycles per tick: %e)\n", ptr, i, t, ((double)i/ t));
-		free(ptr);
-		t = get_ticks();
-		i++;
-		//wait(5);
-		yield();
-
-
 	}
 }
 
@@ -102,6 +42,8 @@ void fn3() {
 
 extern void switch_to_user(void* (fn)(), uint32_t esp);
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
+
+
 void kernel_initialize(uint32_t kernel_end) {
 
 	/*
@@ -130,25 +72,28 @@ void kernel_initialize(uint32_t kernel_end) {
 	vga_clear();
 	vga_pretty(logo, VGA_CYAN);
 
-
-
 	sched_init();
-	//acquire(&key_mutex);
 	printf("Back in kernel-init\n");
 
-/*	while(1) {
+	extern uint32_t KERNEL_PAGE_DIRECTORY;
 
-		list_procs();
-		wait(5);
-		//yield();
-	}*/
-	spawn("memtest", memtr1);
-	spawn("event", event_loop);
+	
+	//uint32_t* pd = k_create_pagedir(0x00100000, 256, 3);	// 4 mb upwards
+	uint32_t* pd = k_create_pagedir(0, 0, 3);
+/*
+	_paging_map(pd, 0xb8000, 0xb8000, 0x7);
+	for (int i = 0x00100000; i < (kernel_end + 0x1000); i += 0x1000)
+		_paging_map(pd, i, i, 0x7);*/
+		
+	_paging_map_more(pd, 0x00100000, 1024, 7);
+	_paging_map_more(pd, 0x01000000, 1024, 7);
+
+	walk_pagedir(pd);
+
+	k_swap_pd(pd);
 	while(1) {
 		yield();
-		//wait(5);
 	}
-
 
 	for(;;);
 }

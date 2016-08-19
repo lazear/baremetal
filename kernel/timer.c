@@ -11,14 +11,10 @@ char* timer_buf = 0;
 
 void timer(regs_t *r) {
 	ticks++;
-//	thread_add_ticks();
 	if (!(ticks%1)) {
 		itoa(ticks, timer_buf, 10);
 		vga_kputs(timer_buf, 150, 0);
 	}
-/*	if (ticks % 10 == 0)
-		sched();*/
-	return r;
 }
 
 void timer_init() {
