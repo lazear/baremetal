@@ -21,7 +21,10 @@ extern int k_paging_unmap(uint32_t virt);
 extern void k_paging_map(uint32_t phys, uint32_t virt, uint8_t flags);
 
 extern void k_paging_init(uint32_t* dir_addr);
-extern uint32_t* k_paging_get_phys(uint32_t virt);
+extern uint32_t* k_virt_to_phys(uint32_t virt);
+
+extern uint32_t* k_phys_to_virt(uint32_t phys);
+extern uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) ;
 
 
 #endif

@@ -128,7 +128,7 @@ Should only be used with caution.
 */
 void free_vpage(uint32_t* addr) {
 	//sbrk(1);
-	uint32_t phys = k_paging_get_phys(addr);
+	uint32_t phys = k_virt_to_phys(addr);
 	k_paging_unmap(addr);			// Unmap and invalidate the page in CR3
 	k_page_free(phys);				// Return the page to the PMM
 
@@ -320,31 +320,35 @@ void* malloc(size_t n) {
 We will first allocate a block of free memory to buffer until page alignment.
 */
 void* malloc_a(size_t n) {
+
+	//acquire(&memlock);
 	uint32_t base = (K_LAST_ALLOC & ~0xFFF) + 0x1000;
 	uint32_t diff = (base - K_LAST_ALLOC);
 	
 	void* ptr = NULL;
 
-	pushcli();
 	if (diff != 0x1000) {
-		if(!blockchain_add(diff))
+		if(!blockchain_add(diff)) {
+			//release(&memlock);
 			return NULL;
+		}
 		K_LAST_ALLOC += diff;
 
 		uint32_t* b = BLOCKCHAIN_START + (BLOCKS_ALLOCATED * sizeof(uint32_t));
 		free(translate(b - 1));
 	}
 
-	if (!blockchain_add(n))
+	if (!blockchain_add(n)) {
+		//release(&memlock);
 		return NULL;
+	}
 
 	ptr = (void*) K_LAST_ALLOC;
 	K_LAST_ALLOC += n;
 
 	if (K_LAST_ALLOC >= K_HEAP_TOP) 
 		sbrk((K_LAST_ALLOC - K_HEAP_TOP) + 0x1000);
-	popcli();
-
+	//release(&memlock);
 	return ptr;
 }
 

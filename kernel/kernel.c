@@ -43,6 +43,7 @@ void fn3() {
 extern void switch_to_user(void* (fn)(), uint32_t esp);
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
 
+uint32_t KERNEL_END = 0;
 
 void kernel_initialize(uint32_t kernel_end) {
 
@@ -57,6 +58,7 @@ void kernel_initialize(uint32_t kernel_end) {
 			- Public heap starts at 3GB. This should be changed when higher half is implemented
 	4.	Todo - initialize multithreading.
 	*/
+	KERNEL_END = kernel_end;
 	uint32_t* pagedir = k_mm_init(kernel_end);
 	k_paging_init(pagedir);
 	k_heap_init();
@@ -77,21 +79,52 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	extern uint32_t KERNEL_PAGE_DIRECTORY;
 
-	
-	//uint32_t* pd = k_create_pagedir(0x00100000, 256, 3);	// 4 mb upwards
-	uint32_t* pd = k_create_pagedir(0, 0, 3);
-/*
-	_paging_map(pd, 0xb8000, 0xb8000, 0x7);
-	for (int i = 0x00100000; i < (kernel_end + 0x1000); i += 0x1000)
-		_paging_map(pd, i, i, 0x7);*/
-		
-	_paging_map_more(pd, 0x00100000, 1024, 7);
-	_paging_map_more(pd, 0x01000000, 1024, 7);
 
-	walk_pagedir(pd);
+	/* 
+	Userspace PD test:
+	Map from 0x0100 to 0x0110 (16 to 17 MB of virtual address space)
+	The physical addresses are going to be allocated by k_page_alloc,
+	but should still be within the 4MB range we have linearly mapped.
+	This will enable us to copy data to the physical address mapped
+	to a new virtual address not yet available in the current mapping.
+	We can then switch PDs and access the data.
+	*/
+
+
+	uint32_t* pd = k_create_pagedir(0x01000000, 1024, 3); 	// map 1mb
+	k_map_kernel(pd);
+	//k_map_kernel(pd2);
+
+
+	/* ptr to a place not mapped in kernel-space yet */
+	/* physical address of that place */
+
+	char* name = malloc(60);
+	strcpy(name, "Jello");
+
+	void* ptr = (void*) name;
+	void* physptr = ((uint32_t) k_virt_to_phys(ptr) & ~0xFFF) + ((uint32_t)ptr & 0xFFF);
+
+
+
+	printf("Mapped to phys %x\n", physptr);
+	printf("0x%x : %s\n", ptr, (char*) physptr);
+
+
+
+	page_copy(pd, KERNEL_PAGE_DIRECTORY, name, 60);
+	strcat(name, "ismyname");
+	printf("0x%x : %s\n", ptr, name);
 
 	k_swap_pd(pd);
+
+	printf("Did it work? %s\n", name);
+	k_swap_pd(KERNEL_PAGE_DIRECTORY);
+	printf("Did it work? %s\n", name);
+	//walk_pagedir(KERNEL_PAGE_DIRECTORY);
+
 	while(1) {
+
 		yield();
 	}
 

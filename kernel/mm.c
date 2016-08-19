@@ -22,7 +22,12 @@ and page table bitmap
 uint32_t* MM_CURRENT_PD = 0;
 uint32_t* MM_CURRENT_PT = 0;
 
-// MM_HEAP will be set to the end of the kernel ~1mb
+/* 
+MM_HEAP will be set to the end of the kernel ~1mb. 1mb / 0x1000 = 256 possible entries.
+There will be less in reality, as the kernel is going to take up quite a bit of room.
+To overcome the issue of allocating page tables, we COULD try and allocate using mm_alloc.
+But there is no freeing capability, so we must be careful. Maybe use the kernel PT/PD from here?
+*/
 uint32_t* MM_HEAP = 0;
 // MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.
 uint32_t* MM_HEAP_MAX = 0x00200000;
@@ -225,9 +230,10 @@ void* k_mm_init(uint32_t heap) {
 	/*First 2 mb are reserved as used.
 	~1Mb to 2Mb are for the K_MM_HEAP, but that shouldn't use more than a couple kb
 	This allows us the benefit of calling k_page_alloc for actual paging.
-
+	2MB to 4MB are linearly mapped for kernel space.
 	TODO: Change this to actual end-of-kernel space, so everything can be in agreement.
 	*/
+
 	for (int i = 0; i < 512; i++)
 		mm_bitmap_set_bit(MM_CURRENT_PT, i);	
 
