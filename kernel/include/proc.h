@@ -1,9 +1,12 @@
 // thread.h
 
 #include <types.h>
+#include <x86.h>
+
 #ifndef __baremetal_thread__
 #define __baremetal_thread__
 
+#define MAX_PROCESS	256
 
 typedef struct process_t {
 	char name[16];
@@ -14,6 +17,7 @@ typedef struct process_t {
 	uint32_t sz;
 	uint32_t* stack;
 	uint32_t* pagedir;
+	struct stackframe* frame;
 	struct process_t* next;
 	struct process_t* parent;
 } process;

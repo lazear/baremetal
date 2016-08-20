@@ -24,8 +24,11 @@ void event_loop() {
 
 		acquire(&key_mutex);
 		if (ftell(kb)) {
-			fflush(kb);
+			//fflush(kb);
 			//list_procs();
+			vga_kputc(fgetc(kb), 150, 1);
+			fflush(kb);
+
 
 		}
 		release(&key_mutex);
@@ -35,10 +38,6 @@ void event_loop() {
 }
 
 
-void fn3() {
-	asm volatile("int $0x80");
-	for(;;);
-}
 
 extern void switch_to_user(void* (fn)(), uint32_t esp);
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
@@ -79,49 +78,15 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	extern uint32_t KERNEL_PAGE_DIRECTORY;
 
+	spawn("loop", event_loop);
 
-	/* 
-	Userspace PD test:
-	Map from 0x0100 to 0x0110 (16 to 17 MB of virtual address space)
-	The physical addresses are going to be allocated by k_page_alloc,
-	but should still be within the 4MB range we have linearly mapped.
-	This will enable us to copy data to the physical address mapped
-	to a new virtual address not yet available in the current mapping.
-	We can then switch PDs and access the data.
-	*/
+	//fork();
+	
+	//yield();
+	int i = fork();
 
-
-	uint32_t* pd = k_create_pagedir(0x01000000, 1024, 3); 	// map 1mb
-	k_map_kernel(pd);
-	//k_map_kernel(pd2);
-
-
-	/* ptr to a place not mapped in kernel-space yet */
-	/* physical address of that place */
-
-	char* name = malloc(60);
-	strcpy(name, "Jello");
-
-	void* ptr = (void*) name;
-	void* physptr = ((uint32_t) k_virt_to_phys(ptr) & ~0xFFF) + ((uint32_t)ptr & 0xFFF);
-
-
-
-	printf("Mapped to phys %x\n", physptr);
-	printf("0x%x : %s\n", ptr, (char*) physptr);
-
-
-
-	page_copy(pd, KERNEL_PAGE_DIRECTORY, name, 60);
-	strcat(name, "ismyname");
-	printf("0x%x : %s\n", ptr, name);
-
-	k_swap_pd(pd);
-
-	printf("Did it work? %s\n", name);
-	k_swap_pd(KERNEL_PAGE_DIRECTORY);
-	printf("Did it work? %s\n", name);
-	//walk_pagedir(KERNEL_PAGE_DIRECTORY);
+	if (i == 0) printf("(CHILD)\n");
+	else printf("PARENT\n");
 
 	while(1) {
 

@@ -37,16 +37,7 @@ struct gdt_ptr
 } __attribute__((packed));
 
 
-typedef struct regs
-{
-    unsigned int gs, fs, es, ds;
-    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;  // pusha instruction
-    unsigned int int_no, err_code;
-    unsigned int eip, cs, eflags, useresp, ss;    
-};
-
-
-typedef struct regs_r {
+typedef struct stackframe {
   uint32_t gs;    // we push gs last, so it's popped first
   uint32_t fs;
   uint32_t es;
@@ -103,7 +94,7 @@ struct tss_entry
 } __attribute__((packed));
 
 
-extern void irq_handler(struct regs *r);
+extern void irq_handler(regs_t *r);
 extern void outportb(uint16_t port, uint16_t data);
 // The following functions are from start.s, ISR and IRQ macros
 

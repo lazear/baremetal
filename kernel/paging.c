@@ -32,7 +32,7 @@ void k_swap_pd(uint32_t* pd) {
 
 
 /* We are going to try and fix PF's by increasing heap if that's the issue */
-void k_page_fault(struct regs* r) {
+void k_page_fault(regs_t * r) {
 	pushcli();
 	uint32_t cr2;
 

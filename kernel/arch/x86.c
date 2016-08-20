@@ -91,7 +91,7 @@ void *irq_routines[16] =
 };
 
 /* This installs a custom IRQ handler for the given IRQ */
-void irq_install_handler(int irq, void (*handler)(struct regs *r))
+void irq_install_handler(int irq, void (*handler)(regs_t *r))
 {
     irq_routines[irq] = handler;
 }
@@ -116,7 +116,7 @@ void irq_remap(void)
     outportb(0xA1, 0x0);
 }
 
-void irq_handler(struct regs *r)
+void irq_handler(regs_t *r)
 {
 
 	if (r->int_no < 32) {
@@ -126,7 +126,7 @@ void irq_handler(struct regs *r)
 	}
 
     /* This is a blank function pointer */
-    void (*handler)(struct regs *r);
+    void (*handler)(regs_t *r);
 
     /* Find out if we have a custom handler to run for this
     *  IRQ, and then finally, run it */

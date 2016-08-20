@@ -29,6 +29,17 @@ sched:
 
 	ret
 
+global trapret
+trapret:
+
+	pop gs
+	pop fs
+	pop es
+	pop ds
+	popa
+	add esp, 8		; pop int-no and errcode
+	iret;
+
 extern pushcli
 extern popcli
 

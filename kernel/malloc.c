@@ -70,13 +70,21 @@ LAST_ALLOC is basically the current used top, the next address allocated will be
 |_____BOTTOM_____|0xC0000000
 */
 
-static const uint32_t K_HEAP_BOTTOM = 0x01000000;
+static const uint32_t K_HEAP_BOTTOM = 0x01000000;	// 16 MB
 static const uint32_t K_HEAP_MAX = 0xF0000000;
 
 uint32_t K_HEAP_TOP = 0;
 uint32_t K_LAST_ALLOC =  0;
 
 mutex memlock = {.lock = 0};
+
+typedef struct malloc_info {
+	uint32_t bc_start, bc_alloc;
+	uint32_t* bc;
+	uint32_t heap_top, last_alloc;
+} malloc_t;
+
+
 
 
 int blockchain_add(uint32_t size) {
@@ -404,3 +412,21 @@ void k_heap_test() {
 	traverse_blockchain();
 }
 
+malloc_t* blockchain_save() {
+	malloc_t* m = (malloc_t*) malloc(sizeof(malloc_t));
+	m->bc_alloc = BLOCKS_ALLOCATED;
+	m->bc_start = BLOCKCHAIN_START;
+	m->bc = blockchain;
+	m->heap_top = K_HEAP_TOP;
+	m->last_alloc = K_LAST_ALLOC;
+
+	return m;
+}
+
+void blockchain_load(malloc_t* m) {
+	BLOCKS_ALLOCATED = m->bc_alloc;
+	BLOCKCHAIN_START = m->bc_start;
+	blockchain = m->bc;
+	K_HEAP_TOP = m->heap_top;
+	K_LAST_ALLOC = m->last_alloc;
+}

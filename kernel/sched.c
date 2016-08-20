@@ -4,16 +4,20 @@ sched.c
 
 #include <types.h>
 #include <x86.h>
-#include <threads.h>
+#include <proc.h>
 #include <mutex.h>
 
-#define MAX_PROCESS		256
 
+
+extern uint32_t* KERNEL_PAGE_DIRECTORY;
 process** ptable;
 int nextpid = 0;
 int running = 0;
 int current_pid = 0;
 
+mutex proclock = {.lock = 0};
+
+extern void trapret();
 extern struct tss_entry system_tss;
 
 void set_tss_esp() {
@@ -31,7 +35,7 @@ void kill(int pid) {
 		return;
 	}
 
-	pushcli();
+	acquire(&proclock);
 	process* p = ptable[pid];
 	p->state = 0;
 	p->next = ptable[0];
@@ -41,7 +45,7 @@ void kill(int pid) {
 	free(p);
 	//ptable[pid] = NULL;
 	printf("PID %d is kill\n", pid);
-	popcli();
+	release(&proclock);
 
 }
 
@@ -50,7 +54,7 @@ void die() {
 
 }
 
-void backup() {
+void __exit() {
 	int pid = getpid();
 
 	kill(pid);
@@ -62,13 +66,11 @@ void backup() {
 }
 
 process* spawn(char* name, void (*fn)() ) {
-	pushcli();
+	acquire(&proclock);
 	process* p = (process*) malloc(sizeof(process));
 	memset(p, 0, sizeof(process));
 	strcpy(p->name, name, 16);
-	p->pid = nextpid++;
-	p->pagedir = NULL;
-	p->state = 1;
+
 	uint32_t* stack = (uint32_t*) (malloc(0x1000));		// stack will grow down
 	uint32_t top = ((uint32_t) stack + 0x1000);			// ebp points to top of stack
 
@@ -76,7 +78,21 @@ process* spawn(char* name, void (*fn)() ) {
 
 	stack = top;
 	stack -= sizeof(regs_t);
-	*--stack = (uint32_t) backup;
+
+	p->pid = nextpid++;
+	p->pagedir = KERNEL_PAGE_DIRECTORY;
+	p->state = 1;
+	p->frame = stack;
+
+	p->frame->eip = (uint32_t) __exit;
+	p->frame->cs = 0x08;
+	p->frame->ds = 0x10;
+	p->frame->es = 0x10;
+	p->frame->fs = 0x10;
+	p->frame->gs = 0x10;
+	p->frame->flags = 0x202;
+
+	*--stack = (uint32_t) trapret;
 	*--stack = (uint32_t) fn;	// EIP
 	*--stack = top;				// EBP
 	*--stack = 0; 				// EBX
@@ -84,23 +100,13 @@ process* spawn(char* name, void (*fn)() ) {
 	*--stack = 0; 				// EDI
 
 	p->stack = stack;
+	p->frame->esp = stack;
 	ptable[p->pid] = p;
 
-	popcli();
+	release(&proclock);
 	return p;
 }
 
-mutex proclock = {.lock = 0};
-
-
-int fork() {
-	acquire(&proclock);
-	int parent = getpid();
-
-	process *child = (process*) malloc(sizeof(process));
-
-	release(&proclock);
-}
 
 
 /* Insert process b after process a */
@@ -191,14 +197,17 @@ uint32_t swap(uint32_t* esp) {
 
 	}
 	ptable[current_pid]->time++;
+
 	popcli();
+	k_swap_pd(ptable[current_pid]->pagedir);
 	return ptable[current_pid]->stack;
 
 
 }
 
 void scheduler(uint32_t esp) {
-	if (!running) return esp;
+	if (!running++) return esp;
+	//printf("%d\n", current_pid);
 	return swap(esp);
 }
 
@@ -231,7 +240,7 @@ void sched_init() {
 	auto_link();
 	
 	running = 1;
-	printf("Cur pid: %d\tNumber of threads: %d\n", current_pid, nextpid);
+
 	//sched();
 
 }
