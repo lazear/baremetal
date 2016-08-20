@@ -47,22 +47,21 @@ void kill(int pid) {
 	printf("PID %d is kill\n", pid);
 	release(&proclock);
 
+
 }
 
 void die() {
 	kill(getpid());
-
-}
-
-void __exit() {
-	int pid = getpid();
-
-	kill(pid);
 	while(1) {
 //		printf("pid %d is a zombie\n", getpid());
 		sched();
 
 	}
+
+}
+
+void __exit() {
+	die();
 }
 
 process* spawn(char* name, void (*fn)() ) {
@@ -107,7 +106,9 @@ process* spawn(char* name, void (*fn)() ) {
 	return p;
 }
 
-
+process* get_current_proc() {
+	return ptable[current_pid];
+}
 
 /* Insert process b after process a */
 void insert_link(process* a, process* b) {
@@ -168,7 +169,7 @@ int getpid() {
 
 
 uint32_t swap(uint32_t* esp) {
-	pushcli();
+	acquire(&proclock);
 	static int first = 0;
 	if (!first) {
 		/*
@@ -178,7 +179,7 @@ uint32_t swap(uint32_t* esp) {
 		actually loop back to kernel_initialize */
 		ptable[0]->stack = esp;
 		first = 1;
-		popcli();
+		release(&proclock);
 		return ptable[++current_pid]->stack;
 
 	} else {
@@ -198,7 +199,7 @@ uint32_t swap(uint32_t* esp) {
 	}
 	ptable[current_pid]->time++;
 
-	popcli();
+	release(&proclock);
 	k_swap_pd(ptable[current_pid]->pagedir);
 	return ptable[current_pid]->stack;
 

@@ -240,6 +240,20 @@ void _paging_map_more(uint32_t* pd, uint32_t virt, uint32_t numpages, int flags)
 }
 
 
+void free_pagedir(uint32_t* pd) {
+	for (int i = 0; i < 1024; i++) {
+		if (pd[i] & ~0x3FF) {
+			uint32_t* pt = pd[i]  & ~0x3FF;
+			for (int q = 0; q < 1024; q++) {
+				if (pt[q] & ~0x3FF) {
+					k_page_free(pt[q] & ~0x3FF);
+					//_paging_unmap(pd, ( (i << 22) + (q << 12)));
+				}
+			}
+		}
+	}
+}
+
 /*
 Copy n bytes starting at virtual address virt from the physical address of virt
 in the source page directory to the physical address of virt in the destination
@@ -262,7 +276,7 @@ void page_copy(uint32_t* dest, uint32_t* src, uint32_t virt, size_t n) {
 
 	size_t sz = n;
 	for (int i = 0; i < n; i+= 0x1000) {
-		va0 += i;
+		va0 += 0x1000;
 		size_t cp = (sz >= 0x1000) ? 0x1000 - off : sz;
 
 
@@ -274,7 +288,9 @@ void page_copy(uint32_t* dest, uint32_t* src, uint32_t virt, size_t n) {
 		uint32_t pa_src = _virt_to_phys(src, va0);
 		uint32_t pa_dest = _virt_to_phys(dest, va0);
 
+
 		if (!pa_src) {
+			printf("%x ", va0);
 			panic("Page not mapped in source page directory!");
 			return;
 		}
@@ -338,7 +354,7 @@ void k_map_kernel(uint32_t* pd) {
 }
 
 uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
-	uint32_t* pd = mm_alloc(0x1000);//k_page_alloc();		// 0xFFFF0000 virtual address
+	uint32_t* pd = mm_alloc(0x1000);	// 0xFFFF0000 virtual address
 	//uint32_t* table = k_page_alloc();	// 0xFFC00000 virtual address
 	memset(pd, 0, 0x1000);
 	//memset(table, 0, 0x1000);

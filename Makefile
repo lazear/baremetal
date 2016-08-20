@@ -4,7 +4,7 @@
 FINAL	= bin/kernel.bin	# Output binary
 START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
-AOBJS	= switch_to_user.so sched.so
+AOBJS	= switch_to_user.so sched.so syscall.so
 CC	    = /home/lazear/opt/cross/bin/i686-elf-gcc
 LD		= /home/lazear/opt/cross/bin/i686-elf-ld
 AS		= nasm
@@ -30,6 +30,7 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/start.s -o start.so
 	$(AS) $(ASFLAGS) kernel/arch/switch_to_user.s -o switch_to_user.so
 	$(AS) $(ASFLAGS) kernel/arch/sched.s -o sched.so
+	$(AS) $(ASFLAGS) kernel/arch/syscall.s -o syscall.so
 	
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain

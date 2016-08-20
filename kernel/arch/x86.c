@@ -125,6 +125,11 @@ void irq_handler(regs_t *r)
 		return;
 	}
 
+/*    if (r->int_no == 0x80) {
+        vga_puts("syscall!");
+        syscall_handler(r);
+    }*/
+
     /* This is a blank function pointer */
     void (*handler)(regs_t *r);
 

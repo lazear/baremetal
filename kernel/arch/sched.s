@@ -3,7 +3,7 @@
 extern scheduler
 global sched
 sched:
-	
+
 
 	push ebp
 	push ebx
