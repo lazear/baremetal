@@ -52,7 +52,7 @@ char* strcpy(char *dest, const char *src) {
 
 
 int strncmp(char* s1, char* s2, size_t n) {
-	for (size_t i = 0; i < n && *s1 == *s2; s1++, s2++)
+	for (size_t i = 0; i < n && *s1 == *s2; s1++, s2++, i++)
 		if (*s1 == '\0')
 			return 0;
 	return ( *(unsigned char*)s1 - *(unsigned char*)s2 );
@@ -69,8 +69,12 @@ char* strchr(const char* s, int c) {
 	return NULL;
 }
 
+char* strdup(const char* s) {
+	return strcpy((char*) malloc(strlen(s)), s);
+}
+
 /*
-In-place string reverse. May be dangerous to use.
+In place string reverse
 */
 char* strrev(char* s) {
 	int length = strlen(s) - 1;
@@ -107,14 +111,57 @@ void* memsetw(void *s, int c, size_t n) {
 void* memmove(void *s1, const void* s2, size_t n) {
 	char* dest 	= (char*) s1;
 	char* src 	= (char*) s2;
-	char temp[n]; // add in malloc
+	char* temp = (char*) malloc(n);
 
 	for (int i = 0; i < n; i++)
 		temp[i] = src[i];
 	for (int i = 0; i < n; i++)
 		dest[i] = temp[i];
 
-	//add in free(temp)
-
+	free(temp);
 	return s1;
+}
+
+void* memchr(const void* s, int c, size_t n) {
+	uint8_t* b = s;
+	while (n--)
+		if (*b++ == c)
+			return b;
+	return NULL;
+}
+
+void* memrchr(const void* s, int c, size_t n) {
+	return strrev(memchr(strrev(s), c, n));
+}
+
+int memcmp(const uint8_t* s1, const uint8_t* s2, size_t n) {
+
+	while (*s1 == *s2 && n--) {
+		s1++;
+		s2++;
+	}
+	return ( *(uint8_t*)s1 - *(uint8_t*)s2 );
+}
+
+
+char* strtok(char* s, const char* delim) {
+	char* b = NULL;
+	static char* ptr, d = NULL;
+
+
+	if (s) 
+		ptr = s;
+
+	if (!ptr && !s)
+		return NULL;
+	for (int i = 0; i < strlen(delim); i++) {
+		b = ptr;
+		ptr = strchr(ptr, delim[i]);
+		if (!ptr && !b) 
+			return NULL;
+		*--ptr = '\0';
+		ptr++;
+		return b;
+	}
+	return NULL;
 }

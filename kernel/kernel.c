@@ -84,22 +84,17 @@ void kernel_initialize(uint32_t kernel_end) {
 	spawn("loop", event_loop);
 
 	//fork();
-	
-	int parent = getpid();
+	char* name = "My full name is Lazear, Michael Ryan";
+	char* follow = "ABCDE";
+	char* ret = strtok(name, "au");
 
-	int i = fork();
-
-	free_pagedir(ptable[i]->pagedir);
-
+	while (ret) {
+		printf("%s\n", ret);
+		ret = strtok(NULL, "au");
+	}
+	printf("%s %s\n", name, follow);
 	while(1) {
-		if (getpid() != 0 ) {
 
-			void *ptr = malloc(10);
-			//memcpy(ptr, "Helllo", 8);
-			printf("CHILD");
-		}
-		if (getpid() == 0)
-			printf("ADULT");
 		yield();
 
 	}
