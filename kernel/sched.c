@@ -60,6 +60,7 @@ void die() {
 
 }
 
+
 void __exit() {
 	die();
 }

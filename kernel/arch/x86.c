@@ -3,13 +3,14 @@ vga.c
 Michael Lazear, 2007-2016
 
 Implementation of x86 interrupts and inline assembly for baremetal
-Adapted/taken from Bran's Kernel Dev tutorial.
+Adapted/taken from Bran's Kernel Dev tutorial and the MIT xv6 project.
 */
 
 
 
 #include <types.h>
 #include <x86.h>
+#include <traps.h>
 
 /****************************************
 *		        ASM Template			*
@@ -75,32 +76,10 @@ uint64_t inportl(uint16_t port) {
 }
 
 
-struct idt_entry idt[256];
-struct idt_ptr idt_pointer;
 
 struct gdt_entry gdt[8];
 struct gdt_ptr gdt_pointer;
 
-
-/* This array is actually an array of function pointers. We use
-*  this to handle custom IRQ handlers for a given IRQ */
-void *irq_routines[16] =
-{
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
-};
-
-/* This installs a custom IRQ handler for the given IRQ */
-void irq_install_handler(int irq, void (*handler)(regs_t *r))
-{
-    irq_routines[irq] = handler;
-}
-
-/* This clears the handler for a given IRQ */
-void irq_uninstall_handler(int irq)
-{
-    irq_routines[irq] = 0;
-}
 
 void irq_remap(void)
 {
@@ -116,138 +95,53 @@ void irq_remap(void)
     outportb(0xA1, 0x0);
 }
 
-void irq_handler(regs_t *r)
-{
 
-	if (r->int_no < 32) {
-		printf("Exception: %d\n", r->int_no);
-        asm ("hlt");
-		return;
-	}
+struct gatedesc idt[256];
 
-/*    if (r->int_no == 0x80) {
-        vga_puts("syscall!");
-        syscall_handler(r);
-    }*/
+static inline void lidt(struct gatedesc *p, int size) {
+	volatile uint16_t pd[3];
 
-    /* This is a blank function pointer */
-    void (*handler)(regs_t *r);
+	pd[0] = size-1;
+	pd[1] = (uint32_t)p;
+	pd[2] = (uint32_t)p >> 16;
 
-    /* Find out if we have a custom handler to run for this
-    *  IRQ, and then finally, run it */
-    handler = irq_routines[r->int_no - 32];
-
-    if (handler)
-    {
-		//printf("IRQ Calling handler: 0x%x\n", handler);
-        handler(r);
-    }
-
-    /* If the IDT entry that was invoked was greater than 40
-    *  (meaning IRQ8 - 15), then we need to send an EOI to
-    *  the slave controller */
-    if (r->int_no >= 40)
-    {
-        outportb(0xA0, 0x20);
-    }
-
-    /* In either case, we need to send an EOI to the master
-    *  interrupt controller too */
-    outportb(0x20, 0x20);
+	asm volatile("lidt (%0)" : : "r" (pd));
 }
 
-void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
-	/* The interrupt routine's base address */
-	idt[num].base_lo = (base & 0xFFFF);
-	idt[num].base_hi = (base >> 16) & 0xFFFF;
-
-	/* The segment or 'selector' that this IDT entry will use
-	*  is set here, along with any access flags */
-	idt[num].sel = sel;
-	idt[num].always0 = 0;
-	idt[num].flags = flags;
-}
 
 void idt_init() {
-	/* Sets the special IDT pointer up, just like in 'gdt.c' */
-	idt_pointer.limit = (sizeof (struct idt_entry) * 256) - 1;
-	idt_pointer.base = &idt;
+	pic_init();
+	//irq_remap();
+	for (int i = 0; i < 256; i ++)
+		SETGATE(idt[i], 0, 0x8, vectors[i], 0);
 
-	/* Clear out the entire IDT, initializing it to zeros */
-//	memset(&idt, 0, sizeof(struct idt_entry) * 256);
+	SETGATE(idt[T_SYSCALL], 1, 0x8, vectors[T_SYSCALL], DPL_USER);
+	
 
-/*
-	for (int i = 0; i < sizeof(struct idt_entry) * 256; i++) {
-		int* pointer = &idt;
-		pointer[i] = 0;
-	}
-*/
-	/* Add any new ISRs to the IDT here using idt_set_gate */
-    idt_set_gate(0, (unsigned)isr0, 0x08, 0x8E);
-    idt_set_gate(1, (unsigned)isr1, 0x08, 0x8E);
-    idt_set_gate(2, (unsigned)isr2, 0x08, 0x8E);
-    idt_set_gate(3, (unsigned)isr3, 0x08, 0x8E);
-    idt_set_gate(4, (unsigned)isr4, 0x08, 0x8E);
-    idt_set_gate(5, (unsigned)isr5, 0x08, 0x8E);
-    idt_set_gate(6, (unsigned)isr6, 0x08, 0x8E);
-    idt_set_gate(7, (unsigned)isr7, 0x08, 0x8E);
-
-    idt_set_gate(8, (unsigned)isr8, 0x08, 0x8E);
-    idt_set_gate(9, (unsigned)isr9, 0x08, 0x8E);
-    idt_set_gate(10, (unsigned)isr10, 0x08, 0x8E);
-    idt_set_gate(11, (unsigned)isr11, 0x08, 0x8E);
-    idt_set_gate(12, (unsigned)isr12, 0x08, 0x8E);
-    idt_set_gate(13, (unsigned)isr13, 0x08, 0x8E);
-    idt_set_gate(14, (unsigned)isr14, 0x08, 0x8E);
-    idt_set_gate(15, (unsigned)isr15, 0x08, 0x8E);
-
-    idt_set_gate(16, (unsigned)isr16, 0x08, 0x8E);
-    idt_set_gate(17, (unsigned)isr17, 0x08, 0x8E);
-    idt_set_gate(18, (unsigned)isr18, 0x08, 0x8E);
-    idt_set_gate(19, (unsigned)isr19, 0x08, 0x8E);
-    idt_set_gate(20, (unsigned)isr20, 0x08, 0x8E);
-    idt_set_gate(21, (unsigned)isr21, 0x08, 0x8E);
-    idt_set_gate(22, (unsigned)isr22, 0x08, 0x8E);
-    idt_set_gate(23, (unsigned)isr23, 0x08, 0x8E);
-
-    idt_set_gate(24, (unsigned)isr24, 0x08, 0x8E);
-    idt_set_gate(25, (unsigned)isr25, 0x08, 0x8E);
-    idt_set_gate(26, (unsigned)isr26, 0x08, 0x8E);
-    idt_set_gate(27, (unsigned)isr27, 0x08, 0x8E);
-    idt_set_gate(28, (unsigned)isr28, 0x08, 0x8E);
-    idt_set_gate(29, (unsigned)isr29, 0x08, 0x8E);
-    idt_set_gate(30, (unsigned)isr30, 0x08, 0x8E);
-    idt_set_gate(31, (unsigned)isr31, 0x08, 0x8E);
-
-    // call an IRQ re-map
-
-    irq_remap();
-
-    idt_set_gate(32, (unsigned)irq0, 0x08, 0x8E);
-    idt_set_gate(33, (unsigned)irq1, 0x08, 0x8E);
-    idt_set_gate(34, (unsigned)irq2, 0x08, 0x8E);
-    idt_set_gate(35, (unsigned)irq3, 0x08, 0x8E);
-    idt_set_gate(36, (unsigned)irq4, 0x08, 0x8E);
-    idt_set_gate(37, (unsigned)irq5, 0x08, 0x8E);
-    idt_set_gate(38, (unsigned)irq6, 0x08, 0x8E);
-    idt_set_gate(39, (unsigned)irq7, 0x08, 0x8E);
-
-    idt_set_gate(40, (unsigned)irq8, 0x08, 0x8E);
-    idt_set_gate(41, (unsigned)irq9, 0x08, 0x8E);
-    idt_set_gate(42, (unsigned)irq10, 0x08, 0x8E);
-    idt_set_gate(43, (unsigned)irq11, 0x08, 0x8E);
-    idt_set_gate(44, (unsigned)irq12, 0x08, 0x8E);
-    idt_set_gate(45, (unsigned)irq13, 0x08, 0x8E);
-    idt_set_gate(46, (unsigned)irq14, 0x08, 0x8E);
-    idt_set_gate(47, (unsigned)irq15, 0x08, 0x8E);
 	/* Points the processor's internal register to the new IDT */
-	idt_load();
+
+	lidt(idt, sizeof(idt));
+}
+
+extern void trap();
+/* Should switch back to using an array of handlers */
+void trap(regs_t* r) {
+	switch (r->int_no) {
+		case IRQ0 + IRQ_TIMER:
+			timer(r);
+		case IRQ0 + IRQ_KBD:
+			keyboard_handler(r);
+	}
+
+	if (r->int_no > 40)
+		outportb(0xA0, 0x20);
+	outportb(0x20, 0x20);
 }
 
 void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran)
 {
     /* Setup the descriptor base address */
-    gdt[num].base_low = (base & 0xFFFF);
+   	gdt[num].base_low = (base & 0xFFFF);
     gdt[num].base_middle = (base >> 16) & 0xFF;
     gdt[num].base_high = (base >> 24) & 0xFF;
 

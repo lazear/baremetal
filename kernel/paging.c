@@ -136,7 +136,7 @@ uint32_t* k_phys_to_virt(uint32_t phys) {
 
 void k_paging_init(uint32_t* dir_addr) {
 	/* load a custom ISR14 handler for page faults */
-	idt_set_gate(14, k_page_fault, 0x08, 0x8E);
+	//idt_set_gate(14, k_page_fault, 0x08, 0x8E);
 
 	CURRENT_PAGE_DIRECTORY = dir_addr;
 	memset(CURRENT_PAGE_DIRECTORY, 0, 4096);

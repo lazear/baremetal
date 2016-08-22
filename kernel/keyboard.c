@@ -2,6 +2,7 @@
 #include <types.h>
 #include <stdio.h>
 #include <mutex.h>
+#include <traps.h>
 
 uint8_t keyboard[] =
 {
@@ -106,5 +107,5 @@ void keyboard_install()
 {
 	kb = k_new_stream(0x1000);
 	buffer = (char*)malloc(0x400);		// allocate and zero the buffer
-    irq_install_handler(1, keyboard_handler);
+	pic_enable(IRQ_KBD);
 }

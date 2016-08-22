@@ -33,7 +33,6 @@ void event_loop() {
 
 		}
 		release(&key_mutex);
-
 		yield();
 	}
 }
@@ -66,6 +65,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	k_heap_init();
 	// Start timer
 	//tss_flush();
+	//pic_init();
 	keyboard_install();
 	timer_init();
 	syscall_init();
@@ -81,23 +81,10 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	extern uint32_t KERNEL_PAGE_DIRECTORY;
 
-	spawn("loop", event_loop);
+//	spawn("loop", event_loop);
 
 	//fork();
-	char* name = "My full name is Lazear, Michael Ryan";
-	char* follow = "ABCDE";
-	char* ret = strtok(name, "au");
-
-	while (ret) {
-		printf("%s\n", ret);
-		ret = strtok(NULL, "au");
-	}
-	printf("%s %s\n", name, follow);
-	while(1) {
-
-		yield();
-
-	}
+	while(1) yield();
 
 	for(;;);
 }
