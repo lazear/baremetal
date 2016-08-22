@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"tss",
+				"tss_swap"
+			],
+			[
+				"SEG_",
+				"SEG_TSS"
+			],
+			[
+				"sys",
+				"system_tss"
+			],
+			[
+				"uint",
+				"uint8_t"
+			],
+			[
+				"uin",
+				"uint16_t"
+			],
+			[
 				"_pagi",
 				"_paging_unmap"
 			],
@@ -312,10 +332,6 @@
 				"BLOCKS_ALLOCATED"
 			],
 			[
-				"uin",
-				"uint32_t"
-			],
-			[
 				"CU",
 				"CURRENT_X"
 			],
@@ -404,16 +420,8 @@
 				"read_base_pointer"
 			],
 			[
-				"tss",
-				"tss_init"
-			],
-			[
 				"gdt",
 				"gdt_flush"
-			],
-			[
-				"uint",
-				"uint32_t"
 			],
 			[
 				"sta",
@@ -506,48 +514,32 @@
 			[
 				"bit",
 				"bitmap"
-			],
-			[
-				"kernel",
-				"kernel_end"
-			],
-			[
-				"kern",
-				"kernel_end"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
+			"file": "kernel/arch/start.s",
+			"settings":
+			{
+				"buffer_size": 1621,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/arch/x86.c",
+			"settings":
+			{
+				"buffer_size": 4624,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "kernel/kernel.c",
 			"settings":
 			{
-				"buffer_size": 3893,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/include/x86.h",
-			"settings":
-			{
-				"buffer_size": 3340,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/lib/stdio.c",
-			"settings":
-			{
-				"buffer_size": 2132,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/syscall.c",
-			"settings":
-			{
-				"buffer_size": 666,
+				"buffer_size": 3668,
 				"line_ending": "Windows"
 			}
 		},
@@ -560,90 +552,10 @@
 			}
 		},
 		{
-			"file": "kernel/arch/sched.s",
+			"file": "kernel/arch/trap.c",
 			"settings":
 			{
-				"buffer_size": 724,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/arch/start.s",
-			"settings":
-			{
-				"buffer_size": 2897,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Makefile",
-			"settings":
-			{
-				"buffer_size": 1148,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/arch/syscall.s",
-			"settings":
-			{
-				"buffer_size": 319,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "/*\nmm.c\n\nMichael Lazear, 2016\n\nPhysical memory management - keep track of physical memory used,\nthis will enable the usage of a virtual memory/page mapped heap.\nWhen the heap nears the top, sbrk() can call k_page_alloc() to get another \n0x1000 bytes (4KB) of physical address space, that can then be mapped to a\ncontinous virtual memory segment.\n*/\n\n#include <vga.h>\n#include <types.h>\n\n#define ERR_NO_MEM	-1\n\n/*\nPointers to the current page directory bitmap\nand page table bitmap\n*/\nuint32_t* MM_CURRENT_PD = 0;\nuint32_t* MM_CURRENT_PT = 0;\n\n/* \nMM_HEAP will be set to the end of the kernel ~1mb. 1mb / 0x1000 = 256 possible entries.\nThere will be less in reality, as the kernel is going to take up quite a bit of room.\nTo overcome the issue of allocating page tables, we COULD try and allocate using mm_alloc.\nBut there is no freeing capability, so we must be careful. Maybe use the kernel PT/PD from here?\n*/\nuint32_t* MM_HEAP = 0;\n// MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.\nuint32_t* MM_HEAP_MAX = 0x00200000;\n\n/*\nThis function should ONLY be used to set up the initial memory manager tables.\nGoing to alloc some blocks right at the end of the kernel\n\nMemory allocated by this function will NEVER be freed.\n*/\nuint32_t* mm_alloc(size_t n) {\n	if (MM_HEAP == 0)\n		return NULL;\n\n	if (MM_HEAP + n < MM_HEAP_MAX) {\n		uint32_t* addr = MM_HEAP;\n		if (n >= 0x1000)\n			MM_HEAP += (n & ~0xFFF);		// Make sure we stay 0x1000 aligned.\n		else\n			MM_HEAP += 0x1000;			// Even if n is small, increment by 0x1000\n		return addr;\n	} else\n		return NULL;\n}\n\n\n/*\nBitmap is an array of 32 * 32 bit integers.\nSetting a bit indicates that it is in use\n*/\nvoid mm_bitmap_set_bit(uint32_t* b, uint32_t bit) {\n	b[bit/32] |= (0x1 << (bit % 32));\n}\n\n/*\nBitmap is an array of 32 * 32 bit integers.\nUnsetting a bit indicates that it is free\n*/\nvoid mm_bitmap_unset_bit(uint32_t* b, uint32_t bit) {\n	b[bit/32] &=  ~(0x1 << (bit % 32));\n}\n\n/*\nReturns the first bit position (bit number in entry ( 32 * array index))\nthat is 0 (free)\n*/\nint mm_first_free(uint32_t* b) {\n	for (int q = 0; q < 32; q++) {\n		uint32_t free_bits = (b[q] ^ ~0x0);\n		for (int i = 0; i < 32; i++ ) \n			if (free_bits & (0x1 << i)) \n				return i + (q*32);\n	}\n	return ERR_NO_MEM;\n}\n\n/*\nAllocate a bitmap (1024 bits, 128 bytes)\nSet every entry to 0 (free)\n*/\nuint32_t* mm_bitmap_init() {\n	size_t bitmap_size = sizeof(uint32_t) * 32;\n	uint32_t* b = mm_alloc(bitmap_size);\n	memset(b, 0, bitmap_size);\n	return b;\n}\n\n/*\nAlign the virtual address to the page directory and page table bitmaps,\nthen mark it as free\n*/\nuint32_t* mm_page_free(uint32_t* PD, uint32_t* PT, uint32_t* address) {\n	uint32_t aligned = (uint32_t) address & ~0x3FF;\n\n	uint32_t pd_index = (uint32_t) aligned >> 22;\n	uint32_t pt_index = (uint32_t) aligned >> 12 & 0x3ff;\n	mm_bitmap_unset_bit(PT, pt_index);\n\n	/*	\n	If the PD that this was in was full, mark it as not full now\n	DON't do this, as stated below. We need an array of pointers\n	Holding the location of the last page table.\n	*/\n	/*\n	if (mm_first_free(PD) != pd_index) {\n		kprintx(\"PAGEFREE:\", pd_index);\n		mm_bitmap_unset_bit(PD, pd_index);\n	}\n	*/\n\n	return address;\n} \n\n\n/*\nInitial implementation will be allocating one page.\nReturns the address of the page\nMarks the page as used (bit shift 1)\nReturns ERR_NO_MEM (-1) if page directory is full.\n*/\nuint32_t* mm_page_alloc(uint32_t* PD, uint32_t* PT) {\n	uint32_t ff_PD = mm_first_free(PD);\n	uint32_t ff_PT = mm_first_free(PT);\n\n	if (ff_PD != ERR_NO_MEM && ff_PT != ERR_NO_MEM) {\n		uint32_t address = ((ff_PD * 0x1000 * 0x400) + (ff_PT * 0x1000));\n\n		mm_bitmap_set_bit(PT, ff_PT);	// Mark the page as no longer free\n		return address;\n\n	} else if (ff_PD != ERR_NO_MEM && ff_PT == ERR_NO_MEM) {\n		/*\n		PT is now full, so mark the PD as full also\n		Set the bit of the PD as the entire page being full\n		Which means we should change the pointer to PT to a new page table\n		since it's full, which means we don't need to save the data for it.\n		*/\n		/*\n		ACTUALLY DON'T.... This allows the entire page table to be reset under \n		the following circumstances:\n		If the page table is completely full (which it is if we are here), we \n		want to delete that entry. But if we then free one of those pages, we\n		can unmark the PD bit for that table - but we no longer have a bitmap\n		with the memory layout for that page table. Maybe we should keep a list of \n		pointers? Or doing a bitmap for the page directory is a bad idea... but\n		the other option is doing uint32 pd[1024], which takes up a whole 4KB of memory\n\n		So working solution for now is to just not unmark a directory after it's been marked full\n		So pages can continue to be used and free()d until the entire page table is full.\n		Then we switch to the next one.\n		*/\n		PT = mm_bitmap_init();\n		\n\n		//vga_pretty(\"\\nSwapping page table bitmap\\n\", 0x05);\n\n		MM_CURRENT_PT = PT;\n		mm_bitmap_set_bit(PD, ff_PD);\n		// Now recursively try again\n\n		mm_page_alloc(PD, PT);\n\n\n	} else {\n		// This means both the PT and the PD are full\n		return ERR_NO_MEM;\n	}\n}\n\n\n\n/* \nWrapper for mm_page_alloc using global pointers\nConcept is to have malloc/whatever the virtual memory manager is call\nk_page_alloc() to get the heap, and then once that heap is outgrown, call alloc again.\nOnce the entire old heap is free()d, free the page.\n*/\nuint32_t* k_page_alloc() {\n	return mm_page_alloc(MM_CURRENT_PD, MM_CURRENT_PT);\n}\n\nuint32_t* k_page_free(uint32_t* addr) {\n	return mm_page_free(MM_CURRENT_PD, MM_CURRENT_PT, addr);\n}\n\nvoid mm_debug() {\n	printf(\"Physical Memory Management Debug:\\n\");\n	int ptidx = mm_first_free(MM_CURRENT_PT);\n	int pdidx = mm_first_free(MM_CURRENT_PD);\n	printf(\"PT (%d): %b\\n\", ptidx%32, MM_CURRENT_PT[ptidx/32]);\n	printf(\"PD (%d): %b\\n\", pdidx%32, MM_CURRENT_PD[pdidx/32]);\n}\n\n\n/*\n8 bits per byte * 4 bytes * 32 = 128 bytes (1024 bits)\nEach bit represents whether one 4096 byte page has been allocated or not.\nThis means that one 128 byte sized bitmap holds information for 4 MB of data\nOne bitmap[32] represents one page table entry, of which there are 1024 in a \npage directory;\nEach bitmap[i] entry represents 1024 pages.\n*/\n\n/*\nWe're going to return a one-time use address for setting up virtual paging.\nIt'll be entry 1023 in the first page table in the first Page directory entry\nThat entry will then be set to full.\n\nInitialize the page heap; and then allocate the first two new bitmaps.\n*/\nvoid* k_mm_init(uint32_t heap) {\n\n	heap = (heap + 0x1000) & ~0xFFF;\n	MM_HEAP = heap;\n//	kprintx(\"Heap@: \", heap);\n	MM_CURRENT_PD = mm_bitmap_init();\n	MM_CURRENT_PT = mm_bitmap_init();\n\n\n	/*First 2 mb are reserved as used.\n	~1Mb to 2Mb are for the K_MM_HEAP, but that shouldn't use more than a couple kb\n	This allows us the benefit of calling k_page_alloc for actual paging.\n	2MB to 4MB are linearly mapped for kernel space.\n	TODO: Change this to actual end-of-kernel space, so everything can be in agreement.\n	*/\n\n	for (int i = 0; i < 512; i++)\n		mm_bitmap_set_bit(MM_CURRENT_PT, i);	\n\n	uint32_t* addr = mm_page_alloc(MM_CURRENT_PD, MM_CURRENT_PT);\n\n	//kprintx(\"Initial addr:\", addr);\n	//kprintb(\"PT bm:\", MM_CURRENT_PT[31]);\n	return addr;\n}\n\n\n\nvoid memtesttr() {\n	int i = 1;\n	int t = 0;\n	vga_pretty(\"Beginning physical memory test! Expect system crash\\n\", VGA_LIGHTGREEN);\n	vga_kputs(\"PT\", 0, 22);\n	vga_kputs(\"PD\", 0, 23);\n	vga_kputs(\"Phys addr\", 0, 24);\n	vga_kputs(\"Cycles/tick\", 110, 24);\n	void *buf = malloc(32);\n	while(1) {\n		void* ptr = k_page_alloc();\n		if (!ptr) {\n			//traverse_blockchain();\n			free(buf);\n			die();\n		}\n		\n		ftoa((double)i/t, buf);\n		vga_kputs(buf, 140, 24);\n\n\n	//	memset(buf, 0, 32);\n		itoa(ptr, buf, 16);\n		vga_kputs(buf, 20, 24);\n		\n		int _pti = mm_first_free(MM_CURRENT_PT)/32;\n		int _pdi = mm_first_free(MM_CURRENT_PD)/32;\n		uint32_t ptidx = MM_CURRENT_PT[_pti];\n		uint32_t pdidx = MM_CURRENT_PD[_pdi];\n\n	//	memset(buf, 0, 32);\n		itoa(pdidx, buf, 2);\n		vga_kputs(buf, 20, 23);\n\n	//	memset(buf, 0, 32);\n		itoa(_pdi, buf, 10);\n		vga_kputs(buf, 10, 23);\n\n	//	memset(buf, 0, 32);\n		itoa(ptidx, buf, 2);\n		vga_kputs(buf, 20, 22);\n\n	//	memset(buf, 0, 32);\n		itoa(_pti, buf, 10);\n		vga_kputs(buf, 10, 22);\n\n		//printf(\"%x -- %d %d (Cycles per tick: %e)\\n\", ptr, i, t, ((double)i/ t));\n		free(ptr);\n		t = get_ticks();\n		i++;\n		//wait(5);\n		yield();\n\n\n	}\n}\n\n\n/*\nFunction to play around with and test the physical mem manager.\n*/\nvoid mm_test() {\n	// each bit in the pdb represents 4mb of address space\n	uint32_t ff_pdb = mm_first_free(MM_CURRENT_PD);\n	uint32_t ff_ptb = mm_first_free(MM_CURRENT_PT);\n\n	printf(\"PD @ %x | PT @ %x\\n\", MM_CURRENT_PD, MM_CURRENT_PT);\n	printf(\"ff_pdb %d\\n\", ff_pdb);\n	printf(\"ff_ptb %d\\n\", ff_ptb);\n\n	uint32_t first_address = (ff_pdb* 0x1000 * 0x400) + (ff_ptb * 0x1000);\n\n	for (int i = 0; i < 3; i++ ) {\n		int result = k_page_alloc();\n		if (result == ERR_NO_MEM)\n			vga_pretty(\"[FAIL] no memory left\", 0x4);\n		else {\n			printf(\"Testing allocation: 0x%x : PT$ %b\\n\", result, MM_CURRENT_PT[mm_first_free(MM_CURRENT_PT)/32]);\n		}\n	}\n\n\n	\n	k_page_free(first_address + 0x30);\n	printf(\"Testing free offset: 0x%x :PT$ %b\\n\", first_address, MM_CURRENT_PT[mm_first_free(MM_CURRENT_PT)/32]);\n	uint32_t* next = k_page_alloc();\n\n	if (next == first_address)\n		vga_pretty(\"Success!\\n\", 0x0A);\n	else {\n		vga_pretty(\"Something went wrong\\n\", 0x4);\n		printf(\"Current ff_pdb: 0x%x\\n\", ff_pdb);\n		printf(\"Current bitmap value: %b\\n\", MM_CURRENT_PD[1]);\n	}\n\n\n	spawn(\"pmm-test\", memtesttr);\n\n}",
-			"file": "kernel/mm.c",
-			"file_size": 9746,
-			"file_write_time": 131160997118898215,
-			"settings":
-			{
-				"buffer_size": 9400,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/paging.c",
-			"settings":
-			{
-				"buffer_size": 10198,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/arch/x86.c",
-			"settings":
-			{
-				"buffer_size": 9242,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/malloc.c",
-			"settings":
-			{
-				"buffer_size": 10753,
-				"line_ending": "Windows",
-				"name": "/*"
-			}
-		},
-		{
-			"contents": "/*\nsched.c\n*/\n\n#include <types.h>\n#include <x86.h>\n#include <proc.h>\n#include <mutex.h>\n\n\n\nextern uint32_t* KERNEL_PAGE_DIRECTORY;\nprocess** ptable;\nint nextpid = 0;\nint running = 0;\nint current_pid = 0;\n\nmutex proclock = {.lock = 0};\n\nextern void trapret();\nextern struct tss_entry system_tss;\n\nvoid set_tss_esp() {\n	system_tss.esp0 = ptable[0]->stack;\n}\n\nvoid kill(int pid) {\n	if (!pid) {\n		panic(\"Attempting to kill system process\");\n		asm volatile(\"hlt\");\n		return;\n	}\n	if (pid >= nextpid) {\n		panic(\"PID does not exist\");\n		return;\n	}\n\n	acquire(&proclock);\n	process* p = ptable[pid];\n	p->state = 0;\n	p->next = ptable[0];\n\n	free(p->stack);\n	memset(p, 0, sizeof(process));\n	free(p);\n	//ptable[pid] = NULL;\n	printf(\"PID %d is kill\\n\", pid);\n	release(&proclock);\n\n\n}\n\nvoid die() {\n	kill(getpid());\n	while(1) {\n//		printf(\"pid %d is a zombie\\n\", getpid());\n		sched();\n\n	}\n\n}\n\n\nvoid __exit() {\n	die();\n}\n\nprocess* spawn(char* name, void (*fn)() ) {\n	acquire(&proclock);\n	process* p = (process*) malloc(sizeof(process));\n	memset(p, 0, sizeof(process));\n	strcpy(p->name, name, 16);\n\n	uint32_t* stack = (uint32_t*) (malloc(0x1000));		// stack will grow down\n	uint32_t top = ((uint32_t) stack + 0x1000);			// ebp points to top of stack\n\n	memset(stack, 0, 0x1000);\n\n	stack = top;\n	stack -= sizeof(regs_t);\n\n	p->pid = nextpid++;\n	p->pagedir = KERNEL_PAGE_DIRECTORY;\n	p->state = 1;\n	p->frame = stack;\n\n	p->frame->eip = (uint32_t) __exit;\n	p->frame->cs = 0x08;\n	p->frame->ds = 0x10;\n	p->frame->es = 0x10;\n	p->frame->fs = 0x10;\n	p->frame->gs = 0x10;\n	p->frame->flags = 0x202;\n\n	*--stack = (uint32_t) trapret;\n	*--stack = (uint32_t) fn;	// EIP\n	*--stack = top;				// EBP\n	*--stack = 0; 				// EBX\n	*--stack = 0; 				// ESI\n	*--stack = 0; 				// EDI\n\n	p->stack = stack;\n	p->frame->esp = stack;\n	ptable[p->pid] = p;\n\n	release(&proclock);\n	return p;\n}\n\nprocess* get_current_proc() {\n	return ptable[current_pid];\n}\n\n/* Insert process b after process a */\nvoid insert_link(process* a, process* b) {\n	if (!b->next)\n		b->next = a;\n	if (!a->next)\n		a->next = b;\n	else {\n		// A has a next link\n		b->next = a->next;\n		a->next = b;\n	}\n}\n\n/* automatically links processes in order of PID */\nvoid auto_link() {\n	for (int i = 0; i < nextpid -1 ; i++) {\n		ptable[i]->next = ptable[i+1];\n	}\n	ptable[nextpid-1]->next = ptable[0];	// last entry links back to first\n}\n\nvoid prioritize(int pid) {\n	pushcli();\n	insert_link(ptable[current_pid], ptable[pid]);\n	popcli();\n}\n\n\n/* __wait spins idly - no context changing */\nvoid __wait(int t) {\n	int waitfor = get_ticks() + t;\n	while(get_ticks() < waitfor) {\n		;//yield(); ;\n	}\n}\n\n/*\nwait(int ticks) calls yield once per tick, allows less time\nspent spinning through the scheduler */\nvoid wait(int n) {\n	while(n--) {\n		__wait(1);\n		yield();\n	}\n}\n\n\n\nvoid yield() {\n//	ptable[current_pid]->state = 0;\n	sched();\n}\n\nint getpid() { \n	return current_pid;\n}\n\n\nuint32_t swap(uint32_t* esp) {\n	acquire(&proclock);\n	static int first = 0;\n	if (!first) {\n		/*\n		If the scheduler is being run for the first time,\n		we need to save the current state of the CPU. \n		PID 0 will become the null/system task, and will \n		actually loop back to kernel_initialize */\n		ptable[0]->stack = esp;\n		first = 1;\n		release(&proclock);\n		return ptable[++current_pid]->stack;\n\n	} else {\n		/* If the scheduler's already been running, save the context\n		of the current task */\n		ptable[current_pid]->stack = esp;\n	}\n\n	current_pid++;\n	if (current_pid == nextpid)		// round robin style\n		current_pid = 0;\n	while (!ptable[current_pid]->state) {\n		current_pid++;\n		if (current_pid == nextpid)		// round robin style\n			current_pid = 0;\n\n	}\n	ptable[current_pid]->time++;\n\n	release(&proclock);\n	k_swap_pd(ptable[current_pid]->pagedir);\n	return ptable[current_pid]->stack;\n\n\n}\n\nvoid scheduler(uint32_t esp) {\n	if (!running++) return esp;\n	//printf(\"%d\\n\", current_pid);\n	return swap(esp);\n}\n\nint status(int pid) {\n	return ptable[pid]->state;\n}\nint sched_state() {\n	return running;\n}\n\nvoid sysidle() {\n	while(1) sched();\n}\n\nvoid procinfo(process* p) {\n	printf(\"%s, pid %d, stack @ %x, state: %d, time %d, link %d\\n\", p->name, p->pid, p->stack, p->state, p->time, p->next->pid);\n}\n\nvoid list_procs() {\n	printf(\"Current process is %s (%d)\\n\", ptable[current_pid]->name, current_pid );\n	for (int i = 0; i < nextpid; i++)\n		procinfo(ptable[i]);\n}\n\nvoid sched_init() {\n	ptable = (process*) malloc(sizeof(process) * MAX_PROCESS);\n\n	process* idle = spawn(\"kernel\", sysidle);\n	spawn(\"sched\", sysidle);\n	auto_link();\n	\n	running = 1;\n\n	//sched();\n\n}",
-			"file": "kernel/sched.c",
-			"file_size": 4756,
-			"file_write_time": 131161922117883196,
-			"settings":
-			{
-				"buffer_size": 4511,
-				"line_ending": "Windows",
-				"name": "/*"
-			}
-		},
-		{
-			"file": "kernel/include/proc.h",
-			"settings":
-			{
-				"buffer_size": 591,
+				"buffer_size": 310,
 				"line_ending": "Windows"
 			}
 		}
@@ -773,26 +685,44 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/timer.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/syscall.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/Makefile",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/string.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/Find Results",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/keyboard.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/paging.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/start.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/fork.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/syscall.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdio.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/x86.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/timer.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/kernel.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/keyboard.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vga.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/proc.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/sched.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/malloc.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/traps.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/pic.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/trap_handler.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/bin/kernel.bin",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/Find Results",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/x86.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mm.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/Makefile",
+		"/C/Users/Mike/Documents/GitHub/baremetal/tools/i686-elf-as",
+		"/C/Users/Mike/Documents/GitHub/baremetal/map.txt",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/sched.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/vectors.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/vectors.py",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/paging.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/syscall.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/string.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/paging.h",
 		"/C/Users/Mike/Documents/GitHub/xv6-public/Makefile",
 		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
 		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/sched.s",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/mutex.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mutex.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/assert.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/types.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/thread.c",
 		"/C/Users/Mike/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdio.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vfs.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
 		"/D/Downloads/snapshot.06.10.09/core/task/taskapi.c",
@@ -882,25 +812,7 @@
 		"/C/Users/Mike/Documents/GitHub/os/core/arch/idt.c",
 		"/C/Users/Mike/Documents/GitHub/os/core/arch/irq.c",
 		"/C/Users/Mike/Documents/GitHub/os/asm/gdt.asm",
-		"/C/Users/Mike/Documents/GitHub/os/asm/irq.asm",
-		"/C/Users/Mike/Downloads/start.asm",
-		"/C/Users/Mike/Documents/GitHub/os/core/sched.c",
-		"/C/Users/Mike/Documents/GitHub/os/asm/isr.asm",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/vga.h",
-		"/C/Users/Mike/Documents/GitHub/os/Makefile",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/Makefile",
-		"/C/Users/Mike/Documents/GitHub/os/elf.ld",
-		"/C/Users/Mike/Documents/GitHub/os/asm/bootsect.asm",
-		"/C/Users/Mike/Documents/GitHub/os/core/memory/paging.c",
-		"/C/Users/Mike/Documents/GitHub/os/asm/inc.asm",
-		"/C/Users/Mike/Documents/GitHub/os/drivers/clock/timer.c",
-		"/C/Users/Mike/Documents/GitHub/os/core/memory/stack.c",
-		"/C/Users/Mike/Documents/GitHub/os/core/memory/malloc.c",
-		"/C/Users/Mike/Documents/GitHub/os/asm/loader.asm",
-		"/C/Users/Mike/Documents/GitHub/os/include/core/stdarg.h",
-		"/C/Users/Mike/Documents/GitHub/os/include/core/fs.h",
-		"/C/Users/Mike/Documents/GitHub/os/core/arch/cpuid.c"
+		"/C/Users/Mike/Documents/GitHub/os/asm/irq.asm"
 	],
 	"find":
 	{
@@ -911,6 +823,10 @@
 		"height": 102.0,
 		"where_history":
 		[
+			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal\\",
+			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal",
+			"<current file>,<open folders>",
+			"<current file>",
 			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal",
 			"D:\\Documents\\GitHub\\baremetal\\",
 			"D:\\Documents\\GitHub\\baremetal",
@@ -922,6 +838,23 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"cpu->",
+			"uint",
+			"c->",
+			"outportb",
+			"outport",
+			"inportb",
+			"inportw",
+			"inportb",
+			"outportb",
+			"T_",
+			"$",
+			"outb",
+			"ushort",
+			"uint",
+			"idt",
+			"ushort",
+			"uint",
 			"regs_t",
 			"regs",
 			"struct regs",
@@ -996,6 +929,10 @@
 		"regex": false,
 		"replace_history":
 		[
+			"out",
+			"inb",
+			"outb",
+			"",
 			"%x\\n",
 			"K",
 			"printf",
@@ -1017,83 +954,84 @@
 			[
 				{
 					"buffer": 0,
-					"file": "kernel/kernel.c",
+					"file": "kernel/arch/start.s",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3893,
+						"buffer_size": 1621,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3702,
-								3702
+								853,
+								853
 							]
 						],
 						"settings":
 						{
-							"rulers":
-							[
-							],
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false,
-							"word_wrap": true,
-							"wrap_width": 80
+							"syntax": "Packages/R/R.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1674.0,
+						"translation.y": 756.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
 				{
 					"buffer": 1,
-					"file": "kernel/include/x86.h",
+					"file": "kernel/arch/x86.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3340,
+						"buffer_size": 4624,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1765,
-								1765
+								3329,
+								3329
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 432.0,
+						"translation.y": 3168.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "kernel/lib/stdio.c",
+					"file": "kernel/kernel.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2132,
+						"buffer_size": 3668,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1606,
-								1606
+								3597,
+								3597
 							]
 						],
 						"settings":
@@ -1102,43 +1040,14 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 540.0,
+						"translation.y": 1044.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "kernel/syscall.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 666,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								481,
-								481
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
 					"file": "kernel/fork.c",
 					"semi_transient": false,
 					"settings":
@@ -1150,324 +1059,49 @@
 						"selection":
 						[
 							[
-								940,
-								940
+								308,
+								308
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C.sublime-syntax"
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 162.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "kernel/arch/sched.s",
+					"buffer": 4,
+					"file": "kernel/arch/trap.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 724,
+						"buffer_size": 310,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								47,
-								47
+								52,
+								52
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/R/R.sublime-syntax",
+							"syntax": "Packages/C++/C.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "kernel/arch/start.s",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2897,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1764,
-								1764
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/R/R.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1882.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 3,
-			"sheets":
-			[
-				{
-					"buffer": 7,
-					"file": "Makefile",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1148,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								48,
-								47
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "kernel/arch/syscall.s",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 319,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								80,
-								80
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/R/R.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "kernel/mm.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 9400,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								9400,
-								9400
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3114.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "kernel/paging.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10198,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5751,
-								5751
-							]
-						],
-						"settings":
-						{
-							"rulers":
-							[
-								80
-							],
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 4159.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "kernel/arch/x86.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 9242,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2760,
-								2760
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2015.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "kernel/malloc.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10753,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4586,
-								4586
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3078.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "kernel/sched.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4511,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								875,
-								875
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"rulers":
-							[
-							],
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 378.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "kernel/include/proc.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 591,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								396,
-								396
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 14,
 					"type": "text"
 				}
 			]

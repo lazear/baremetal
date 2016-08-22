@@ -4,6 +4,7 @@
 extern trap
 global trap_handler
 trap_handler:
+	cli
 	pusha
 	push ds
 	push es

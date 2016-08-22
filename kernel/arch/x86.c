@@ -7,7 +7,6 @@ Adapted/taken from Bran's Kernel Dev tutorial and the MIT xv6 project.
 */
 
 
-
 #include <types.h>
 #include <x86.h>
 #include <traps.h>
@@ -20,6 +19,7 @@ Adapted/taken from Bran's Kernel Dev tutorial and the MIT xv6 project.
 * outputs example: "=r"(val)			*
 * inputs example: "r"(10)				*
 *****************************************/
+
 int set_eflags(int val) {
 	int flags;
 	asm volatile("			\
@@ -44,63 +44,44 @@ int get_eflags(void) {
 }
 
 
-uint8_t inportb(uint16_t port) {
+uint8_t inb(uint16_t port) {
   // "=a" (result) means: put AL register in variable result when finished
   // "d" (_port) means: load EDX with _port
-  unsigned char result;
-   asm volatile("inb %1, %0" : "=a" (result) : "dN" (port));
-  return result;
+	unsigned char result;
+	asm volatile("inb %1, %0" : "=a" (result) : "dN" (port));
+	return result;
 }
 
-void outportb(uint16_t port, uint16_t data) {
+void outb(uint16_t port, uint16_t data) {
 	asm volatile ("outb %1, %0" : : "dN" (port), "a" (data));
 }
 
-uint16_t inportw(uint16_t port) {
+uint16_t inw(uint16_t port) {
 	unsigned short result;
 	asm volatile ("inw %1, %0" : "=a" (result) : "dN" (port));
 	return result;
 }
 
-void outportw(uint16_t port, uint16_t data) {
+void outw(uint16_t port, uint16_t data) {
 	asm volatile("outw %1, %0" : :"dN"(port), "a"(data));
 }
 
-void outportl(uint16_t port, uint32_t data) {
+void outl(uint16_t port, uint32_t data) {
 	asm volatile("outl %1, %0" : :"dN"(port), "a"(data));
 }
 
-uint64_t inportl(uint16_t port) {
+uint64_t inl(uint16_t port) {
 	uint32_t ret;
 	asm volatile("inl %1, %0" : "=a"(ret) : "dN"(port));
 }
 
 
-
-struct gdt_entry gdt[8];
-struct gdt_ptr gdt_pointer;
-
-
-void irq_remap(void)
-{
-    outportb(0x20, 0x11);
-    outportb(0xA0, 0x11);
-    outportb(0x21, 0x20);
-    outportb(0xA1, 0x28);
-    outportb(0x21, 0x04);
-    outportb(0xA1, 0x02);
-    outportb(0x21, 0x01);
-    outportb(0xA1, 0x01);
-    outportb(0x21, 0x0);
-    outportb(0xA1, 0x0);
-}
-
-
+struct segdesc gdt[8];
 struct gatedesc idt[256];
+struct tss_entry system_tss;
 
 static inline void lidt(struct gatedesc *p, int size) {
 	volatile uint16_t pd[3];
-
 	pd[0] = size-1;
 	pd[1] = (uint32_t)p;
 	pd[2] = (uint32_t)p >> 16;
@@ -109,60 +90,35 @@ static inline void lidt(struct gatedesc *p, int size) {
 }
 
 
+static inline void lgdt(struct segdesc *p, int size) {
+
+	volatile uint16_t pd[3];
+	pd[0] = size-1;
+	pd[1] = (uint32_t)p;
+	pd[2] = (uint32_t)p >> 16;
+	asm volatile("lgdt (%0)" : : "r" (pd));
+}
+
+static inline void ltr(uint16_t sel) {
+	asm volatile("ltr %0" : : "r" (sel));
+}
+
 void idt_init() {
 	pic_init();
 	//irq_remap();
 	for (int i = 0; i < 256; i ++)
 		SETGATE(idt[i], 0, 0x8, vectors[i], 0);
-
+	// Make syscall accessible from userland
 	SETGATE(idt[T_SYSCALL], 1, 0x8, vectors[T_SYSCALL], DPL_USER);
-	
-
-	/* Points the processor's internal register to the new IDT */
-
 	lidt(idt, sizeof(idt));
 }
 
-extern void trap();
-/* Should switch back to using an array of handlers */
-void trap(regs_t* r) {
-	switch (r->int_no) {
-		case IRQ0 + IRQ_TIMER:
-			timer(r);
-		case IRQ0 + IRQ_KBD:
-			keyboard_handler(r);
-	}
-
-	if (r->int_no > 40)
-		outportb(0xA0, 0x20);
-	outportb(0x20, 0x20);
-}
-
-void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran)
-{
-    /* Setup the descriptor base address */
-   	gdt[num].base_low = (base & 0xFFFF);
-    gdt[num].base_middle = (base >> 16) & 0xFF;
-    gdt[num].base_high = (base >> 24) & 0xFF;
-
-    /* Setup the descriptor limits */
-    gdt[num].limit_low = (limit & 0xFFFF);
-    gdt[num].granularity = ((limit >> 16) & 0x0F);
-
-    /* Finally, set up the granularity and access flags */
-    gdt[num].granularity |= (gran & 0xF0);
-    gdt[num].access = access;
-}
-
-// Statically allocate, since we just need one entry
-struct tss_entry system_tss;
-extern uint32_t* read_stack_pointer();
 
 void tss_init() {
     uint32_t base = (uint32_t) &system_tss;         // address of tss
     uint32_t limit = base + sizeof(system_tss);     // limit of selector
 
-    gdt_set_gate(5, base, limit, 0xE9, 0x00);     // setup gdt entry
+   // gdt_set_gate(5, base, limit, 0xE9, 0x00);     // setup gdt entry
     memset(&system_tss, 0, sizeof(system_tss));     // clear the tss
 
     system_tss.ss0  = 0x10;
@@ -171,21 +127,32 @@ void tss_init() {
     system_tss.ss   = system_tss.ds = system_tss.es = system_tss.fs = system_tss.gs = 0x13;     // RPL = 3
 }
 
-void gdt_init()
+
+
+void tss_swap(uint32_t stack, size_t n) {
+	gdt[SEG_TSS] = SEG16(STS_T32A, &system_tss, sizeof(system_tss)-1, 0);
+	gdt[SEG_TSS].s = 0;
+	system_tss.ss0 = SEG_KDATA << 3;
+	system_tss.esp0 = stack + n; //(uint)proc->kstack + KSTACKSIZE;
+	ltr(SEG_TSS<<3);
+}
+
+// Set up CPU's kernel segment descriptors.
+// Run once on entry on each CPU.
+void gdt_init(void)
 {
-    gdt_pointer.limit = (sizeof(struct gdt_entry) * 6) - 1;
-    gdt_pointer.base = &gdt;
 
-    gdt_set_gate(0, 0, 0, 0, 0);					// 0x00
-    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);		// 0x08 Code, PL0
-    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);		// 0x10 Data, PL0
-	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);		// 0x18 Code, PL3
-	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);		// 0x20 Data, PL3
-
-	tss_init();
-    gdt_flush();
-
-    tss_flush();
+	// Map "logical" addresses to virtual addresses using identity map.
+	// Cannot share a CODE descriptor for both kernel and user
+	// because it would have to have DPL_USR, but the CPU forbids
+	// an interrupt from CPL=0 to DPL=3.
+	gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);
+	gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);
+	gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);
+	gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);
+	
+	lgdt(gdt, sizeof(gdt));
+	tss_swap(0, 0);
 }
 
 

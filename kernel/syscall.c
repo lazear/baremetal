@@ -14,15 +14,13 @@ void syscall(regs_t *r)
 	asm volatile("mov %%ebx, %0" : "=r"(ebx));
 	asm volatile("mov %%ecx, %0" : "=r"(ecx));
 	asm volatile("mov %%edx, %0" : "=r"(edx));*/
-	process* c = get_current_proc();
-	c->frame = r;
-	int ret = 10;
+	int ret;
 	switch(r->eax)
 	{
 
 	default:
 		printf("syscall 0x80, eax 0x%x\n", r->eax);
-		ret = fork();
+		//ret = fork();
 		break;
 	}
 	//print_regs(cp);

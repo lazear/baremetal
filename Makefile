@@ -5,6 +5,7 @@ FINAL	= bin/kernel.bin	# Output binary
 START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
 AOBJS	= vectors.so trap_handler.so sched.so syscall.so
+INIT 	= initcode
 CC	    = /home/lazear/opt/cross/bin/i686-elf-gcc
 LD		= /home/lazear/opt/cross/bin/i686-elf-ld
 AS		= nasm
@@ -12,7 +13,7 @@ AR		= /home/lazear/opt/cross/bin/i686-elf-as
 CP		= cp
 
 CCFLAGS	= -O -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
-LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS)
+LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) -b binary $(INIT)
 ASFLAGS = -f elf 
 
 all: compile link clean
@@ -32,6 +33,11 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/syscall.s -o syscall.so
 	$(AS) $(ASFLAGS) kernel/arch/trap_handler.s -o trap_handler.so
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
+
+	$(AS) -f bin kernel/arch/initcode.s -o initcode
+
+
+
 	
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain

@@ -25,10 +25,10 @@ void vga_move_cursor( uint16_t x, uint16_t y ) {
 	unsigned temp;
 	temp = (y * 80) + x;
 
-	outportb(0x3D4, 14);
-	outportb(0x3D5, temp >> 8);
-	outportb(0x3D4, 15);
-	outportb(0x3D5, temp);
+	outb(0x3D4, 14);
+	outb(0x3D5, temp >> 8);
+	outb(0x3D4, 15);
+	outb(0x3D5, temp);
 }
 
 void vga_update_cursor() {

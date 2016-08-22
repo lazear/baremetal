@@ -244,66 +244,6 @@ void* k_mm_init(uint32_t heap) {
 	return addr;
 }
 
-
-
-void memtesttr() {
-	int i = 1;
-	int t = 0;
-	vga_pretty("Beginning physical memory test! Expect system crash\n", VGA_LIGHTGREEN);
-	vga_kputs("PT", 0, 22);
-	vga_kputs("PD", 0, 23);
-	vga_kputs("Phys addr", 0, 24);
-	vga_kputs("Cycles/tick", 110, 24);
-	void *buf = malloc(32);
-	while(1) {
-		void* ptr = k_page_alloc();
-		if (!ptr) {
-			//traverse_blockchain();
-			free(buf);
-			die();
-		}
-		
-		ftoa((double)i/t, buf);
-		vga_kputs(buf, 140, 24);
-
-
-	//	memset(buf, 0, 32);
-		itoa(ptr, buf, 16);
-		vga_kputs(buf, 20, 24);
-		
-		int _pti = mm_first_free(MM_CURRENT_PT)/32;
-		int _pdi = mm_first_free(MM_CURRENT_PD)/32;
-		uint32_t ptidx = MM_CURRENT_PT[_pti];
-		uint32_t pdidx = MM_CURRENT_PD[_pdi];
-
-	//	memset(buf, 0, 32);
-		itoa(pdidx, buf, 2);
-		vga_kputs(buf, 20, 23);
-
-	//	memset(buf, 0, 32);
-		itoa(_pdi, buf, 10);
-		vga_kputs(buf, 10, 23);
-
-	//	memset(buf, 0, 32);
-		itoa(ptidx, buf, 2);
-		vga_kputs(buf, 20, 22);
-
-	//	memset(buf, 0, 32);
-		itoa(_pti, buf, 10);
-		vga_kputs(buf, 10, 22);
-
-		//printf("%x -- %d %d (Cycles per tick: %e)\n", ptr, i, t, ((double)i/ t));
-		free(ptr);
-		t = get_ticks();
-		i++;
-		//wait(5);
-		yield();
-
-
-	}
-}
-
-
 /*
 Function to play around with and test the physical mem manager.
 */
@@ -340,8 +280,5 @@ void mm_test() {
 		printf("Current ff_pdb: 0x%x\n", ff_pdb);
 		printf("Current bitmap value: %b\n", MM_CURRENT_PD[1]);
 	}
-
-
-	spawn("pmm-test", memtesttr);
 
 }

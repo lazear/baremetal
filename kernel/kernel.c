@@ -20,31 +20,13 @@ static mutex key_mutex = { .lock = 0 };
 
 extern STREAM* kb;
 
-void event_loop() {
-	while(1) {
-
-		acquire(&key_mutex);
-		if (ftell(kb)) {
-			//fflush(kb);
-			//list_procs();
-			vga_kputc(fgetc(kb), 150, 1);
-			fflush(kb);
-
-
-		}
-		release(&key_mutex);
-		yield();
-	}
-}
-
-
+extern void scheduler();
 
 extern void switch_to_user(void* (fn)(), uint32_t esp);
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
 
 uint32_t KERNEL_END = 0;
 
-extern process** ptable;
 
 void kernel_initialize(uint32_t kernel_end) {
 
@@ -63,12 +45,11 @@ void kernel_initialize(uint32_t kernel_end) {
 	uint32_t* pagedir = k_mm_init(kernel_end);
 	k_paging_init(pagedir);
 	k_heap_init();
-	// Start timer
-	//tss_flush();
-	//pic_init();
+
 	keyboard_install();
 	timer_init();
 	syscall_init();
+
 	// Initial start interrupts.
 	sti();
 
@@ -76,15 +57,8 @@ void kernel_initialize(uint32_t kernel_end) {
 	vga_clear();
 	vga_pretty(logo, VGA_CYAN);
 
-	sched_init();
 	printf("Back in kernel-init\n");
 
-	extern uint32_t KERNEL_PAGE_DIRECTORY;
-
-//	spawn("loop", event_loop);
-
-	//fork();
-	while(1) yield();
 
 	for(;;);
 }

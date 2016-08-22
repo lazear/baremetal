@@ -49,7 +49,7 @@ extern gdt_pointer
 global gdt_flush
 
 gdt_flush:
-	lgdt [gdt_pointer]
+	lgdt [esp+4]
 	mov ax, 0x10
 	mov ds, ax
 	mov es, ax

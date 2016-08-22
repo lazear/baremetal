@@ -42,7 +42,8 @@ void keyboard_handler(regs_t *r)
 		idx = 0;
 
 
-    scancode = inportb(0x60);
+    scancode = inb(0x60);
+  	uint8_t  data = inb(0x60);
     if (scancode & 0x80)
 	{
 		scancode &= ~0x80;		/* Get rid of key-release code */
@@ -58,9 +59,9 @@ void keyboard_handler(regs_t *r)
 				break;
 			}
 			while(1)
-				if (!(inportb(0x64) & 2)) break;
-			outportb(0x60, 0xed);			/* Write command */
-			outportb(0x60, (shift << 2));	/* Caps lock light */
+				if (!(inb(0x64) & 2)) break;
+			outb(0x60, 0xed);			/* Write command */
+			outb(0x60, (shift << 2));	/* Caps lock light */
 		}
 	}
     else 
@@ -71,7 +72,7 @@ void keyboard_handler(regs_t *r)
 			key = keyboard[scancode];
 
 			vga_putc(key);
-			fputc(kb, key);
+		//	fputc(kb, key);
 			if (key == '\n')	// line return
 			{
 			//	sched_asm();
