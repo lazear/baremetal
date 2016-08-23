@@ -25,11 +25,12 @@ void scheduler() {}
 extern void switch_to_user(void* (fn)(), uint32_t esp);
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
 
+extern uint32_t* KERNEL_PAGE_DIRECTORY;
 uint32_t KERNEL_END = 0;
 extern uint32_t _init_pt;
 extern uint32_t _init_pd;
-
-extern uint32_t id_map();
+extern uint32_t stack_top;
+extern uint32_t stack_bottom;
 
 void kernel_initialize(uint32_t kernel_end) {
 
@@ -46,45 +47,35 @@ void kernel_initialize(uint32_t kernel_end) {
 	*/
 	KERNEL_END = kernel_end;
 	uint32_t* pagedir = k_mm_init(kernel_end);
-//	k_paging_init(pagedir);
-
 	k_heap_init();
-	k_page_alloc();
+	k_paging_init(&_init_pd);
 
-//	keyboard_install();
+	keyboard_install();
 	timer_init();
 	syscall_init();
-
-	// Initial start interrupts.
-	//sti();
+	//k_paging_init(&_init_pd);
+	sti();
 
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
-	vga_pretty(logo, VGA_CYAN);
+	vga_pretty(logo, VGA_LIGHTGREEN);
 
-	printf("Kernel end: 0x%x\n", kernel_end);
-	printf("Kernel end: 0x%x\n", 0xC0000000 >> 22);
-	char *buf = malloc(20);
-	//itoa(kernel_end, buf, 10);
-	strcpy(buf, "My name is Michael");
-	vga_pretty("Hello?", VGA_LIGHTGREEN);
-	vga_puts(buf);
-
-	uint32_t* ptr = &_init_pt;
+	printf("Memory map:\n");
+	printf("Kernel end:     0x%x\n", kernel_end);
+	printf("Stack top:      0x%x\n", &stack_top);
+	printf("Stack bottom:   0x%x\n", &stack_bottom);
+	printf("Page directory: 0x%x\nPage table:     0x%x\n", &_init_pd, &_init_pt);
+//	sbrk(0x20000);
+	printf("Heap brk:       0x%x\n", heap_brk());
 
 
-	for (int i = 0; i < 1024; i++)
-		if (ptr[i])
-			printf("(%x)\n", ptr[i] );
+	k_paging_map(k_page_alloc(), 0xD0000000, 0x7);
+	//k_paging_load_directory((uint32_t) KERNEL_PAGE_DIRECTORY - KERNEL_VIRT);
 
-	vga_pretty("PD!!!\n", VGA_LIGHTGREEN);
-	uint32_t* ptr2 = &_init_pd;
-	for (int i = 0; i < 1024; i++)
-		if (ptr2[i])
-			printf("%d: (%x)\n", i, ptr2[i] );
+	char* ptr = 0xD0000000;
+	*ptr = 'A';
 
 
-	printf("PTE %x\nPDE: %x\n", ptr, ptr2);
 	for(;;);
 }
 

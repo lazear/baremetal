@@ -30,7 +30,7 @@ But there is no freeing capability, so we must be careful. Maybe use the kernel 
 */
 uint32_t* MM_HEAP = 0;
 // MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.
-uint32_t* MM_HEAP_MAX = 0xC0200000;
+uint32_t* MM_HEAP_MAX = 0xC0300000;
 
 /*
 This function should ONLY be used to set up the initial memory manager tables.
@@ -234,9 +234,10 @@ void* k_mm_init(uint32_t heap) {
 	TODO: Change this to actual end-of-kernel space, so everything can be in agreement.
 	*/
 
-	for (int i = 0; i < 512; i++)
-		mm_bitmap_set_bit(MM_CURRENT_PT, i);	
+/*	for (int i = 0; i < 512; i++)
+		mm_bitmap_set_bit(MM_CURRENT_PT, i);	*/
 
+	mm_bitmap_set_bit(MM_CURRENT_PD, 0);
 	uint32_t* addr = mm_page_alloc(MM_CURRENT_PD, MM_CURRENT_PT);
 
 	//kprintx("Initial addr:", addr);

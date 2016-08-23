@@ -1,6 +1,8 @@
-;start.s
-;2007-2016, Michael Lazear
-;combine ISRs, IRQ, GDT setup into a multiboot sector
+; start.s
+; 2007-2016, Michael Lazear
+; Initialize paging, move kernel to 0xC0000000
+; Set up the GDT, IDT, and then hand control to 
+; kernel_initialize()
 
 [BITS 32]
 
@@ -62,6 +64,7 @@ start:
 
 	mov eax, stack_top
 	mov esp, eax
+
 	push kernel_end
 	call kernel_initialize
 	jmp $
@@ -126,6 +129,8 @@ _init_pd:
 
 section .bss
 align 32
+global stack_bottom
+global stack_top
 
 stack_bottom:
 	resb SIZE

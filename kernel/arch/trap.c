@@ -6,6 +6,8 @@
 /* Should switch back to using an array of handlers */
 void trap(regs_t* r) {
 	switch (r->int_no) {
+		case 14:
+			k_page_fault(r);
 		case IRQ0 + IRQ_TIMER:
 			timer(r);
 		case IRQ0 + IRQ_KBD:
