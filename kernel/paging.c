@@ -28,7 +28,7 @@ uint32_t* CURRENT_PAGE_DIRECTORY = 0;
 
 void k_swap_pd(uint32_t* pd) {
 	CURRENT_PAGE_DIRECTORY = pd;
-	k_paging_load_directory(pd);
+	asm volatile("movl %0, %%cr3" : : "r"(pd));
 }
 
 
@@ -119,8 +119,12 @@ void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, uint8_t flags) {
 	if ( dir[_pdi] & ~0x3FF ) {
 		pt = dir[_pdi] & ~0x3FF;
 	} else {
-	//	vga_puts("SHOULD NOT SEE THIS");
-		pt = mm_alloc(0x1000) - KERNEL_VIRT;//k_page_alloc();
+
+		/*
+		I have discovered through thorough testing that it is critical
+		to convert back to the base address.
+		*/
+		pt = mm_alloc(0x1000) - KERNEL_VIRT;
 	}
 
 	pt[_pti] = ((phys) | flags | PF_PRESENT );
@@ -343,7 +347,7 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 	memset(pd, 0, 0x1000);
 	//memset(table, 0, 0x1000);
 
-	pd[1023] = (uint32_t) pd | flags;
+	//pd[1023] = (uint32_t) pd | flags;
 
 	uint32_t phys = 0;
 
@@ -363,7 +367,7 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 
 			uint32_t _pdi = ((virt + (i * 0x1000 * 0x400)) >> 22);
 			printf("%d pdi\n", _pdi);
-			uint32_t* pt = mm_alloc(0x1000) - KERNEL_VIRT;//k_page_alloc();
+			uint32_t* pt = mm_alloc(0x1000) - KERNEL_VIRT ;//k_page_alloc();
 			
 			pd[_pdi] = ((uint32_t) pt | flags );
 			printf("%x\n", pd[_pdi]);

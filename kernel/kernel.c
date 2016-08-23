@@ -27,8 +27,8 @@ extern void switch_to_user(void* (fn)(), uint32_t esp);
 
 extern uint32_t* KERNEL_PAGE_DIRECTORY;
 uint32_t KERNEL_END = 0;
-extern uint32_t _init_pt;
-extern uint32_t _init_pd;
+extern uint32_t _init_pt[];
+extern uint32_t _init_pd[];
 extern uint32_t stack_top;
 extern uint32_t stack_bottom;
 
@@ -46,9 +46,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	4.	Todo - initialize multithreading.
 	*/
 	KERNEL_END = kernel_end;
-	uint32_t* pagedir = k_mm_init(kernel_end);
+	k_mm_init(kernel_end);
 	k_heap_init();
-	k_paging_init(&_init_pd);
+	k_paging_init(_init_pd);
 
 	keyboard_install();
 	timer_init();
@@ -64,13 +64,14 @@ void kernel_initialize(uint32_t kernel_end) {
 	printf("Kernel end:     0x%x\n", kernel_end);
 	printf("Stack top:      0x%x\n", &stack_top);
 	printf("Stack bottom:   0x%x\n", &stack_bottom);
-	printf("Page directory: 0x%x\nPage table:     0x%x\n", &_init_pd, &_init_pt);
+	printf("Page directory: 0x%x\nPage table:     0x%x\n", _init_pd, _init_pt);
 //	sbrk(0x20000);
 	printf("Heap brk:       0x%x\n", heap_brk());
 
 
-	k_paging_map(k_page_alloc(), 0xD0000000, 0x7);
-	//k_paging_load_directory((uint32_t) KERNEL_PAGE_DIRECTORY - KERNEL_VIRT);
+	_paging_map(&_init_pd, k_page_alloc(), 0xD0000000, 0x3);
+
+//	asm volatile("mov %0, %%cr3" : : "r"(&_init_pd));
 
 	char* ptr = 0xD0000000;
 	*ptr = 'A';
