@@ -30,7 +30,7 @@ But there is no freeing capability, so we must be careful. Maybe use the kernel 
 */
 uint32_t* MM_HEAP = 0;
 // MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.
-uint32_t* MM_HEAP_MAX = 0x00200000;
+uint32_t* MM_HEAP_MAX = 0xC0200000;
 
 /*
 This function should ONLY be used to set up the initial memory manager tables.

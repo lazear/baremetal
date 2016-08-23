@@ -114,21 +114,6 @@ void idt_init() {
 }
 
 
-void tss_init() {
-    uint32_t base = (uint32_t) &system_tss;         // address of tss
-    uint32_t limit = base + sizeof(system_tss);     // limit of selector
-
-   // gdt_set_gate(5, base, limit, 0xE9, 0x00);     // setup gdt entry
-    memset(&system_tss, 0, sizeof(system_tss));     // clear the tss
-
-    system_tss.ss0  = 0x10;
-    system_tss.esp0 = 0x0;
-    system_tss.cs   = 0xb;
-    system_tss.ss   = system_tss.ds = system_tss.es = system_tss.fs = system_tss.gs = 0x13;     // RPL = 3
-}
-
-
-
 void tss_swap(uint32_t stack, size_t n) {
 	gdt[SEG_TSS] = SEG16(STS_T32A, &system_tss, sizeof(system_tss)-1, 0);
 	gdt[SEG_TSS].s = 0;

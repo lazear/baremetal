@@ -134,6 +134,7 @@ uint32_t* k_phys_to_virt(uint32_t phys) {
 	return _phys_to_virt(CURRENT_PAGE_DIRECTORY, phys);
 }
 
+
 void k_paging_init(uint32_t* dir_addr) {
 	/* load a custom ISR14 handler for page faults */
 	//idt_set_gate(14, k_page_fault, 0x08, 0x8E);
@@ -150,12 +151,14 @@ void k_paging_init(uint32_t* dir_addr) {
 
 
 	CURRENT_PAGE_DIRECTORY[0] = (uint32_t) table | 3;
+	CURRENT_PAGE_DIRECTORY[0xC0000000 >> 22] = (uint32_t) table | 3;
 	CURRENT_PAGE_DIRECTORY[1023] = (uint32_t) CURRENT_PAGE_DIRECTORY | 3;
 
 
 	KERNEL_PAGE_DIRECTORY = CURRENT_PAGE_DIRECTORY;
+
 	k_paging_load_directory(CURRENT_PAGE_DIRECTORY);
-	k_paging_enable();
+	//kbpage();
 }
 
 /* 

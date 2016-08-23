@@ -70,7 +70,7 @@ LAST_ALLOC is basically the current used top, the next address allocated will be
 |_____BOTTOM_____|0xC0000000
 */
 
-static const uint32_t K_HEAP_BOTTOM = 0x01000000;	// 16 MB
+static const uint32_t K_HEAP_BOTTOM = 0xC0300000;	// 16 MB
 static const uint32_t K_HEAP_MAX = 0xF0000000;
 
 uint32_t K_HEAP_TOP = 0;

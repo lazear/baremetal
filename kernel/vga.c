@@ -9,7 +9,7 @@ Implementation of vga driver for baremetal
 #include <types.h>
 #include <ctype.h>
 
-char* VGA_MEMORY = 0x000B8000;
+char* VGA_MEMORY = 0xC00B8000;
 
 
 int CURRENT_X = 0;
