@@ -8,10 +8,16 @@ void trap(regs_t* r) {
 	switch (r->int_no) {
 		case 14:
 			k_page_fault(r);
+			break;
 		case IRQ0 + IRQ_TIMER:
 			timer(r);
+			break;
 		case IRQ0 + IRQ_KBD:
 			keyboard_handler(r);
+			break;
+		case IRQ0 + IRQ_IDE:
+			ide_handler();
+			break;
 	}
 
 	if (r->int_no > 40)

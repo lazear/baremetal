@@ -151,7 +151,9 @@ char* itoa(uint32_t num, char* buffer, int base) {
 
 	if (base == 2)
 		len = 32;
-
+	if (num <= 0xFF && base == 16)
+		len = 2;
+	
 	if (num == 0 && base == 2) {
 		while(i < len)
 			buffer[i++] = '0';

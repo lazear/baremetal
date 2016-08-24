@@ -76,6 +76,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	char* ptr = 0xD0000000;
 	*ptr = 'A';
 
+	//buffer_init();
+	ide_init();
+	ide_test();
 
 	for(;;);
 }

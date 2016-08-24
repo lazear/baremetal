@@ -75,6 +75,28 @@ uint64_t inl(uint16_t port) {
 	asm volatile("inl %1, %0" : "=a"(ret) : "dN"(port));
 }
 
+/*
+cld						clear direction flag
+mov ecx, cnt 			set loop counter
+rep outsl port, addr	repeats outsl ecx times
+*/
+void outsl(int port, const void *addr, int cnt)
+{
+  asm volatile("cld; rep outsl" :
+               "=S" (addr), "=c" (cnt) :
+               "d" (port), "0" (addr), "1" (cnt) :
+               "cc");
+}
+
+void insl(int port, void *addr, int cnt)
+{
+  asm volatile("cld; rep insl" :
+               "=D" (addr), "=c" (cnt) :
+               "d" (port), "0" (addr), "1" (cnt) :
+               "memory", "cc");
+}
+
+
 
 struct segdesc gdt[8];
 struct gatedesc idt[256];

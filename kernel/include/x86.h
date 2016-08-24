@@ -50,7 +50,7 @@ typedef struct stackframe {
 
 
 extern void irq_handler(regs_t *r);
-extern void outb(uint16_t port, uint16_t data);
+
 // The following functions are from start.s, ISR and IRQ macros
 
 extern void gdt_flush();
