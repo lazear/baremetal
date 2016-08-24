@@ -53,6 +53,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	keyboard_install();
 	timer_init();
 	syscall_init();
+	ide_init();
 	//k_paging_init(&_init_pd);
 	sti();
 
@@ -77,8 +78,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	*ptr = 'A';
 
 	//buffer_init();
-	ide_init();
-	ide_test();
+
 
 	for(;;);
 }
