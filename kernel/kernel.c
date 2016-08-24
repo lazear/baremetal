@@ -1,7 +1,27 @@
 /*
-Michael Lazear, (C) 2007-2016
-
 kernel.c
+===============================================================================
+MIT License
+Copyright (c) 2007-2016 Michael Lazear
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+===============================================================================
 */
 
 #include <kernel.h>
@@ -45,6 +65,7 @@ void kernel_initialize(uint32_t kernel_end) {
 			- Public heap starts at 3GB. This should be changed when higher half is implemented
 	4.	Todo - initialize multithreading.
 	*/
+
 	KERNEL_END = kernel_end;
 	k_mm_init(kernel_end);
 	k_heap_init();
@@ -54,7 +75,6 @@ void kernel_initialize(uint32_t kernel_end) {
 	timer_init();
 	syscall_init();
 	ide_init();
-	//k_paging_init(&_init_pd);
 	sti();
 
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
@@ -66,18 +86,13 @@ void kernel_initialize(uint32_t kernel_end) {
 	printf("Stack top:      0x%x\n", &stack_top);
 	printf("Stack bottom:   0x%x\n", &stack_bottom);
 	printf("Page directory: 0x%x\nPage table:     0x%x\n", _init_pd, _init_pt);
-//	sbrk(0x20000);
 	printf("Heap brk:       0x%x\n", heap_brk());
 
 
 	_paging_map(&_init_pd, k_page_alloc(), 0xD0000000, 0x3);
-
-//	asm volatile("mov %0, %%cr3" : : "r"(&_init_pd));
-
+	// Page fault test
 	char* ptr = 0xD0000000;
 	*ptr = 'A';
-
-	//buffer_init();
 
 
 	for(;;);

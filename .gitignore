@@ -4,4 +4,4 @@
 *.sublime-project
 *.sublime-workspace
 initcode
-
+*.img
