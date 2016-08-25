@@ -83,7 +83,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
 	vga_pretty(logo, VGA_LIGHTGREEN);
-
+/*
 	printf("Memory map:\n");
 	printf("Kernel end:     0x%x\n", kernel_end);
 	printf("Stack top:      0x%x\n", &stack_top);
@@ -91,7 +91,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	printf("Page directory: 0x%x\nPage table:     0x%x\n", _init_pd, _init_pt);
 	printf("Heap brk:       0x%x\n", heap_brk());
 
-
+*/
 	_paging_map(&_init_pd, k_page_alloc(), 0xD0000000, 0x3);
 	// Page fault test
 	char* ptr = 0xD0000000;
@@ -99,8 +99,13 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	printf("Superblock size: %d\nBGD size %d\n", sizeof(struct superblock_s), sizeof(struct block_group_descriptor_s));
-
+	superblock* s = ext2_superblock(1);
+	sb_dump(s);
+	buffer_dump(buffer_read(1, 18));
+	bgd(1);
+	buffer_dump(buffer_read(1, 20));
+	//inode_dump(s, 50);
+	//buffer_traverse();
 	for(;;);
 }
 

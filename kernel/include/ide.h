@@ -11,7 +11,7 @@ with xv6 inspired queueing
 #ifndef __baremetal_ide__
 #define __baremetal_ide__
 
-#define BLOCK_SIZE		512
+#define BLOCK_SIZE		1024
 #define SECTOR_SIZE		512
 
 #define B_BUSY	0x1		// buffer is locked by a process
@@ -40,8 +40,11 @@ with xv6 inspired queueing
 #define LBA_HIGH(c)		((uint8_t) (c >> 16) & 0xFF)
 #define LBA_LAST(c)		((uint8_t) (c >> 24) & 0xF)
 
-#define IDE_CMD_READ  0x20
-#define IDE_CMD_WRITE 0x30
+#define IDE_CMD_READ  (BLOCK_SIZE/SECTOR_SIZE == 1) ? 0x20 : 0xC4
+#define IDE_CMD_WRITE (BLOCK_SIZE/SECTOR_SIZE == 1) ? 0x30 : 0xC5
+#define IDE_CMD_READ_MUL  0xC4
+#define IDE_CMD_WRITE_MUL 0xC5
+
 
 
 #define MAX_OP_BLOCKS	16	// Max # of blocks any operation can write (8 KB)
@@ -52,6 +55,7 @@ typedef struct ide_buffer {
 	uint32_t dev;				// device number
 	uint32_t block;				// block number
 	struct ide_buffer* next;	// next block in queue
+	struct ide_buffer* q;
 	uint8_t data[BLOCK_SIZE];	// 1 disk sector of data
 } buffer;
 

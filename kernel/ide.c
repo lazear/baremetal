@@ -94,25 +94,30 @@ Actual reading of data takes place in the interrupt handler
 */
 void ide_handler() {
 	acquire(&idelock);
-
+	vga_pretty("IDE!!\n", 0xC);
 	buffer* b = idequeue;
+
+	assert(b);
 	if(!b) {
 		release(&idequeue);
 		return;
 	}
-	idequeue = b->next;
+	idequeue = b->q;
+	//assert(idequeue);
 
 	//if dirty is not set, and no errors, read data
 	int stat = ide_wait(1);
 	assert(stat >= 0);
-	if (!(b->flags & B_DIRTY) && stat >= 0)
+	assert(!(b->flags & B_DIRTY));
+	if (!(b->flags & B_DIRTY) && stat >= 0) {
 		insl(0x1f0, b->data, BLOCK_SIZE/4);
+		printf("Reading data to buffer %x dev %d block %d\n", b, b->dev, b->block);
+	}
 
 	b->flags |= B_VALID;	// set valid flag
 	b->flags &= ~B_DIRTY;	// clear dirty flag
 	ide_delay();
 	wake(b);
-
 	// Move to next item in queue
 	if (idequeue != 0)
 		ide_op(idequeue);
@@ -142,7 +147,10 @@ void ide_init() {
 	release(&idelock);
 }
 
-
+int check_buf(buffer* b) {
+	return (b->flags & (B_VALID | B_DIRTY) != B_VALID);
+}
+	
 int ide_rw(buffer* b) {
 	if ((b->flags & (B_VALID | B_DIRTY)) == B_VALID)
 		return -1;	// only valid is set, nothing to read or write
@@ -150,36 +158,23 @@ int ide_rw(buffer* b) {
 		return -2;
 
 	buffer** pp;
-	for(pp = &idequeue; *pp; pp=&(*pp)->next) 
+	b->q = 0;
+	for(pp = &idequeue; *pp; pp = &(*pp)->q) 
 		;	// Cycle through all valid next's.
 	*pp = b;	// b is now appended.
+	//idequeue->next->next = 0;
 
-	assert(idequeue == b);
+	//assert(idequeue == b);
 	if (idequeue == b)
 		ide_op(b);	// If this is only item in queue, start operation.
+	else
+		printf("IDEque %x, %x\n", idequeue, idequeue->next);
 
 	//assert( b->flags & (B_VALID | B_DIRTY) != B_VALID);
-	//while( b->flags & (B_VALID | B_DIRTY) != B_VALID);
+//	while(check_buf(b))
 		sleep(b, &idelock);	// Sleep until VALID is set and DIRTY is clear
-
+	assert(ide_wait(1) == 0);
 	return 0;
-}
-
-void ide_test() {
-	buffer* b = malloc(sizeof(buffer));
-	b->flags = 0;
-	b->dev = 1;
-	b->block = 7;
-
-	buffer* c = malloc(sizeof(buffer));
-	c->flags = 0;
-	c->dev = 1;
-	c->block = 1;
-	printf("RW status: %d\n", ide_rw(b));
-	printf("RW status: %d\n", ide_rw(c));
-
-	int ticks = get_ticks();
-	while(ticks + 20 > get_ticks());
 }
 
 
@@ -201,19 +196,32 @@ void buffer_init() {
 	b->dev = -1;
 }
 
+uint32_t byte_order(uint32_t i) {
+	uint32_t x;
+	uint8_t* bytes = (uint8_t*) &x;
+	bytes[0] = i >> 24 & 0xFF;
+	bytes[1] = i >> 16 & 0xFF;
+	bytes[2] = i >> 8 & 0xFF;
+	bytes[3] = i & 0xFF;
+	return x;
+}
+
 void buffer_dump(buffer *b) {
 	assert(b);
-	for (int i = 0; i < BLOCK_SIZE; i++)
-		printf("%x", b->data[i]);
+	assert(b->flags & B_VALID);
+	//assert(idequeue == b);
+	for (int i = 0; i < BLOCK_SIZE/4; i += 4)
+		printf("%x ", byte_order(*(uint32_t*)((uint32_t)b->data + i)));
 }
 
 /* For debugging purposes */
 void buffer_traverse() {
-	buffer* b;
+	buffer** b;
 	int i = 0;
-	for (b = cache.list; b; b = b->next) {
-		printf("%d this %x that %x\n", i++, b, b->next);
+	for (b = &cache.list; *b; b = &(*b)->next) {
+		printf("%d this %x that %x\n", i++, *b, (*b)->next);
 	}
+	printf("IDEque %x\n", idequeue);
 }
 
 buffer* buffer_get(uint32_t dev, uint32_t block) {
@@ -222,13 +230,16 @@ buffer* buffer_get(uint32_t dev, uint32_t block) {
 loop:
 	for (b = cache.list; b; b = b->next) {
 		if (b->dev == dev && b->block == block) {
+			printf("Buffer found\n");
 			if (!(b->flags & B_BUSY)) {		// Is buffer free?
 				b->flags |= B_BUSY;			// Mark buffer as in-use
 				release(&cache.lock);
 				return b;
 			}
 			sleep(b, &cache.lock);			// Wait until that block is free
-			goto loop;					// Without MT, this freezes
+			release(&cache.lock);
+			return b;
+		//	goto loop;					// Without MT, this freezes
 		}
 	}
 
@@ -239,6 +250,7 @@ loop:
 			b->dev = dev;
 			b->block = block;
 			b->flags = B_BUSY;
+			
 			release(&cache.lock);
 			return b;
 		}
@@ -254,7 +266,8 @@ loop:
 	(*bp)->dev = dev;
 	(*bp)->block = block;
 	(*bp)->flags = B_BUSY;
-
+	//(*bp)->next = NULL;
+	printf("Making new buffer\n");
 	release(&cache.lock);
 	return *bp;
 }
@@ -264,6 +277,12 @@ buffer* buffer_read(uint32_t dev, uint32_t block) {
 	int i = -1;
 	if ( !(b->flags & B_VALID)) 	// Block not read yet
 		i = ide_rw(b);
+	if (i == -1) {
+		ide_delay();
+		buffer_read(dev, block);
+	}
+	//ide_wait(1);
+	printf("Escape\n");
 	return b;
 }
 
