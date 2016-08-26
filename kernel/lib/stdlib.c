@@ -179,11 +179,11 @@ char* itoa(uint32_t num, char* buffer, int base) {
 		buffer[i] = '\0';
 		return buffer;
 	}
-	if (num == 0 || base == 0) {
+/*	if (num == 0 && base == 0) {
 		buffer[0] = '0';
 		buffer[1] = '\0';
 		return buffer;
-	}
+	}*/
 
 	// go in reverse order
 	while (num != 0 && len--) {

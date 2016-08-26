@@ -103,7 +103,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	sb_dump(s);
 	buffer_dump(buffer_read(1, 18));
 	bgd(1);
-	buffer_dump(buffer_read(1, 20));
+	buffer_dump(buffer_read(1, 19));
 	//inode_dump(s, 50);
 	//buffer_traverse();
 	for(;;);

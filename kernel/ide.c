@@ -196,6 +196,7 @@ void buffer_init() {
 	b->dev = -1;
 }
 
+// Converts to same endian-ness as sublime for hex viewing
 uint32_t byte_order(uint32_t i) {
 	uint32_t x;
 	uint8_t* bytes = (uint8_t*) &x;
@@ -210,8 +211,13 @@ void buffer_dump(buffer *b) {
 	assert(b);
 	assert(b->flags & B_VALID);
 	//assert(idequeue == b);
-	for (int i = 0; i < BLOCK_SIZE/4; i += 4)
+	for (int i = 0; i < BLOCK_SIZE/4; i += 4) {
+		if (i % 32 == 0 && i)
+			vga_putc('\n');
 		printf("%x ", byte_order(*(uint32_t*)((uint32_t)b->data + i)));
+
+
+	}
 }
 
 /* For debugging purposes */
