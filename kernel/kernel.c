@@ -102,9 +102,11 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	ext2_lookup("abstract");
-
-
+	lsroot();
+	char* data = ext2_open(ext2_lookup("abstract"));
+/*	for (int i = 0; i < 2048; i++)
+		if(*data)vga_putc(*data++);
+*/
 	for(;;);
 }
 
