@@ -134,8 +134,13 @@ void vga_putc(char c) {
 		return;
 	}
 	if (c == '\t') {
-		CURRENT_X += 8;
+		while(CURRENT_X % 16)
+			CURRENT_X++;
+		CURRENT_X += 2;
 		return;
+	}
+	if (c=='\q') {
+
 	}
 	vga_kputc(c, CURRENT_X, CURRENT_Y);
 	CURRENT_X += 2;
@@ -153,7 +158,7 @@ void vga_pretty(char* s, int color) {
 
 	vga_puts(s);
 
-	vga_overwrite_color(color, start_x, start_y, CURRENT_X, CURRENT_Y);
+	vga_overwrite_color(color, start_x, start_y, 80, CURRENT_Y);
 
 }
 

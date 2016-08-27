@@ -59,5 +59,7 @@ typedef struct ide_buffer {
 	uint8_t data[BLOCK_SIZE];	// 1 disk sector of data
 } buffer;
 
+extern int IDE_STATUS;
+
 
 #endif

@@ -55,6 +55,9 @@ extern uint32_t _init_pd[];
 extern uint32_t stack_top;
 extern uint32_t stack_bottom;
 
+
+#define DEBUG 0
+
 void kernel_initialize(uint32_t kernel_end) {
 
 	/*
@@ -99,13 +102,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	superblock* s = ext2_superblock(1);
-	sb_dump(s);
-	buffer_dump(buffer_read(1, 18));
-	bgd(1);
-	buffer_dump(buffer_read(1, 19));
-	//inode_dump(s, 50);
-	//buffer_traverse();
+	ext2_lookup("abstract");
+
+
 	for(;;);
 }
 

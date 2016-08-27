@@ -38,14 +38,14 @@ void wake(void* channel) {}
 
 mutex idelock = {.lock = 0};		// spinlock for disk access
 buffer* idequeue;					// cache of buffer access
-static int present = 0;				// Dev 1 present?
+int IDE_STATUS = 0;				// Dev 1 present?
 
 /*
 Wait for IDE device to become ready
 check =  0, do not check for errors
 check != 0, return -1 if error bit set
 */
-static int ide_wait(int check) {
+int ide_wait(int check) {
 	char r;
 
 	// Wait while drive is busy. Once just ready is set, exit the loop
@@ -58,7 +58,7 @@ static int ide_wait(int check) {
 }
 
 // Delay 400 ns
-static int ide_delay() {
+ int ide_delay() {
 	char ret = 0;
 	for (int i = 0; i < 5; i++)
 		ret = (char)inb(IDE_ALT);
@@ -68,7 +68,9 @@ static int ide_delay() {
 static void ide_op(buffer* b) {
 	if (!b)
 		panic("ide_op");
+	//printf("Begin op on dev %d block %d\n", b->dev, b->block );
 
+	assert(b->dev);
 	int sector_per_block = BLOCK_SIZE / SECTOR_SIZE;	// 1
 	int sector = b->block * sector_per_block;
 
@@ -94,7 +96,7 @@ Actual reading of data takes place in the interrupt handler
 */
 void ide_handler() {
 	acquire(&idelock);
-	vga_pretty("IDE!!\n", 0xC);
+	//vga_pretty("IDE: ", 0xC);
 	buffer* b = idequeue;
 
 	assert(b);
@@ -111,7 +113,7 @@ void ide_handler() {
 	assert(!(b->flags & B_DIRTY));
 	if (!(b->flags & B_DIRTY) && stat >= 0) {
 		insl(0x1f0, b->data, BLOCK_SIZE/4);
-		printf("Reading data to buffer %x dev %d block %d\n", b, b->dev, b->block);
+		//printf("Reading data to buffer %x dev %d block %d\n", b, b->dev, b->block);
 	}
 
 	b->flags |= B_VALID;	// set valid flag
@@ -119,6 +121,7 @@ void ide_handler() {
 	ide_delay();
 	wake(b);
 	// Move to next item in queue
+	//assert(idequeue != 0);
 	if (idequeue != 0)
 		ide_op(idequeue);
 
@@ -136,13 +139,13 @@ void ide_init() {
 
 	for (int i = 0; i < 1000; i++) {
 		if (inb(IDE_IO | IDE_CMD)) {
-			present = 1;
+			IDE_STATUS = 1;
 			break;
 		}
 	}
 
 
-	printf("IDE status: %d\n", present);
+	printf("IDE status: %d\n", IDE_STATUS);
 	//outb(IDE_IO | IDE_HEAD, 0xE0 | (0<<4));
 	release(&idelock);
 }
@@ -162,14 +165,11 @@ int ide_rw(buffer* b) {
 	for(pp = &idequeue; *pp; pp = &(*pp)->q) 
 		;	// Cycle through all valid next's.
 	*pp = b;	// b is now appended.
-	//idequeue->next->next = 0;
 
 	//assert(idequeue == b);
 	if (idequeue == b)
 		ide_op(b);	// If this is only item in queue, start operation.
-	else
-		printf("IDEque %x, %x\n", idequeue, idequeue->next);
-
+	
 	//assert( b->flags & (B_VALID | B_DIRTY) != B_VALID);
 //	while(check_buf(b))
 		sleep(b, &idelock);	// Sleep until VALID is set and DIRTY is clear
@@ -211,10 +211,11 @@ void buffer_dump(buffer *b) {
 	assert(b);
 	assert(b->flags & B_VALID);
 	//assert(idequeue == b);
-	for (int i = 0; i < BLOCK_SIZE/4; i += 4) {
+	for (int i = 0; i < BLOCK_SIZE; i += 4) {
 		if (i % 32 == 0 && i)
 			vga_putc('\n');
-		printf("%x ", byte_order(*(uint32_t*)((uint32_t)b->data + i)));
+		int o = byte_order(*(uint32_t*)((uint32_t)b->data + i));
+		printf("%x ", o);
 
 
 	}
@@ -236,7 +237,7 @@ buffer* buffer_get(uint32_t dev, uint32_t block) {
 loop:
 	for (b = cache.list; b; b = b->next) {
 		if (b->dev == dev && b->block == block) {
-			printf("Buffer found\n");
+			//printf("Buffer found\n");
 			if (!(b->flags & B_BUSY)) {		// Is buffer free?
 				b->flags |= B_BUSY;			// Mark buffer as in-use
 				release(&cache.lock);
@@ -283,12 +284,13 @@ buffer* buffer_read(uint32_t dev, uint32_t block) {
 	int i = -1;
 	if ( !(b->flags & B_VALID)) 	// Block not read yet
 		i = ide_rw(b);
-	if (i == -1) {
+
+	if (i == -1 &  !(b->flags & B_VALID) ) {
 		ide_delay();
 		buffer_read(dev, block);
 	}
 	//ide_wait(1);
-	printf("Escape\n");
+	// /printf("Escape\n");
 	return b;
 }
 
