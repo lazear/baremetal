@@ -275,7 +275,7 @@ loop:
 	(*bp)->block = block;
 	(*bp)->flags = B_BUSY;
 	//(*bp)->next = NULL;
-	printf("Making new buffer\n");
+//	printf("Making new buffer\n");
 	release(&cache.lock);
 	return *bp;
 }
@@ -299,4 +299,16 @@ void buffer_write(buffer* b) {
 	assert((b->flags & B_BUSY) == 0);
 	b->flags |= B_DIRTY; 		// Set write flag
 	ide_rw(b);
+}
+
+void buffer_free(buffer* b) {
+	buffer* bp;
+	acquire(&cache.lock);
+	for (bp = cache.list; bp != b; bp = bp->next);
+	bp++;
+	bp->flags = 0;
+	bp->block = -1;
+	memset(bp->data, 0, BLOCK_SIZE);
+	free(b);
+	release(&cache.lock);
 }

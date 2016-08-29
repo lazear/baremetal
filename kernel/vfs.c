@@ -26,3 +26,38 @@ SOFTWARE.
 Begin work on implementing virtual filesystem. Use a *NIX-ish approach, with 
 everything mounted under "/" (root)
 */
+
+#include <types.h>
+#include <ext2.h>
+
+#define VFS_DIR		2
+#define VFS_FILE	1
+
+typedef struct vfs_entry_s {
+	int dev;
+	int inode;
+	int type;
+	char* name;
+	struct vfs_entry_s* parent;
+} vfs_entry;
+
+vfs_entry* root = NULL;
+
+void vfs_init() {
+	root = malloc(sizeof(vfs_entry));
+	root->dev 	= 1;
+	root->inode = 2;
+	root->type 	= VFS_DIR;
+	root->parent = NULL;
+	strcpy(root->name, "/");
+}
+
+void vfs_traverse(char* name) {
+	dirent* d = ext2_open_dir(2);
+	do{
+		d->name[d->name_len] = '\0';
+		printf("%s%s\n", name, d->name);
+
+		d = (dirent*)((uint32_t) d + d->rec_len);
+	} while(d->inode);
+}

@@ -37,8 +37,6 @@ typedef struct device_info_s {
 device *rootdev = NULL;
 
 
-
-
 /* 	Read superblock from device dev, and check the magic flag.
 	Return NULL if not a valid EXT2 partition */
 superblock* ext2_superblock(int dev) {
@@ -138,22 +136,20 @@ inode* ext2_lookup(char* name) {
 dirent* ext2_open_dir(int in) {
 	inode* i = ext2_inode(1, in);
 	char* buf = malloc(BLOCK_SIZE*i->blocks/2);
-
 	for (int q = 0; q < i->blocks / 2; q++) {
 		buffer* b = buffer_read(1, i->block[q]);
 		memcpy((uint32_t)buf+(q * BLOCK_SIZE), b->data, BLOCK_SIZE);
-	//	printf("%d\t", i->block[q]);
 	}
+	return (dirent*) buf;
+}
 
-	dirent* d = (dirent*) buf;
+void ls(dirent* d) {
 	do{
 		d->name[d->name_len] = '\0';
 		printf("\t%s\ttype %d\n", d->name, d->file_type);
 
 		d = (dirent*)((uint32_t) d + d->rec_len);
 	} while(d->inode);
-	free(buf);
-	return NULL;
 }
 
 void lsroot() {
@@ -171,8 +167,6 @@ void lsroot() {
 	do{
 		d->name[d->name_len] = '\0';
 		printf("name: %s\tinode %d\n", d->name, d->inode);
-		if (d->file_type == 2)
-			ext2_open_dir(d->inode);
 		d = (dirent*)((uint32_t) d + d->rec_len);
 	} while(d->inode);
 	free(buf);

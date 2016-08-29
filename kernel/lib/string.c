@@ -178,8 +178,8 @@ char* strtok(char* s, const char* delim) {
 	for (int i = 0; i < strlen(delim); i++) {
 		b = ptr;
 		ptr = strchr(ptr, delim[i]);
-		if (!ptr && !b) 
-			return NULL;
+		if (!ptr) 
+			return b;
 		*--ptr = '\0';
 		ptr++;
 		return b;
