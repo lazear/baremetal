@@ -4,40 +4,31 @@
 
 [ORG 0x7C00]                    ; The BIOS loads the boot sector into memory location 0x7C00
 
-jmp word start            ; Load the OS Kernel
+jmp word read_disk            ; Load the OS Kernel
 
-	;----------Fat 12 Header junk----------;
+read_disk:
+        mov ah, 0               ; Reset drive command
+        int 13h                 ; Call interrupt 13h
+        mov [drive], dl         ; Store boot disk
+        or ah, ah               ; Check for error code
+        jnz read_disk           ; Try again if error
+        
+        mov ax, 0				; Clear AX
+        mov es, ax              ; ES segment = 0                
+        mov bx, 0x1000          ; Destination address = 0000:1000
+        mov ah, 02h             ; Read sector command
+        mov al, 1            	; Number of sectors to read (0x12 = 18 sectors)
+        mov dl, [drive]         ; Load boot disk
+        mov ch, 0               ; Cylinder = 0
+        mov cl, 2               ; Starting Sector = 3
+        mov dh, 0               ; Head = 1
+        int 13h                 ; Call interrupt 13h
+        or ah, ah               ; Check for error code
+        jnz read_disk         ; Try again if error
+        cli                     ; Disable interrupts
 
-	;----------Bootsector Code----------;
-start:
-	mov ax, 0x4F02          ; set VBE mode
-	mov bx, 0x4118          ; Bit 14 is set(Linear frame buffer) 15 is clear
-	int 0x10
+        jmp 0x1000
 
-	cmp ax, 0x004F
-	jne .error
-
-.print:
-	mov bp, .string
-	mov ah, 0x13
-	mov al, 0x01
-	mov bh, 0x00
-	mov bl, 0x1F
-	mov cx, .strlen
-	int 0x10
-	jmp $
-
-
-.error:
-	mov ah, 09h
-	mov al, 'C'
-	mov bh, 0
-	mov bl, 0xA;
-	mov cx, 2
-	int 0x10
-
-.string	db 13, 'Hello, World!'
-.strlen equ $-.string
-
+drive db 0
 times 510-($-$$) db 0           ; Fill up the file with zeros
 dw 0AA55h                   	; Last 2 bytes = Boot sector identifyer

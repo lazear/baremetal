@@ -59,7 +59,7 @@ entry:
 	xor ecx, ecx			; clear ecx before entering the loop
 
 ; Begin a loop to identity map the first 4 MB of virtual address space
-_loop:	
+.loop:	
 
 	or ecx, 0x000000003 	; set PF_PRESENT, PF_RW
 	mov [ebx], ecx			; set page table entry to value in ecx (phys addr)
@@ -67,7 +67,7 @@ _loop:
 	add ebx, 4				; increment by 32 bits
 	add ecx, 0x1000			; increment the physical address by 4 KB
 	cmp ecx, 0x00400000		; Loop until we hit 4 MB
-jne _loop
+jne .loop
 
 	mov cr3, eax			; Eax is still our page directory address
 	

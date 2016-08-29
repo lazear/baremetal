@@ -56,7 +56,14 @@ extern uint32_t stack_top;
 extern uint32_t stack_bottom;
 
 
-#define DEBUG 0
+#define RGB(r,g,b) (((r&0xFF)<<16) | ((g&0xFF)<<8) | (b & 0xFF))
+/* only valid for 800x600x16M */
+static void putpixel(unsigned char* screen, int x,int y, int color) {
+    unsigned where = x*3 + y*768*4;
+    screen[where] = color & 255;              // BLUE
+    screen[where + 1] = (color >> 8) & 255;   // GREEN
+    screen[where + 2] = (color >> 16) & 255;  // RED
+}
 
 void kernel_initialize(uint32_t kernel_end) {
 
@@ -95,19 +102,26 @@ void kernel_initialize(uint32_t kernel_end) {
 	printf("Heap brk:       0x%x\n", heap_brk());
 
 */
-	_paging_map(&_init_pd, k_page_alloc(), 0xD0000000, 0x3);
+	for (int i =0; i < 0x1000000; i+=0x1000) 
+		_paging_map(&_init_pd, i+0xFD000000, i+0xFD000000, 0x3);
+
 	// Page fault test
-	char* ptr = 0xD0000000;
-	*ptr = 'A';
 	ide_init();
 	buffer_init();
-	char* name = "/home/lazear/bin/echo";
-	char* pch = strtok(name, "/");
-	while (pch) {
-		printf("%s\n", pch);
-		pch = strtok(NULL, "/");
+
+	int32_test();
+	vga_pretty("why isnt this working", VGA_LIGHTGREEN);
+
+	char* VID = 0xFD000000;
+	
+	for (int i = 0; i < 768; i++) {
+		putpixel(VID, 10, i, 0xFFFFFFFF);
+	
 	}
+	for (int i = 0; i < 1024; i++)
+		putpixel(VID, i, 1, RGB(0, 0xFF, 0));
 
 	for(;;);
 }
+
 

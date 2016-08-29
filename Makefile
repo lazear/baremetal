@@ -4,7 +4,7 @@
 FINAL	= bin/kernel.bin	# Output binary
 START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
-AOBJS	= vectors.so trap_handler.so sched.so syscall.so
+AOBJS	= vectors.so trap_handler.so sched.so syscall.so int32.so
 INIT 	= initcode
 CC	    = /home/lazear/opt/cross/bin/i686-elf-gcc
 LD		= /home/lazear/opt/cross/bin/i686-elf-ld
@@ -20,7 +20,10 @@ all: compile link clean
 build: compile link 
 db: compile link clean debug
 
-
+boot:
+	nasm -f bin kernel/bootstrap.asm -o kernel/bootstrap
+	nasm -f bin kernel/stage2.asm -o kernel/stage2
+	cat kernel/stage2 >> kernel/bootstrap
 
 compile:
 	#Compile C source
@@ -33,6 +36,7 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/syscall.s -o syscall.so
 	$(AS) $(ASFLAGS) kernel/arch/trap_handler.s -o trap_handler.so
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
+	$(AS) $(ASFLAGS) kernel/arch/int32.s -o int32.so
 
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
 
