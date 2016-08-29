@@ -30,19 +30,18 @@ SOFTWARE.
 #include <assert.h>
 
 
-block_group_descriptor* bgd(superblock*s, int dev) {
+block_group_descriptor* bg_dump(block_group_descriptor* bg) {
 
-	block_group_descriptor* bg = ext2_blockdesc(dev);
-	
-/*	printf("Block bitmap %d\n", bg->block_bitmap);
+
+	printf("Block bitmap %d\n", bg->block_bitmap);
 	printf("Inode bitmap %d\n", bg->inode_bitmap);
 	printf("Inode table  %d\n", bg->inode_table);
 	printf("Free blocks  %d\n", bg->free_blocks_count);
 	printf("Free inodes  %d\n", bg->free_inodes_count);
-	printf("Used dirs    %d\n", bg->used_dirs_count);*/
+	printf("Used dirs    %d\n", bg->used_dirs_count);
 	
-	buffer* bbm = buffer_read(dev, bg->block_bitmap);
-	buffer* ibm = buffer_read(dev, bg->inode_bitmap);
+	buffer* bbm = buffer_read(1, bg->block_bitmap);
+	buffer* ibm = buffer_read(1, bg->inode_bitmap);
 
 	uint32_t* block_bitmap = malloc(BLOCK_SIZE);
 	uint32_t* inode_bitmap = malloc(BLOCK_SIZE);
@@ -53,10 +52,8 @@ block_group_descriptor* bgd(superblock*s, int dev) {
 		inode_bitmap[i] = byte_order(*(uint32_t*)((uint32_t)ibm->data + i));
 
 
-	printf("First free BBM: %d\n", ext_first_free(block_bitmap, \
-		s->blocks_per_group / 8));
-	printf("First free IBM: %d\n", ext_first_free(inode_bitmap, \
-		s->blocks_per_group / 8));
+	printf("First free BBM: %d\n", ext_first_free(block_bitmap, 1024));
+	printf("First free IBM: %d\n", ext_first_free(inode_bitmap, 1024));
 
 	//for (int i =0; i < 20; i++) {
 //	buffer* c = buffer_read(dev, 18);
@@ -82,7 +79,7 @@ void inode_dump(inode* in) {
 	printf("Sector\t%d\t", in->blocks);		// # of 512-bytes blocks reserved to contain the data
 	printf("Flags\t%x\n", in->flags);			// EXT2 behavior
 //	printf("%x\n", in->osdl);			// OS dependent value
-//	printf("Block1\t%d\n", in->block[0]);		// Block pointers. Last 3 are indirect
+	printf("Block1\t%d\n", in->block[0]);		// Block pointers. Last 3 are indirect
 
 //	printf("%x\n", i->generation);	// File version
 //	printf("%x\n", i->file_acl);		// Block # containing extended attributes

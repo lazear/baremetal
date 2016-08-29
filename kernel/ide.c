@@ -215,6 +215,7 @@ void buffer_dump(buffer *b) {
 		if (i % 32 == 0 && i)
 			vga_putc('\n');
 		int o = byte_order(*(uint32_t*)((uint32_t)b->data + i));
+		if(o)
 		printf("%x ", o);
 
 

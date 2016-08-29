@@ -4,172 +4,156 @@
 		"selected_items":
 		[
 			[
-				"buff",
-				"buffer_free"
-			],
-			[
-				"EXT",
-				"EXT2_SUPER"
-			],
-			[
-				"buffer",
-				"buffer_dump"
-			],
-			[
-				"EXT2",
-				"EXT2_MAGIC"
-			],
-			[
-				"name",
-				"name_len"
-			],
-			[
-				"Cu",
-				"CURRENT_X"
-			],
-			[
-				"cu",
-				"CURRENT_X"
-			],
-			[
-				"blo",
-				"block_group_descriptor"
-			],
-			[
-				"suo",
-				"superblock"
-			],
-			[
-				"block",
-				"block_group_descriptor"
-			],
-			[
-				"size",
-				"sizeof"
-			],
-			[
-				"dev",
-				"device_info_s"
-			],
-			[
-				"ext",
-				"ext2_superblock"
-			],
-			[
-				"de",
-				"device"
-			],
-			[
-				"re",
-				"rec_len"
-			],
-			[
-				"bl",
-				"block_group_descriptor"
-			],
-			[
-				"inode",
-				"inode_bitmap"
-			],
-			[
-				"blocks_",
-				"blocks_per_group"
-			],
-			[
 				"uin",
-				"uint32_t"
+				"uint16_t"
 			],
 			[
-				"byt",
-				"byte_order"
+				"fr",
+				"free_inodes_count"
 			],
 			[
-				"uint",
-				"uint32_t"
+				"free",
+				"free_blocks_count"
 			],
 			[
 				"ide",
 				"idequeue"
 			],
 			[
-				"check",
-				"check_buf"
+				"buff",
+				"buffer_dump"
 			],
 			[
-				"ino",
-				"inode_bitmap"
-			],
-			[
-				"inodes",
-				"inodes_per_group"
-			],
-			[
-				"ET",
-				"EXT2_MAGIC"
+				"bu",
+				"buffer_get"
 			],
 			[
 				"B_",
-				"B_DIRTY"
+				"B_BUSY"
 			],
 			[
-				"stat",
-				"status"
+				"ac",
+				"acquire"
 			],
 			[
-				"IDE",
-				"IDE_CMD"
+				"ma",
+				"markov"
 			],
 			[
-				"ide_",
-				"ide_wait"
+				"wor",
+				"wordlist"
 			],
 			[
-				"IDE_CMD",
-				"IDE_CMD_READ"
+				"tot",
+				"total_words"
 			],
 			[
-				"sec",
-				"sector"
+				"nex",
+				"nextw	statement"
 			],
 			[
-				"ID",
-				"IDE_IO"
+				"ne",
+				"nextw	statement"
 			],
 			[
-				"q",
-				"queue"
+				"rad",
+				"readline	function"
+			],
+			[
+				"k_pa",
+				"k_page_alloc"
+			],
+			[
+				"_ini",
+				"_init_pd	label"
 			],
 			[
 				"KE",
-				"KERNEL_PAGE_NUMBER"
+				"KERNEL_VIRT"
 			],
 			[
-				"_bini",
-				"_binary_initcode_start"
+				"KERNEL",
+				"KERNEL_VIRT"
 			],
 			[
-				"tss",
-				"tss_swap"
+				"_",
+				"_init_pt"
 			],
 			[
-				"SEG_",
-				"SEG_TSS"
+				"KERNE",
+				"KERNEL_VIRT"
+			],
+			[
+				"K",
+				"KERNEL_PAGE_DIRECTORY"
+			],
+			[
+				"KER",
+				"KERNEL_VIRT"
+			],
+			[
+				"KERN",
+				"KERNEL_VIRT"
+			],
+			[
+				"MM",
+				"MM_CURRENT_PD"
+			],
+			[
+				"_in",
+				"_init_pd"
+			],
+			[
+				"stack",
+				"stack_top"
+			],
+			[
+				"sta",
+				"stack_top"
+			],
+			[
+				"kerne",
+				"kernel_initialize"
+			],
+			[
+				"PF",
+				"PF_RW"
+			],
+			[
+				"add",
+				"address"
+			],
+			[
+				"_init",
+				"_init_pd"
+			],
+			[
+				"CU",
+				"CURRENT_PAGE_DIRECTORY"
+			],
+			[
+				"0x",
+				"0x00000010"
+			],
+			[
+				"chil",
+				"child_esp"
+			],
+			[
+				"te",
+				"test_user_function"
 			],
 			[
 				"sys",
 				"system_tss"
 			],
 			[
-				"_pagi",
-				"_paging_unmap"
-			],
-			[
-				"curre",
-				"current_pid"
-			],
-			[
 				"page",
 				"pagedir"
+			],
+			[
+				"re",
+				"release"
 			],
 			[
 				"pare",
@@ -228,10 +212,6 @@
 				"k_paging_unmap"
 			],
 			[
-				"k_pa",
-				"k_page_alloc"
-			],
-			[
 				"_paging",
 				"_paging_map_more"
 			],
@@ -252,16 +232,8 @@
 				"0x3FF"
 			],
 			[
-				"KERN",
-				"KERNEL_PAGE_DIRECTORY"
-			],
-			[
 				"is",
 				"is_mapped"
-			],
-			[
-				"KER",
-				"KERNEL_PAGE_DIRECTORY"
 			],
 			[
 				"C",
@@ -308,10 +280,6 @@
 				"current_pid"
 			],
 			[
-				"nex",
-				"nextpid"
-			],
-			[
 				"pro",
 				"proc_link"
 			],
@@ -328,12 +296,12 @@
 				"free_vpage"
 			],
 			[
-				"bloc",
-				"blockchain_add"
+				"block",
+				"Blockchain"
 			],
 			[
-				"K",
-				"K_CURRENT_PAGE_DIRECTORY"
+				"bloc",
+				"blockchain_add"
 			],
 			[
 				"K_HE",
@@ -342,10 +310,6 @@
 			[
 				"swa",
 				"swap_to"
-			],
-			[
-				"ne",
-				"nextpid"
 			],
 			[
 				"iq",
@@ -364,8 +328,8 @@
 				"context"
 			],
 			[
-				"MM",
-				"MM_CURRENT_PT"
+				"curre",
+				"current_thread"
 			],
 			[
 				"ff",
@@ -394,6 +358,10 @@
 			[
 				"small",
 				"smallest_sz"
+			],
+			[
+				"size",
+				"size_t"
 			],
 			[
 				"BLO",
@@ -436,6 +404,10 @@
 				"total_size"
 			],
 			[
+				"blo",
+				"block_value"
+			],
+			[
 				"MAX",
 				"MAX_BLOCKS"
 			],
@@ -450,10 +422,6 @@
 			[
 				"BLOCk",
 				"BLOCKS_ALLOCATED"
-			],
-			[
-				"CU",
-				"CURRENT_X"
 			],
 			[
 				"kb",
@@ -514,68 +482,48 @@
 			[
 				"wait",
 				"wait_for"
+			],
+			[
+				"null",
+				"null_thread"
+			],
+			[
+				"zombie",
+				"zombie2"
+			],
+			[
+				"cu",
+				"current_thread"
+			],
+			[
+				"k_T",
+				"K_THREAD_COUNT"
+			],
+			[
+				"read",
+				"read_stack_pointer"
+			],
+			[
+				"read_",
+				"read_base_pointer"
+			],
+			[
+				"tss",
+				"tss_init"
+			],
+			[
+				"gdt",
+				"gdt_flush"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "kernel/arch/start.s",
+			"file": "Makefile",
 			"settings":
 			{
-				"buffer_size": 3851,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/vga.c",
-			"settings":
-			{
-				"buffer_size": 4485,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/ide.c",
-			"settings":
-			{
-				"buffer_size": 7460,
-				"line_ending": "Windows",
-				"name": "/*"
-			}
-		},
-		{
-			"file": "kernel/lib/string.c",
-			"settings":
-			{
-				"buffer_size": 4376,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/mm.c",
-			"settings":
-			{
-				"buffer_size": 9485,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/ext2.c",
-			"settings":
-			{
-				"buffer_size": 6137,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "/*\nkernel.c\n===============================================================================\nMIT License\nCopyright (c) 2007-2016 Michael Lazear\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n===============================================================================\n*/\n\n#include <kernel.h>\n#include <vga.h>\n#include <x86.h>\n#include <stdlib.h>\n#include <stdio.h>\n#include <string.h>\n#include <types.h>\n#include <mutex.h>\n#include <proc.h>\n#include <assert.h>\n#include <ide.h>\n#include <ext2.h>\n\nchar logo[] = {0x5f,0x5f,0x5f,0x2e,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x5f,0x5f,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x2e,0x5f,0x5f,0x20,0x20,0x20,0x0a,0x5c,0x5f,0x20,0x7c,0x5f,0x5f,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x20,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x20,0x5f,0x5f,0x5f,0x5f,0x5f,0x2f,0x20,0x20,0x7c,0x5f,0x5f,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x7c,0x20,0x20,0x7c,0x20,0x20,0x0a,0x20,0x7c,0x20,0x5f,0x5f,0x20,0x5c,0x5c,0x5f,0x5f,0x20,0x20,0x5c,0x5c,0x5f,0x20,0x20,0x5f,0x5f,0x20,0x5c,0x5f,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x20,0x2f,0x20,0x20,0x20,0x20,0x20,0x5c,0x5f,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x20,0x20,0x20,0x5f,0x5f,0x5c,0x5f,0x5f,0x20,0x20,0x5c,0x20,0x7c,0x20,0x20,0x7c,0x20,0x20,0x0a,0x20,0x7c,0x20,0x5c,0x5f,0x5c,0x20,0x5c,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x7c,0x20,0x20,0x7c,0x20,0x5c,0x2f,0x5c,0x20,0x20,0x5f,0x5f,0x5f,0x2f,0x7c,0x20,0x20,0x59,0x20,0x59,0x20,0x20,0x5c,0x20,0x20,0x5f,0x5f,0x5f,0x2f,0x7c,0x20,0x20,0x7c,0x20,0x20,0x2f,0x20,0x5f,0x5f,0x20,0x5c,0x7c,0x20,0x20,0x7c,0x5f,0x5f,0x0a,0x20,0x7c,0x5f,0x5f,0x5f,0x20,0x20,0x28,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x2f,0x5f,0x5f,0x7c,0x20,0x20,0x20,0x20,0x5c,0x5f,0x5f,0x5f,0x20,0x20,0x3e,0x5f,0x5f,0x7c,0x5f,0x7c,0x20,0x20,0x2f,0x5c,0x5f,0x5f,0x5f,0x20,0x20,0x3e,0x5f,0x5f,0x7c,0x20,0x28,0x5f,0x5f,0x5f,0x5f,0x20,0x20,0x2f,0x5f,0x5f,0x5f,0x5f,0x2f,0x0a,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x5c,0x2f,0x20,0x20,0x20,0x20,0x20, '\\n'};\n\nstatic mutex key_mutex = { .lock = 0 };\n\nextern STREAM* kb;\n\nextern void scheduler();\nvoid scheduler() {}\nextern void switch_to_user(void* (fn)(), uint32_t esp);\n//We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled\n\nextern uint32_t* KERNEL_PAGE_DIRECTORY;\nuint32_t KERNEL_END = 0;\nextern uint32_t _init_pt[];\nextern uint32_t _init_pd[];\nextern uint32_t stack_top;\nextern uint32_t stack_bottom;\n\n\n#define DEBUG 0\n\nvoid kernel_initialize(uint32_t kernel_end) {\n\n	/*\n	1.	Initialize physical memory manager, with private heap @ kernel_end to 2MB\n			- Bitmap has the first 2MB (512 bits) marked as used, will not be allocated\n			- Allows k_page_alloc()\n	2.	Initialize paging, passing the reserved first page directory address\n	3.	Initialize heap management with malloc, free, and sbrk.\n			- Utilizes both k_page_alloc() and k_paging_map() to generate a continous\n				virtual address space.\n			- Public heap starts at 3GB. This should be changed when higher half is implemented\n	4.	Todo - initialize multithreading.\n	*/\n\n	KERNEL_END = kernel_end;\n	k_mm_init(kernel_end);\n	k_heap_init();\n	k_paging_init(_init_pd);\n\n	keyboard_install();\n	timer_init();\n	syscall_init();\n\n	sti();\n\n	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));\n	vga_clear();\n	vga_pretty(logo, VGA_LIGHTGREEN);\n/*\n	printf(\"Memory map:\\n\");\n	printf(\"Kernel end:     0x%x\\n\", kernel_end);\n	printf(\"Stack top:      0x%x\\n\", &stack_top);\n	printf(\"Stack bottom:   0x%x\\n\", &stack_bottom);\n	printf(\"Page directory: 0x%x\\nPage table:     0x%x\\n\", _init_pd, _init_pt);\n	printf(\"Heap brk:       0x%x\\n\", heap_brk());\n\n*/\n	_paging_map(&_init_pd, k_page_alloc(), 0xD0000000, 0x3);\n	// Page fault test\n	char* ptr = 0xD0000000;\n	*ptr = 'A';\n	ide_init();\n	buffer_init();\n\n	inode* file = ext2_lookup(\"abstract\");\n\n	char* buf = malloc(1024);\n	\n	dirent* filed = \n\n	for(;;);\n}\n\n",
-			"file": "kernel/kernel.c",
-			"file_size": 5258,
-			"file_write_time": 131167356061835418,
-			"settings":
-			{
-				"buffer_size": 5209,
+				"buffer_size": 1295,
 				"line_ending": "Windows"
 			}
 		},
@@ -588,68 +536,35 @@
 			}
 		},
 		{
-			"file": "linker.ld",
+			"file": "kernel/ide.c",
 			"settings":
 			{
-				"buffer_size": 420,
+				"buffer_size": 7460,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "kernel/include/ide.h",
+			"file": "kernel/ext2.c",
 			"settings":
 			{
-				"buffer_size": 1891,
-				"line_ending": "Windows",
-				"name": "/*"
-			}
-		},
-		{
-			"file": "/C/Users/Mike/Documents/GitHub/xv6-public/bio.c",
-			"settings":
-			{
-				"buffer_size": 3414,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "kernel/paging.c",
-			"settings":
-			{
-				"buffer_size": 11168,
+				"buffer_size": 4600,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
+			"file": "kernel/ext2_debug.c",
 			"settings":
 			{
-				"buffer_size": 6146,
-				"line_ending": "Unix"
+				"buffer_size": 4859,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Users/Mike/Documents/GitHub/xv6-public/proc.c",
+			"file": "kernel/kernel.c",
 			"settings":
 			{
-				"buffer_size": 9823,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/Users/Mike/Documents/GitHub/xv6-public/fs.c",
-			"settings":
-			{
-				"buffer_size": 15208,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/Users/Mike/Documents/GitHub/xv6-public/trap.c",
-			"settings":
-			{
-				"buffer_size": 2607,
-				"line_ending": "Unix"
+				"buffer_size": 5248,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -677,19 +592,11 @@
 	"command_palette":
 	{
 		"height": 392.0,
-		"last_filter": "package",
+		"last_filter": "pack",
 		"selected_items":
 		[
 			[
-				"package",
-				"Package Control: Add Repository"
-			],
-			[
-				"package control:",
-				"Package Control: Discover Packages"
-			],
-			[
-				"packa",
+				"pack",
 				"Package Control: Install Package"
 			],
 			[
@@ -790,81 +697,77 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/ext2.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/ext.img",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/x86.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/trap.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/assert.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/ide.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vga.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/stdlib.h",
-		"/C/Users/Mike/Downloads/kernel.bin",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/fs.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/fs.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/switch_to_user.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/sched.s",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/param.h",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/drivers/disk/hdd.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/initcode",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/x86.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/sched.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/.gitignore",
-		"/C/Users/Mike/Documents/GitHub/baremetal/Makefile",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/initcode.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/ctype.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/fs.img",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/buf.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/x86.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/main.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/traps.h",
-		"/C/Users/Mike/Downloads/ata/ATAIOREG.C",
-		"/C/Users/Mike/Downloads/ata/EXAMPLE1.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOISA.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOINT.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOSUB.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOTMR.C",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/vm.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/syscall.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mm.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/fork.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/proc.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/proc.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/initcode",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/start.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdio.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/timer.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/kernel.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/keyboard.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/malloc.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/pic.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/trap_handler.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/bin/kernel.bin",
+		"/D/Documents/GitHub/baremetal/kernel/kernel.c",
+		"/D/Documents/GitHub/baremetal/kernel/syscall.c",
+		"/D/Documents/GitHub/baremetal/kernel/vfs.c",
+		"/D/Documents/GitHub/baremetal/kernel/paging.c",
+		"/D/Documents/GitHub/baremetal/kernel/include/ide.h",
+		"/D/Documents/GitHub/baremetal/kernel/ide.c",
+		"/D/Documents/GitHub/baremetal/fs.img",
+		"/D/Documents/GitHub/baremetal/kernel/include/ctype.h",
+		"/D/Documents/GitHub/baremetal/kernel/include/types.h",
+		"/D/Documents/GitHub/baremetal/kernel/include/assert.h",
+		"/D/Documents/GitHub/markov/markov.c",
+		"/D/Documents/GitHub/markov/plot",
+		"/D/Documents/GitHub/markov/exac",
+		"/D/Documents/GitHub/markov/markov.py",
+		"/D/Documents/GitHub/markov/test",
+		"/D/Documents/GitHub/markov/LICENSE",
+		"/D/Documents/GitHub/markov/Makefile",
+		"/D/Documents/GitHub/baremetal/kernel/vga.c",
+		"/D/Documents/GitHub/baremetal/kernel/timer.c",
+		"/D/Documents/GitHub/baremetal/kernel/keyboard.c",
+		"/D/Documents/GitHub/baremetal/kernel/arch/start.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/switch_to_user.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/sched.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/vectors.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/trap_handler.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/syscall.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/trap.c",
+		"/D/Documents/GitHub/baremetal/kernel/arch/x86.c",
+		"/D/Documents/GitHub/baremetal/kernel/arch/pic.c",
+		"/D/Documents/GitHub/baremetal/kernel/arch/initcode.s",
+		"/D/Documents/GitHub/baremetal/kernel/lib/printf.c",
+		"/D/Documents/GitHub/baremetal/kernel/lib/stdio.c",
+		"/D/Documents/GitHub/baremetal/kernel/lib/string.c",
+		"/D/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
+		"/D/Documents/GitHub/baremetal/kernel/mutex.c",
+		"/D/Documents/GitHub/baremetal/kernel/mm.c",
+		"/D/Downloads/snapshot.06.10.09/asm/higherhalf.s",
+		"/D/Documents/GitHub/baremetal/kernel/include/x86.h",
+		"/D/Documents/GitHub/baremetal/kernel/malloc.c",
+		"/D/Documents/GitHub/baremetal/kernel/include/kernel.h",
+		"/D/Documents/GitHub/baremetal/linker.ld",
+		"/D/Documents/GitHub/baremetal/kernel/fork.c",
+		"/D/Documents/GitHub/baremetal/kernel/sched.c",
+		"/D/Documents/GitHub/baremetal/kernel/include/proc.h",
+		"/D/Documents/GitHub/xv6-public/proc.c",
+		"/D/Documents/GitHub/baremetal/kernel/bio.c",
+		"/D/Documents/GitHub/baremetal/kernel/fs.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/Find Results",
-		"/C/Users/Mike/Documents/GitHub/baremetal/tools/i686-elf-as",
-		"/C/Users/Mike/Documents/GitHub/baremetal/map.txt",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/vectors.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/vectors.py",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/paging.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/syscall.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/string.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/keyboard.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/paging.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/start.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/x86.c",
 		"/C/Users/Mike/Documents/GitHub/xv6-public/Makefile",
+		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
 		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/sched.s",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/mutex.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mutex.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/assert.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/types.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/thread.c",
 		"/C/Users/Mike/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/timer.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdio.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vfs.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
 		"/D/Downloads/snapshot.06.10.09/core/task/taskapi.c",
 		"/D/Downloads/snapshot.06.10.09/core/task/task.c",
 		"/D/Downloads/snapshot.06.10.09/core/task/sched.c",
 		"/D/Documents/GitHub/baremetal/kernel/arch/pswitch.s",
 		"/D/Documents/GitHub/baremetal/kernel/arch/pswith.s",
-		"/D/Documents/GitHub/baremetal/kernel/lib/printf.c",
-		"/D/Documents/GitHub/baremetal/kernel/include/x86.h",
 		"/D/Documents/GitHub/baremetal/include/types.h",
 		"/D/Documents/GitHub/baremetal/include/stdio.h",
 		"/D/Documents/GitHub/baremetal/kernel/lib/stdio/stdio.c",
@@ -917,22 +820,24 @@
 		"/C/Users/Mike/Documents/GitHub/os/include/lib/assert.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/include/assert.h",
 		"/C/Users/Mike/Documents/GitHub/os/drivers/char/text.c",
-		"/C/Users/Mike/Documents/GitHub/os/include/lib/atomic.h"
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/atomic.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/bool.h",
+		"/C/Users/Mike/Documents/GitHub/os/include/lib/ctype.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/Makefile",
+		"/C/Users/Mike/Documents/GitHub/baremetal/include/iso646.h"
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 36.0
 	},
 	"find_in_files":
 	{
 		"height": 102.0,
 		"where_history":
 		[
-			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal\\,C:\\Users\\Mike\\Documents\\GitHub\\xv6-public",
-			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal\\",
-			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal",
-			"<current file>,<open folders>",
 			"<current file>",
+			"D:\\Documents\\GitHub\\xv6-public",
+			"D:\\Documents\\GitHub\\baremetal",
 			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal",
 			"D:\\Documents\\GitHub\\baremetal\\",
 			"D:\\Documents\\GitHub\\baremetal",
@@ -944,84 +849,25 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"present",
-			"4865",
-			"48",
-			"4d",
-			"4d6",
-			"4d",
-			"dump",
-			"i-",
-			"i",
-			"x\\n",
-			"n",
-			"uint16_t",
-			"qnext",
-			"inode",
-			"x",
-			")\n",
-			";\n",
-			"sb",
-			"	printf(\"%x\\n\", sb->inodes_count;\n",
-			"sb",
-			"inodes_count",
-			"sb",
-			"uint16_t",
-			"uint32_t",
-			"b",
-			"idequeue",
-			"wakeup",
-			"sleep",
-			"dev",
-			"inline",
-			"static",
-			"insl",
-			"NBUF",
-			"BootPageDirectory",
-			"kalloc",
-			"ptable",
-			"uint",
-			"uchar",
-			"uint",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
-			"Proc",
-			"proc",
-			"PROC",
-			"proc",
-			"Proc",
-			"proc",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
+			"** ",
+			"16",
+			"</i>",
+			"<i>",
+			"- KERNEL_VIRT",
 			"0x23",
-			"0x28",
+			"bread",
+			"reads",
+			"uint",
+			"0x2B",
+			"tss",
 			"0x10",
-			"tf",
-			"cpu->",
-			"uint",
-			"c->",
-			"outportb",
-			"outport",
-			"inportb",
-			"inportw",
-			"inportb",
-			"outportb",
-			"T_",
-			"$",
-			"outb",
-			"ushort",
-			"uint",
-			"idt",
-			"ushort",
-			"uint",
+			"system_tss",
+			"0x2B",
+			"SEG_UCODE",
+			"(;;);\n",
+			"rev",
+			"vga_kputs",
+			"vga_kputc",
 			"regs_t",
 			"regs",
 			"struct regs",
@@ -1071,7 +917,24 @@
 			"GO_hie",
 			"table",
 			"TABLE",
-			"init"
+			"init",
+			"uniprot",
+			"mirage",
+			"print",
+			"0",
+			"sub.table",
+			"sub.table$f",
+			"vn1",
+			"vn2",
+			"r2.cutoff",
+			"surfact",
+			"'GO:0016209'",
+			"GO:0005215",
+			".-",
+			"ggatcc",
+			"ttcgaa",
+			"lint",
+			"console"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1079,9 +942,6 @@
 		"regex": false,
 		"replace_history":
 		[
-			"out",
-			"inb",
-			"outb",
 			"",
 			"%x\\n",
 			"K",
@@ -1099,67 +959,71 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "kernel/arch/start.s",
+					"file": "Makefile",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3851,
+						"buffer_size": 1295,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								136,
-								142
+								338,
+								338
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/R/R.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "kernel/vga.c",
+					"file": "kernel/include/ext2.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4485,
+						"buffer_size": 4318,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3525,
-								3525
+								2511,
+								2511
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 2485.0,
+						"translation.y": 1050.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 4,
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
 				{
 					"buffer": 2,
 					"file": "kernel/ide.c",
@@ -1173,88 +1037,29 @@
 						"selection":
 						[
 							[
-								6636,
-								6636
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "/*",
 							"syntax": "Packages/C++/C.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1772.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "kernel/lib/string.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4376,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 798.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "kernel/mm.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 9485,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6711,
-								6711
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1985.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
 					"file": "kernel/ext2.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6137,
+						"buffer_size": 4600,
 						"regions":
 						{
 						},
@@ -1270,172 +1075,20 @@
 							"syntax": "Packages/C++/C.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 0.0,
-						"translation.y": 85.0,
+						"translation.x": -0.0,
+						"translation.y": 720.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 6,
-					"file": "kernel/kernel.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5209,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5105,
-								5105
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1487.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "kernel/include/ext2.h",
+					"buffer": 4,
+					"file": "kernel/ext2_debug.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4318,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4155,
-								4155
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1938.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "linker.ld",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 420,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								177,
-								177
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 114.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "kernel/include/ide.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1891,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1882,
-								1882
-							]
-						],
-						"settings":
-						{
-							"auto_name": "/*",
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 540.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "/C/Users/Mike/Documents/GitHub/xv6-public/bio.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3414,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1975,
-								1975
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1053.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "kernel/paging.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11168,
+						"buffer_size": 4859,
 						"regions":
 						{
 						},
@@ -1455,133 +1108,36 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
-					"file": "/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
+					"buffer": 5,
+					"file": "kernel/kernel.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6146,
+						"buffer_size": 5248,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1488,
-								1488
+								3862,
+								3862
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1425.0,
+						"translation.y": 900.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 13,
-					"file": "/C/Users/Mike/Documents/GitHub/xv6-public/proc.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 9823,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								7492,
-								7492
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 6151.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "/C/Users/Mike/Documents/GitHub/xv6-public/fs.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 15208,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								523,
-								523
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 114.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 14,
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "/C/Users/Mike/Documents/GitHub/xv6-public/trap.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2607,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1084,
-								1084
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1083.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 15,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -1589,11 +1145,11 @@
 	],
 	"incremental_find":
 	{
-		"height": 27.0
+		"height": 28.0
 	},
 	"input":
 	{
-		"height": 35.0
+		"height": 36.0
 	},
 	"layout":
 	{
@@ -1603,38 +1159,31 @@
 				0,
 				0,
 				1,
-				2
+				1
 			],
 			[
 				1,
 				0,
 				2,
 				1
-			],
-			[
-				1,
-				1,
-				2,
-				2
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.468229166667,
+			0.49375,
 			1.0
 		],
 		"rows":
 		[
 			0.0,
-			0.949341438703,
 			1.0
 		]
 	},
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 30.0
+		"height": 332.0
 	},
 	"output.find_results":
 	{
@@ -1644,7 +1193,7 @@
 	"project": "baremetal.sublime-project",
 	"replace":
 	{
-		"height": 50.0
+		"height": 52.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1689,27 +1238,6 @@
 	"selected_group": 1,
 	"settings":
 	{
-		"last_automatic_layout":
-		[
-			[
-				0,
-				0,
-				1,
-				2
-			],
-			[
-				1,
-				0,
-				2,
-				1
-			],
-			[
-				1,
-				1,
-				2,
-				2
-			]
-		]
 	},
 	"show_minimap": true,
 	"show_open_files": true,
@@ -1719,6 +1247,5 @@
 	"status_bar_visible": true,
 	"template_settings":
 	{
-		"max_columns": 2
 	}
 }

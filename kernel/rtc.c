@@ -6,64 +6,30 @@
 
 #define RTC_BASE	0x70
 #define RTC_DATA	0x71
+#define RTC_SEC		0x00
+#define RTC_MIN		0x02
+#define RTC_HOUR	0x04
+#define RTC_DAY		0x07
+#define RTC_MON		0x08
+#define RTC_YEAR	0x09
 
-void rtc_send(uint8_t b)
-{
+/* 2000-03-01 (mod 400 year, immediately after feb29 */
+#define LEAPOCH (946684800LL + 86400*(31+29))
+#define DAYS_PER_400Y (365*400 + 97)
+
+typedef uint32_t time_t;
+
+uint32_t rtc_read(uint8_t b) {
 	outb(RTC_BASE, b);
-}
-
-uint8_t rtc_readin(void)
-{
-	return inb(RTC_DATA);
-}
-
-uint32_t rtc_read()
-{
 	uint32_t in = inb(RTC_DATA);
+
 	uint32_t out;
 	out = ((in >> 4) & 0x0F) * 10;
 	out += (in & 0x0F);
 	return out;
 }
 
-uint32_t RtcGetSecond(void)
-{
-	rtc_send(0x00);
-	return rtc_read();
-}
-
-uint32_t RtcGetMinute(void)
-{
-	rtc_send(0x02);
-	return rtc_read();
-}
-
-uint32_t RtcGetHour(void)
-{
-	rtc_send(0x04);
-	return rtc_read();
-}
-
-uint32_t RtcGetDay(void)
-{
-	rtc_send(0x07);
-	return rtc_read();
-}
-
-uint32_t RtcGetMonth(void)
-{
-	rtc_send(0x08);
-	return rtc_read();
-}
-
-uint32_t RtcGetYear(void)
-{
-	rtc_send(0x09);
-	return rtc_read();
-}
-
-char *RtcTranslateMonth(uint32_t month)
-{
+char *rtc_month(uint32_t month) {
 	char *months[12] = {
 		"January", "February", "March", "April",
 		"May", "June", "July", "August", "September",
@@ -71,70 +37,61 @@ char *RtcTranslateMonth(uint32_t month)
 	return months[month - 1];
 }
 
-void PrintRtcTime(void)
-{
-	uint32_t sec, min, hour;
-	sec = RtcGetSecond();
-	min = RtcGetMinute();
-	hour = RtcGetHour();
+char* ctime(time_t t) {
+	// t is a value in seconds
+	uint32_t secs = t - LEAPOCH;
+	uint32_t days = secs / (60*60*24);
+	uint32_t remsec = secs % (60*60*24);
 
-	printf("Current time is: %i:%i:%i\n", hour, min, sec);
+	if (remsec < 0)  {
+		remsec += 86400;
+		days--;
+	}
+	
+
+	//printf("t: %x Year: %d Month: %d Day: %d Hour: %d", t, years, i, days, hours); 
 }
 
-void PrintRtcDate(void)
-{
-		uint32_t day, mon, year;
-		day = RtcGetDay();
-		mon = RtcGetMonth();
-		year = RtcGetYear() + 2000;
 
-		printf("Current date is: %s %i, %i\n", RtcTranslateMonth(mon), day, year);
-}
+time_t time(void) {
+	time_t t;
 
-// taken from Ominos
-uint64_t RtcEpochTime(void)
-{
-	uint64_t time;
-
-	uint32_t sec = RtcGetSecond();
-	uint32_t min = RtcGetMinute();
-	uint32_t hour = RtcGetHour();
-	uint32_t day = RtcGetDay();
-	uint32_t mon = RtcGetMonth();
-	uint32_t year = RtcGetYear();
-
-	uint32_t days;
+	uint32_t sec = rtc_read(RTC_SEC);
+	uint32_t min = rtc_read(RTC_MIN);
+	uint32_t hour = rtc_read(RTC_HOUR);
+	uint32_t day = rtc_read(RTC_DAY);
+	uint32_t mon = rtc_read(RTC_MON);
+	uint32_t year = rtc_read(RTC_YEAR);
 	int i;
-
 	uint32_t months[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 304, 334};
 
-	days = day;
 
-	if (year < 70) year += 100;	
+	if (year < 70) 
+		year += 100;	
 	year += 1900;
 
 	for (i = 1970; i < year; i++)
 	{
 		if ((i % 4) != 0)
-			days += 365;
+			day += 365;
 		else if ((i % 400) != 0)
-			days += 366;
+			day += 366;
 		else if ((i % 100) != 0)
-			days += 365;
+			day += 365;
 		else 
-			days += 366;
+			day += 366;
 	}
 
-	days += months[mon-1];
-	days++;
+	day += months[mon-1];
+	day++;
 
-	time = days * 24;	// hours
-	time += hour;		// current hour
-	time *= 60;			// minutes
-	time += min;		// current minute
-	time *= 60;			// seconds
-	time += sec;		// current second
-	return time;
+	t = day * 24;	// hours
+	t += hour;		// current hour
+	t *= 60;			// minutes
+	t += min;		// current minute
+	t *= 60;			// seconds
+	t += sec;		// current second
+	return t;
 }
 
 

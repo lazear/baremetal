@@ -102,11 +102,31 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
+	//lsroot();
+	buffer* b = buffer_read(1, 8192+EXT2_SUPER+1);
+	block_group_descriptor* sb = (block_group_descriptor*) b->data;
+	
+//	assert(sb->magic == EXT2_MAGIC);
+	//bg_dump(sb);
 	lsroot();
-	char* data = ext2_open(ext2_lookup("abstract"));
-/*	for (int i = 0; i < 2048; i++)
-		if(*data)vga_putc(*data++);
-*/
+//	bg_dump(ext2_blockdesc(1) + 14*sizeof(block_group_descriptor));
+	//printf("time %x\n", time());
+	//ctime(time());
+	//ext2_open_dir(28);
+
+/*	ext2_inode(1, 28001);
+
+	char* data = ext2_open(ext2_lookup("home"));
+	dirent* d = (dirent*) data;
+	
+	do{
+		d->name[d->name_len] = '\0';
+		printf("name: %s\ttype %d\n", d->name, d->file_type);
+
+		d = (dirent*)((uint32_t) d + d->rec_len);
+	} while(d->inode);*/
+
+
 	for(;;);
 }
 
