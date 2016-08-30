@@ -42,6 +42,9 @@ void trap(regs_t* r) {
 		case IRQ0 + IRQ_IDE:
 			ide_handler();
 			break;
+		case 0x80:
+			syscall(r);
+			break;
 	}
 
 	if (r->int_no > 40)

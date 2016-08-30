@@ -50,7 +50,8 @@ void syscall(regs_t *r)
 	//print_regs(cp);
 	r->eax = ret;
 	//r->eax = 0xDEADBEEF;
-//	asm volatile("hlt");
+	pushcli();
+	asm volatile("hlt");
 }
 
 void syscall_init(void)

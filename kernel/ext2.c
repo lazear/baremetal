@@ -101,7 +101,6 @@ void* ext2_open(inode* in) {
 	char* buf = malloc(BLOCK_SIZE*num_blocks);
 
 	for (int i = 0; i < num_blocks; i++) {
-		printf("Loading block %d\n", in->blocks, in->block[i]);
 
 		buffer* b = buffer_read(1, in->block[i]);
 		memcpy((uint32_t)buf+(i*BLOCK_SIZE), b->data, BLOCK_SIZE);

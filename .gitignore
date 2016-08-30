@@ -7,3 +7,7 @@ initcode
 *.img
 *.raw
 exttrunc
+*.out
+app.ld
+app.sso
+kernel/app.asm
