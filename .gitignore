@@ -5,3 +5,5 @@
 *.sublime-workspace
 initcode
 *.img
+*.raw
+exttrunc

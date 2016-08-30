@@ -17,7 +17,7 @@ read_disk:
         mov es, ax              ; ES segment = 0                
         mov bx, 0x1000          ; Destination address = 0000:1000
         mov ah, 02h             ; Read sector command
-        mov al, 1            	; Number of sectors to read (0x12 = 18 sectors)
+        mov al, 5            	; Number of sectors to read (0x12 = 18 sectors)
         mov dl, [drive]         ; Load boot disk
         mov ch, 0               ; Cylinder = 0
         mov cl, 2               ; Starting Sector = 3
@@ -27,8 +27,11 @@ read_disk:
         jnz read_disk         ; Try again if error
         cli                     ; Disable interrupts
 
+
+
         jmp 0x1000
 
 drive db 0
 times 510-($-$$) db 0           ; Fill up the file with zeros
 dw 0AA55h                   	; Last 2 bytes = Boot sector identifyer
+

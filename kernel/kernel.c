@@ -56,6 +56,9 @@ extern uint32_t stack_top;
 extern uint32_t stack_bottom;
 
 
+	char* VID = 0xFD000000;
+extern char font[];
+
 #define RGB(r,g,b) (((r&0xFF)<<16) | ((g&0xFF)<<8) | (b & 0xFF))
 /* only valid for 800x600x16M */
 static void putpixel(unsigned char* screen, int x,int y, int color) {
@@ -64,6 +67,24 @@ static void putpixel(unsigned char* screen, int x,int y, int color) {
     screen[where + 1] = (color >> 8) & 255;   // GREEN
     screen[where + 2] = (color >> 16) & 255;  // RED
 }
+
+
+void get_font(unsigned char* screen, int c, int x, int y) {
+	for (int i = 0; i < 8; i++) {		// row by row
+		for(int q = 0; q < 8; q++) {
+			if (font[c*8 + i] & (1<<q))
+				putpixel(screen, x+q, y+i, RGB(0, 255, 0));
+		}
+	}
+
+}
+
+void fancy(char* s, int x, int y) {
+	for (int i = 0; i < strlen(s); i++) {
+		get_font(VID, s[i], x + (i*8), y);
+	}
+}
+
 
 void kernel_initialize(uint32_t kernel_end) {
 
@@ -112,15 +133,21 @@ void kernel_initialize(uint32_t kernel_end) {
 	int32_test();
 	vga_pretty("why isnt this working", VGA_LIGHTGREEN);
 
-	char* VID = 0xFD000000;
 	
-	for (int i = 0; i < 768; i++) {
-		putpixel(VID, 10, i, 0xFFFFFFFF);
+	for (int i = 0; i < 40; i++) {
+		putpixel(VID, 5, i, 0xFFFFFFFF);
+		putpixel(VID, 100, i, 0xFFFFFFFF);
 	
 	}
-	for (int i = 0; i < 1024; i++)
-		putpixel(VID, i, 1, RGB(0, 0xFF, 0));
+	for (int i = 0; i < 100; i++) {
+		putpixel(VID, i, 5, RGB(0, 0xFF, 0));
+		putpixel(VID, i, 40, RGB(0, 0xFF, 0));
+	}
 
+
+	printf("%x", font);
+	fancy("0xDEADBEEF!", 11, 11);
+	fancy("BAREMETAL!", 11, 19);
 	for(;;);
 }
 

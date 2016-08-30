@@ -4,7 +4,7 @@
 FINAL	= bin/kernel.bin	# Output binary
 START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
-AOBJS	= vectors.so trap_handler.so sched.so syscall.so int32.so
+AOBJS	= vectors.so trap_handler.so sched.so syscall.so int32.so font.so
 INIT 	= initcode
 CC	    = /home/lazear/opt/cross/bin/i686-elf-gcc
 LD		= /home/lazear/opt/cross/bin/i686-elf-ld
@@ -13,7 +13,7 @@ AR		= /home/lazear/opt/cross/bin/i686-elf-as
 CP		= cp
 
 CCFLAGS	= -O -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
-LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) -b binary $(INIT)
+LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) -b binary ConsoleFont.raw
 ASFLAGS = -f elf 
 
 all: compile link clean
@@ -24,6 +24,7 @@ boot:
 	nasm -f bin kernel/bootstrap.asm -o kernel/bootstrap
 	nasm -f bin kernel/stage2.asm -o kernel/stage2
 	cat kernel/stage2 >> kernel/bootstrap
+	cat exttrunc >> kernel/bootstrap
 
 compile:
 	#Compile C source
@@ -37,7 +38,7 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/trap_handler.s -o trap_handler.so
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
 	$(AS) $(ASFLAGS) kernel/arch/int32.s -o int32.so
-
+		$(AS) $(ASFLAGS) kernel/font.s -o font.so
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
 
 
