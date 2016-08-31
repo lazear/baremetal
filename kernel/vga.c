@@ -137,6 +137,11 @@ void vga_putc(char c) {
 		while(CURRENT_X % 16)
 			CURRENT_X++;
 		CURRENT_X += 2;
+
+			if (CURRENT_X >= 160) {
+		CURRENT_X = 0;
+		CURRENT_Y += 1;
+	}
 		return;
 	}
 	if (c=='\q') {

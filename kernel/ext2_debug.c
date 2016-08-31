@@ -31,8 +31,6 @@ SOFTWARE.
 
 
 block_group_descriptor* bg_dump(block_group_descriptor* bg) {
-
-
 	printf("Block bitmap %d\n", bg->block_bitmap);
 	printf("Inode bitmap %d\n", bg->inode_bitmap);
 	printf("Inode table  %d\n", bg->inode_table);
@@ -43,28 +41,8 @@ block_group_descriptor* bg_dump(block_group_descriptor* bg) {
 	buffer* bbm = buffer_read(1, bg->block_bitmap);
 	buffer* ibm = buffer_read(1, bg->inode_bitmap);
 
-	uint32_t* block_bitmap = malloc(BLOCK_SIZE);
-	uint32_t* inode_bitmap = malloc(BLOCK_SIZE);
-
-	memcpy(block_bitmap, bbm->data, BLOCK_SIZE);
-	memcpy(inode_bitmap, ibm->data, BLOCK_SIZE);
-
-	// for (int i = 0; i < BLOCK_SIZE/4; i += 4) 
-	// 	block_bitmap[i] = byte_order(*(uint32_t*)((uint32_t)bbm->data + i));
-	// for (int i = 0; i < BLOCK_SIZE/4; i += 4) 
-	// 	inode_bitmap[i] = byte_order(*(uint32_t*)((uint32_t)ibm->data + i));
-
-
-	printf("First free BBM: %d\n", ext_first_free(block_bitmap, 1024));
-	printf("First free IBM: %d\n", ext_first_free(inode_bitmap, 1024));
-
-	//for (int i =0; i < 20; i++) {
-//	buffer* c = buffer_read(dev, 18);
-	//	int ticks = get_ticks();
-	//while(ticks + 20 > get_ticks());
-	//buffer_dump(c);
-	//}
-
+	printf("First free BBM: %d\n", ext_first_free(bbm->data, 1024));
+	printf("First free IBM: %d\n", ext_first_free(ibm->data, 1024));
 	return bg;
 }
 
@@ -115,12 +93,11 @@ uint32_t ext2_alloc_inode() {
 	// Free our bitmaps
 	free(bitmap);				
 	return num + 1;	// 1 indexed				
-
 }
 
 
 
-void ext2_touch(char* name, char* data, size_t n) {
+int ext2_touch(char* name, char* data, size_t n) {
 	/* 
 	Things we need to do:
 		* Find the first free inode # and free blocks needed
@@ -148,28 +125,30 @@ void ext2_touch(char* name, char* data, size_t n) {
 	i->atime = time();
 	i->ctime = time();
 	i->mtime = time();
-	i->links_count = 0;
+	i->dtime = 0;
+	i->links_count = 1;		/* Setting this to 0 = BIG NO NO */
 
-	printf("Writing %d bytes to new inode #%d\n", n, inode_num);
 /* SECTION: BLOCK ALLOCATION AND DATA WRITING */
 	int q = 0;
 	while(sz) {
 		uint32_t block_num = ext2_alloc_block();
 
+		// Do we write BLOCK_SIZE or sz bytes?
 		int c = (sz >= BLOCK_SIZE) ? BLOCK_SIZE : sz;
 
 		i->block[q] = block_num;
 		i->blocks += 2;			// 2 sectors per block
 
-		printf("Writing %d bytes to block %d\n", c, block_num);
-		
 		/* Go ahead and write the data to disk */
 		buffer* b = buffer_read(1, block_num);
 		memset(b->data, 0, BLOCK_SIZE);
 		memcpy(b->data, (uint32_t) data + (q * BLOCK_SIZE), c);
 		buffer_write(b);
+
 		q++;
-		sz -= c;
+		sz -= c;	// decrease bytes to write
+		s->free_blocks_count--;		// Update Superblock
+		bg->free_blocks_count--;	// Update BG
 	}
 
 	for (int q = 0; q < i->blocks/2; q++)
@@ -179,18 +158,20 @@ void ext2_touch(char* name, char* data, size_t n) {
 	int block_group = (inode_num - 1) / s->inodes_per_group; // block group #
 	int index 		= (inode_num - 1) % s->inodes_per_group; // index into block group
 	int block 		= (index * INODE_SIZE) / BLOCK_SIZE; 
+	int offset 		= (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE;
 	bg += block_group;
 
 	//printf("Inode %d:\tGroup %d\tIndex %d\tOffset into table %d\n", inode_num, block_group, index, bg->inode_table+block);
-	//printf("Offset %x\n", (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE );
+	//printf("Offset %x\n", offset);
 
 	// Not using the inode table was the issue...
 	buffer* ib = buffer_read(1, bg->inode_table+block);
-	memcpy((uint32_t) ib->data + (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE, i, INODE_SIZE);
+
+	memcpy((uint32_t) ib->data + offset, i, INODE_SIZE);
 	buffer_write(ib);
 
+/* SECTION: UPDATE DIRECTORY */
 	inode* rootdir = ext2_inode(1, 2);
-
 	buffer* rootdir_buf = buffer_read(1, rootdir->block[0]);
 
 	dirent* d = (dirent*) rootdir_buf->data;
@@ -216,8 +197,9 @@ void ext2_touch(char* name, char* data, size_t n) {
 			d->rec_len = calc; 		// Resize this entry to it's real size
 			d = (dirent*)((uint32_t) d + d->rec_len);
 			break;
-		}
 
+		}
+		//printf("name %s\n",d->name);
 		d = (dirent*)((uint32_t) d + d->rec_len);
 
 
@@ -230,17 +212,22 @@ void ext2_touch(char* name, char* data, size_t n) {
 	d->name_len = strlen(name);
 
 	/* memcpy() causes a page fault */
-	for (int i = 0; i < strlen(name); i++)
-		d->name[i] = name[i];
+	for (int q = 0; q < strlen(name); q++) 
+		d->name[q] = name[q];
 
 	/* Write the buffer to the disk */
 	buffer_write(rootdir_buf);
 
 	/* Update superblock information */
-	s->free_blocks_count--;
 	s->free_inodes_count--;
 	s->wtime = time();
 	ext2_superblock_rw(1,s);
+
+	/* Update block group descriptors */
+	bg->free_inodes_count--;
+	ext2_blockdesc_rw(1, bg);
+
+	return inode_num;
 }
 
 

@@ -18,7 +18,7 @@ ASFLAGS = -f elf
 
 all: compile link clean
 build: compile link 
-emu: compile link clean qemu
+emu: compile link clean run
 
 boot:
 	nasm -f bin kernel/bootstrap.asm -o kernel/bootstrap
@@ -49,9 +49,6 @@ hd:
 	sudo mke2fs ext2
 	dd if=kernel/bootstrap of=ext2 conv=notrunc
 	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
-
-qemu:
-	qemu-system-i386 -kernel bin/kernel.bin -hdb ext.img -curses
 
 run:
 	qemu-system-i386 -kernel bin/kernel.bin -hdb ext2 -curses

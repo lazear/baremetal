@@ -33,6 +33,18 @@ everything mounted under "/" (root)
 #define VFS_DIR		2
 #define VFS_FILE	1
 
+typedef struct __io_file {
+	uint8_t *ptr;	/* Next character from/to here in buffer */
+	size_t count;	/* Number of available chars in buffer */
+	uint8_t *base;	/* the buffer */
+	uint8_t flag;	
+	uint8_t fd;		/* File descriptor */
+} FILE;
+
+
+#define EOF	(-1)
+
+
 typedef struct vfs_entry_s {
 	int dev;
 	int inode;
@@ -50,14 +62,4 @@ void vfs_init() {
 	root->type 	= VFS_DIR;
 	root->parent = NULL;
 	strcpy(root->name, "/");
-}
-
-void vfs_traverse(char* name) {
-	dirent* d = ext2_open_dir(2);
-	do{
-	//	d->name[d->name_len] = '\0';
-		printf("%s%s\n", name, d->name);
-
-		d = (dirent*)((uint32_t) d + d->rec_len);
-	} while(d->inode);
 }
