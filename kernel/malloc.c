@@ -419,7 +419,7 @@ void k_heap_init() {
 	K_HEAP_TOP = K_HEAP_BOTTOM;
 	K_LAST_ALLOC = K_HEAP_BOTTOM;
 
-	sbrk(0x4000);
+	sbrk(0x10000);
 }
 
 

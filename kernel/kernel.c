@@ -132,10 +132,13 @@ void kernel_initialize(uint32_t kernel_end) {
 	
 
 
+	traverse_blockchain();
+	//buffer_traverse();
 
-	
 	void (*entry)(void);
 	entry = (void(*)(void))(ehdr->e_entry);
+
+	free(data);
 
 	printf("entry: %x\n", entry);
 
