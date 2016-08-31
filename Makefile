@@ -12,7 +12,7 @@ AS		= nasm
 AR		= /home/lazear/opt/cross/bin/i686-elf-as
 CP		= cp
 
-CCFLAGS	= -O -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
+CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) -b binary $(INIT)
 ASFLAGS = -f elf 
 

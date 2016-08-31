@@ -39,8 +39,14 @@ void syscall(regs_t *r)
 	asm volatile("mov %%ecx, %0" : "=r"(ecx));
 	asm volatile("mov %%edx, %0" : "=r"(edx));*/
 	int ret;
+	char* s;
 	switch(r->eax)
 	{
+
+	case 1:	// syscall write()
+		//printf("Syscall write() %x", r->edx);
+		printf("%s\n", (char*) r->edx);
+		break;
 
 	default:
 		printf("syscall 0x80, eax 0x%x\n", r->eax);

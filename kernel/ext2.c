@@ -122,15 +122,16 @@ void* ext2_open(inode* in) {
 	if(!in)
 		return NULL;
 	int num_blocks = in->blocks / (BLOCK_SIZE/SECTOR_SIZE);	
-	assert(num_blocks);
+	assert(num_blocks != 0);
 	if (!num_blocks){
 
 		return NULL;
 	}
-	char* buf = malloc(BLOCK_SIZE*num_blocks);
 
+	volatile char* buf = malloc(BLOCK_SIZE*num_blocks);
+	assert(buf != NULL);
+	printf("%d bytes allocated @ 0x%x\n",BLOCK_SIZE*num_blocks, buf );
 	for (int i = 0; i < num_blocks; i++) {
-
 		buffer* b = buffer_read(1, in->block[i]);
 		memcpy((uint32_t)buf+(i*BLOCK_SIZE), b->data, BLOCK_SIZE);
 	}
