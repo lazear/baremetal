@@ -51,7 +51,7 @@ superblock* ext2_superblock(int dev) {
 
 /* RW first superblock 
 set s to NULL to read a superblock */
-superblock* ext2_superblock_rw(int dev,  superblock* s) {
+superblock* ext2_superblock_rw(int dev, superblock* s) {
 	assert(dev);
 	if (!dev) 
 		return NULL;

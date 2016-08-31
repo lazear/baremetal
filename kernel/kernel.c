@@ -124,8 +124,6 @@ void kernel_initialize(uint32_t kernel_end) {
 	//int i = ext2_touch("data", 'Hello, World!', 13);
 
 	lsroot();
-	char* data = ext2_open(ext2_inode(1, 20));
-	printf("%s\n", data);
 
 //	asm volatile ("int $0x80");
 	for(;;);
