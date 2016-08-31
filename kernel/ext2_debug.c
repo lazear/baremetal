@@ -46,10 +46,13 @@ block_group_descriptor* bg_dump(block_group_descriptor* bg) {
 	uint32_t* block_bitmap = malloc(BLOCK_SIZE);
 	uint32_t* inode_bitmap = malloc(BLOCK_SIZE);
 
-	for (int i = 0; i < BLOCK_SIZE/4; i += 4) 
-		block_bitmap[i] = byte_order(*(uint32_t*)((uint32_t)bbm->data + i));
-	for (int i = 0; i < BLOCK_SIZE/4; i += 4) 
-		inode_bitmap[i] = byte_order(*(uint32_t*)((uint32_t)ibm->data + i));
+	memcpy(block_bitmap, bbm->data, BLOCK_SIZE);
+	memcpy(inode_bitmap, ibm->data, BLOCK_SIZE);
+
+	// for (int i = 0; i < BLOCK_SIZE/4; i += 4) 
+	// 	block_bitmap[i] = byte_order(*(uint32_t*)((uint32_t)bbm->data + i));
+	// for (int i = 0; i < BLOCK_SIZE/4; i += 4) 
+	// 	inode_bitmap[i] = byte_order(*(uint32_t*)((uint32_t)ibm->data + i));
 
 
 	printf("First free BBM: %d\n", ext_first_free(block_bitmap, 1024));
@@ -64,6 +67,139 @@ block_group_descriptor* bg_dump(block_group_descriptor* bg) {
 
 	return bg;
 }
+
+
+void ext2_touch() {
+	/* 
+	Things we need to do:
+		* Find the first free inode # and free blocks needed
+		* Mark that inode and block as used
+		* Allocate a new inode and fill out the struct
+		* Write the new inode to the inode_table
+		* Update superblock&blockgroup w/ last mod time, # free inodes, etc
+		* Update directory structures
+	*/
+
+	block_group_descriptor* bg = ext2_blockdesc(1);
+	superblock* s = ext2_superblock(1);
+
+	buffer* bbm = buffer_read(1, bg->block_bitmap);
+	buffer* ibm = buffer_read(1, bg->inode_bitmap);
+
+	uint32_t* block_bitmap = malloc(BLOCK_SIZE);
+	uint32_t* inode_bitmap = malloc(BLOCK_SIZE);
+
+	memcpy(block_bitmap, bbm->data, BLOCK_SIZE);
+	memcpy(inode_bitmap, ibm->data, BLOCK_SIZE);
+
+	uint32_t block_num = ext_first_free(block_bitmap, 1024);
+	uint32_t inode_num = ext_first_free(inode_bitmap, 1024);
+
+
+	char* data = "My name is Michael and this is an inode!";
+
+	block_bitmap[block_num / 32] |= (1<<(block_num % 32));
+	inode_bitmap[inode_num / 32] |= (1<<(inode_num % 32));
+
+	memcpy(bbm->data, block_bitmap, BLOCK_SIZE);	// Update bitmaps
+	memcpy(ibm->data, inode_bitmap, BLOCK_SIZE);
+
+	buffer_write(bbm);								// Write to disk
+	buffer_write(ibm);
+	free(block_bitmap);								// Free()
+	free(inode_bitmap);
+
+	/*
+	Inodes are indexed starting at 1
+	bitmap does not take this into account
+	*/
+	inode_num++;		
+	block_num++;
+
+	/* Allocate a new inode and set it up
+	*/
+	inode* i = malloc(sizeof(inode));
+	i->mode = 0x81C0;		// File, User mask
+	i->size = strlen(data);
+	i->atime = time();
+	i->ctime = time();
+	i->mtime = time();
+	i->links_count = 0;
+	i->block[0] = block_num;
+	i->blocks = 2;			// 2 sectors per block
+
+	buffer* b = buffer_read(1, block_num);
+	memset(b->data, 0, BLOCK_SIZE);
+	memcpy(b->data, data, strlen(data));
+
+	buffer_write(b);
+
+
+	int block_group = (inode_num - 1) / s->inodes_per_group; // block group #
+	int index 		= (inode_num - 1) % s->inodes_per_group; // index into block group
+	int block 		= (index * INODE_SIZE) / BLOCK_SIZE; 
+	bg += block_group;
+
+	//printf("Inode %d:\tGroup %d\tIndex %d\tOffset into table %d\n", inode_num, block_group, index, bg->inode_table+block);
+	//printf("Offset %x\n", (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE );
+
+	// Not using the inode table was the issue...
+	buffer* ib = buffer_read(1, bg->inode_table+block);
+	memcpy((uint32_t) ib->data + (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE, i, INODE_SIZE);
+	buffer_write(ib);
+
+	inode* rootdir = ext2_inode(1, 2);
+
+	buffer* rootdir_buf = buffer_read(1, rootdir->block[0]);
+	printf("roodir block %d\n", rootdir->block[0]);
+	dirent* d = (dirent*) rootdir_buf->data;
+	int sum = 0;
+	int calc = 0;
+	do {
+		
+		//d->name[d->name_len] = '\0';
+	if (!d->rec_len)
+			break;
+
+	
+		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
+	//	printf("name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
+		sum += d->rec_len;
+		if (d->rec_len != calc) {
+			sum -= d->rec_len;
+			d->rec_len = calc;
+			printf("LAST name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
+
+			d = (dirent*)((uint32_t) d + d->rec_len);
+printf("LAST name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
+	
+			break;
+		}
+
+		d = (dirent*)((uint32_t) d + d->rec_len);
+
+
+	} while(sum < 1024);
+	//dirent* entry = malloc((sizeof(dirent) + strlen("newfile") + 4) & ~0x3);
+	d->rec_len = BLOCK_SIZE - ((uint32_t)d - (uint32_t)rootdir_buf->data);
+	d->inode = inode_num;
+	d->file_type = 1;
+	d->name[0] = 'N';
+//	memcpy(d->name, "newfile");
+	d->name_len = strlen("1");
+
+
+	buffer_write(rootdir_buf);
+
+	printf("name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
+		
+
+	s->free_blocks_count--;
+	s->free_inodes_count--;
+	s->wtime = time();
+	ext2_superblock_rw(1,s);
+}
+
 
 void inode_dump(inode* in) {
 

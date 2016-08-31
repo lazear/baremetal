@@ -57,34 +57,6 @@ extern uint32_t stack_top;
 extern uint32_t stack_bottom;
 
 
-	char* VID = 0xFD000000;
-extern char font[];
-
-#define RGB(r,g,b) (((r&0xFF)<<16) | ((g&0xFF)<<8) | (b & 0xFF))
-/* only valid for 800x600x16M */
-static void putpixel(unsigned char* screen, int x,int y, int color) {
-    unsigned where = x*3 + y*768*4;
-    screen[where] = color & 255;              // BLUE
-    screen[where + 1] = (color >> 8) & 255;   // GREEN
-    screen[where + 2] = (color >> 16) & 255;  // RED
-}
-
-
-void get_font(unsigned char* screen, int c, int x, int y) {
-	for (int i = 0; i < 8; i++) {		// row by row
-		for(int q = 0; q < 8; q++) {
-			if (font[c*8 + i] & (1<<q))
-				putpixel(screen, x+q, y+i, RGB(0, 255, 0));
-		}
-	}
-
-}
-
-void fancy(char* s, int x, int y) {
-	for (int i = 0; i < strlen(s); i++) {
-		get_font(VID, s[i], x + (i*9), y);
-	}
-}
 
 
 void kernel_initialize(uint32_t kernel_end) {
@@ -115,44 +87,15 @@ void kernel_initialize(uint32_t kernel_end) {
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	vga_clear();
 	vga_pretty(logo, VGA_LIGHTGREEN);
-/*
-	printf("Memory map:\n");
-	printf("Kernel end:     0x%x\n", kernel_end);
-	printf("Stack top:      0x%x\n", &stack_top);
-	printf("Stack bottom:   0x%x\n", &stack_bottom);
-	printf("Page directory: 0x%x\nPage table:     0x%x\n", _init_pd, _init_pt);
-	printf("Heap brk:       0x%x\n", heap_brk());
 
-*/
-	for (int i =0; i < 0x1000000; i+=0x1000) 
-		_paging_map(&_init_pd, i+0xFD000000, i+0xFD000000, 0x3);
-
-	// Page fault test
 	ide_init();
 	buffer_init();
 
-/*	int32_test();
-	vga_pretty("why isnt this working", VGA_LIGHTGREEN);
+//	lsroot();
+	//sb_dump(ext2_superblock(1));
+	//inode_dump(ext2_inode(1,11));
 
-	
-	for (int i = 0; i < 40; i++) {
-		putpixel(VID, 5, i, 0xFFFFFFFF);
-		putpixel(VID, 100, i, 0xFFFFFFFF);
-	
-	}
-	for (int i = 0; i < 100; i++) {
-		putpixel(VID, i, 5, RGB(0, 0xFF, 0));
-		putpixel(VID, i, 40, RGB(0, 0xFF, 0));
-	}
-
-
-	printf("%x", font);
-	fancy("0xDEADBEEF!", 11, 11);
-	fancy("BAREMETAL!", 11, 19);*/
-
-	extern char  _binary_app_sso_start[];
-
-	lsroot();
+	/*
 	char* data = ext2_open(ext2_inode(1,12));
 	//char* data = & _binary_app_sso_start;
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
@@ -176,23 +119,12 @@ void kernel_initialize(uint32_t kernel_end) {
 	printf("LOAD: offset 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x\n",
 		 				phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz);
 
-
-	uint32_t* newpd = k_create_pagedir(0, 32, 0x7);
-	k_map_kernel(newpd);
-
-	//_paging_map(newpd, k_page_alloc(), 0, 0x3);
-	newpd[1023] = (uint32_t) newpd | 3;
-	k_swap_pd(newpd);
+	*/
 
 
-	memcpy(0, data+phdr->p_offset, 0xC2);
-
-	uint32_t* ptr = 0;
-	for(int i = 0; i < 10; i++)
-		printf("%x\t", *ptr++);
-
-	//entry();
-
+	ext2_touch();
+	printf("\nROOT TEST\n");
+	lsroot();
 //	asm volatile ("int $0x80");
 	for(;;);
 }

@@ -55,7 +55,7 @@ void vfs_init() {
 void vfs_traverse(char* name) {
 	dirent* d = ext2_open_dir(2);
 	do{
-		d->name[d->name_len] = '\0';
+	//	d->name[d->name_len] = '\0';
 		printf("%s%s\n", name, d->name);
 
 		d = (dirent*)((uint32_t) d + d->rec_len);

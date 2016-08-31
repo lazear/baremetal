@@ -13,18 +13,18 @@ AR		= /home/lazear/opt/cross/bin/i686-elf-as
 CP		= cp
 
 CCFLAGS	= -O -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
-LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) -b binary app.sso
+LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) -b binary $(INIT)
 ASFLAGS = -f elf 
 
 all: compile link clean
 build: compile link 
-db: compile link clean debug
+emu: compile link clean qemu
 
 boot:
 	nasm -f bin kernel/bootstrap.asm -o kernel/bootstrap
 	nasm -f bin kernel/stage2.asm -o kernel/stage2
-	dd if=kernel/bootstrap of=ext.img conv=notrunc
-	dd if=kernel/stage2 of=ext.img seek=1 conv=notrunc
+	dd if=kernel/bootstrap of=ext2 conv=notrunc
+	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
 
 	#cat kernel/stage2 >> kernel/bootstrap
 	#cat exttrunc >> kernel/bootstrap
@@ -42,14 +42,21 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
 	$(AS) $(ASFLAGS) kernel/arch/int32.s -o int32.so
 	$(AS) $(ASFLAGS) kernel/font.s -o font.so
-	$(AS) $(ASFLAGS) kernel/app.asm -o app.so
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
 
+hd:
+	dd if=/dev/zero of=ext2 bs=1k count=16k
+	sudo mke2fs ext2
+	dd if=kernel/bootstrap of=ext2 conv=notrunc
+	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
 
+qemu:
+	qemu-system-i386 -kernel bin/kernel.bin -hdb ext.img -curses
 
+run:
+	qemu-system-i386 -kernel bin/kernel.bin -hdb ext2 -curses
 	
 link:
-	$(LD) -T app.ld -o app.sso app.so
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain
 	
 clean:

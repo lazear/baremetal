@@ -117,13 +117,17 @@ typedef struct inode_s {
 
 #define INODE_SIZE (sizeof(inode))
 
+
+/*
+Directories must be 4byte aligned, and cannot extend between multiple
+blocks on the disk */
 typedef struct dirent_s {
 	uint32_t inode;			// Inode
 	uint16_t rec_len;		// Total size of entry, including all fields
 	uint8_t name_len;		// Name length, least significant 8 bits
 	uint8_t file_type;		// Type indicator
 	uint8_t name[];
-} dirent;
+} __attribute__((packed)) dirent;
 
 /* IMPORTANT: Inode addresses start at 1 */
 

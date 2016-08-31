@@ -27,40 +27,7 @@ start:
 	mov cx, 2
 	mul cx
 	push ax
-
-
-.read_disk:	
-	mov ah, 0               ; Reset drive command
-	int 13h                 ; Call interrupt 13h
-	mov [drive], dl         ; Store boot disk
-	or ah, ah               ; Check for error code
-	jnz .error           ; Try again if error
-
-	mov ax, 0				; Clear AX
-	mov es, ax              ; ES segment = 0                
-	mov bx, 0x2000          ; Destination address = 0000:1000
-	mov ah, 02h             ; Read sector command
-	mov al, 2            	; Number of sectors to read (0x12 = 18 sectors)
-	mov dl, [drive]         ; Load boot disk
-	mov ch, 0               ; Cylinder = 0
-	pop ax
-	mov cx, ax				; Sector
-	mov dh, 0               ; Head = 1
-	int 13h                 ; Call interrupt 13h
-	or ah, ah               ; Check for error code
-	jnz .error         ; Try again if error
-	cli                     ; Disable interrupts
-
-
-	mov bx, 0x2100
-	add bx, 40
-	mov ax, [bx]
-
-
-	jmp $
-
 	;jmp $
-
 
 
 .print:

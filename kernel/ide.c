@@ -110,7 +110,7 @@ void ide_handler() {
 	//if dirty is not set, and no errors, read data
 	int stat = ide_wait(1);
 	assert(stat >= 0);
-	assert(!(b->flags & B_DIRTY));
+
 	if (!(b->flags & B_DIRTY) && stat >= 0) {
 		insl(0x1f0, b->data, BLOCK_SIZE/4);
 		//printf("Reading data to buffer %x dev %d block %d\n", b, b->dev, b->block);
@@ -296,7 +296,7 @@ buffer* buffer_read(uint32_t dev, uint32_t block) {
 }
 
 void buffer_write(buffer* b) {
-	assert((b->flags & B_BUSY) == 0);
+	//assert((b->flags & B_BUSY) == 0);
 	b->flags |= B_DIRTY; 		// Set write flag
 	ide_rw(b);
 }

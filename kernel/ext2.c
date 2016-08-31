@@ -58,6 +58,28 @@ superblock* ext2_superblock(int dev) {
 	return sb;
 }
 
+/* RW first superblock */
+superblock* ext2_superblock_rw(int dev,  superblock* s) {
+	assert(dev);
+
+	buffer* b = buffer_read(dev, EXT2_SUPER);
+
+	if (s->magic != EXT2_MAGIC) {	// Non-valid superblock, read 
+		s = (superblock*) b->data;
+	} else {							// Valid superblock, overwrite
+		memcpy(b->data, s, sizeof(superblock));
+		buffer_write(b);
+	}
+	
+	assert(s->magic == EXT2_MAGIC);
+	if (s->magic != EXT2_MAGIC)
+		return NULL;
+	assert(1024 << s->log_block_size == BLOCK_SIZE);
+	return s;
+}
+
+
+
 block_group_descriptor* ext2_blockdesc(int dev) {
 	assert(dev);
 	if (!dev) 
@@ -85,7 +107,45 @@ inode* ext2_inode(int dev, int i) {
 	// Not using the inode table was the issue...
 	buffer* b = buffer_read(dev, bgd->inode_table+block);
 	inode* in = (inode*)((uint32_t) b->data + (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE);
+	
 	return in;
+}
+
+
+void ext2_write_to_inode(int i, char* data) {
+	superblock* s = ext2_superblock(1);
+	block_group_descriptor* bgd = ext2_blockdesc(1);
+
+	assert(s->magic == EXT2_MAGIC);
+	assert(bgd);
+
+	int block_group = (i - 1) / s->inodes_per_group; // block group #
+	int index 		= (i - 1) % s->inodes_per_group; // index into block group
+	int block 		= (index * INODE_SIZE) / BLOCK_SIZE; 
+	bgd += block_group;
+//	printf("Inode %d:\tGroup %d\tIndex %d\tOffset into table %d\n", i, block_group, index, bgd->inode_table+block);
+//	printf("Offset %x\n", (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE );
+
+	// Not using the inode table was the issue...
+	buffer* b = buffer_read(1, bgd->inode_table+block);
+	inode* in = (inode*)((uint32_t) b->data + (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE);
+	
+	assert(in);
+	if(!in)
+		return NULL;
+	int num_blocks = in->blocks / (BLOCK_SIZE/SECTOR_SIZE);	
+	assert(num_blocks);
+	if (!num_blocks){
+
+		return NULL;
+	}
+	for (int i = 0; i < num_blocks; i++) {
+
+		buffer* b = buffer_read(1, in->block[i]);
+		memcpy(b->data, (uint32_t) data + (i*BLOCK_SIZE), BLOCK_SIZE);
+		buffer_write(b);
+	}
+
 }
 
 void* ext2_open(inode* in) {
@@ -121,7 +181,7 @@ inode* ext2_lookup(char* name) {
 
 	do{
 	//	printf("name: %s\t", d->name);
-		d->name[d->name_len] = '\0';
+		//d->name[d->name_len] = '\0';
 		if (strncmp(d->name, name, strlen(name)) == 0) {
 			printf("Match! %s\n", d->name);
 			printf("Inode %d\n", d->inode);
@@ -144,7 +204,7 @@ dirent* ext2_open_dir(int in) {
 
 void ls(dirent* d) {
 	do{
-		d->name[d->name_len] = '\0';
+	//	d->name[d->name_len] = '\0';
 		printf("\t%s\ttype %d\n", d->name, d->file_type);
 
 		d = (dirent*)((uint32_t) d + d->rec_len);
@@ -153,21 +213,32 @@ void ls(dirent* d) {
 
 void lsroot() {
 	inode* i = ext2_inode(1, 2);			// Root directory
-
+	printf("Numblocks: %d\n", i->blocks);
 	char* buf = malloc(BLOCK_SIZE*i->blocks/2);
+	memset(buf, 0, BLOCK_SIZE*i->blocks/2);
+
 	for (int q = 0; q < i->blocks / 2; q++) {
 		buffer* b = buffer_read(1, i->block[q]);
 		memcpy((uint32_t)buf+(q * BLOCK_SIZE), b->data, BLOCK_SIZE);
-	//	printf("%d\t", i->block[q]);
 	}
 
 	dirent* d = (dirent*) buf;
 	
-	do{
-		d->name[d->name_len] = '\0';
-		printf("name: %s\tinode %d\n", d->name, d->inode);
+	int sum = 0;
+
+	do {
+		
+		//d->name[d->name_len] = '\0';
+		printf("name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
+		sum += d->rec_len;
+		int calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
+
+		if (d->rec_len != calc || !d->rec_len) {
+			break;
+		}
 		d = (dirent*)((uint32_t) d + d->rec_len);
-	} while(d->inode);
+	} while(sum < BLOCK_SIZE*(i->blocks/2));
+
 	free(buf);
 	return NULL;
 }
