@@ -69,7 +69,58 @@ block_group_descriptor* bg_dump(block_group_descriptor* bg) {
 }
 
 
-void ext2_touch() {
+/* 
+Finds a free block from the block descriptor group, and sets it as used
+*/
+uint32_t ext2_alloc_block() {
+	block_group_descriptor* bg = ext2_blockdesc(1);
+	// Read the block and inode bitmaps from the block descriptor group
+	buffer* bitmap_buf = buffer_read(1, bg->block_bitmap);
+	uint32_t* bitmap = malloc(BLOCK_SIZE);
+	memcpy(bitmap, bitmap_buf->data, BLOCK_SIZE);
+
+	// Find the first free bit in both bitmaps
+	uint32_t num = ext_first_free(bitmap, BLOCK_SIZE);
+
+	// Should use a macro, not "32"
+	bitmap[num / 32] |= (1<<(num % 32));
+
+	// Update bitmaps and write to disk
+	memcpy(bitmap_buf->data, bitmap, BLOCK_SIZE);	
+	buffer_write(bitmap_buf);								
+	// Free our bitmaps
+	free(bitmap);				
+	return num + 1;	// 1 indexed				
+}
+
+/* 
+Finds a free inode from the block descriptor group, and sets it as used
+*/
+uint32_t ext2_alloc_inode() {
+	block_group_descriptor* bg = ext2_blockdesc(1);
+	// Read the block and inode bitmaps from the block descriptor group
+	buffer* bitmap_buf = buffer_read(1, bg->inode_bitmap);
+	uint32_t* bitmap = malloc(BLOCK_SIZE);
+	memcpy(bitmap, bitmap_buf->data, BLOCK_SIZE);
+
+	// Find the first free bit in both bitmaps
+	uint32_t num = ext_first_free(bitmap, BLOCK_SIZE);
+
+	// Should use a macro, not "32"
+	bitmap[num / 32] |= (1<<(num % 32));
+
+	// Update bitmaps and write to disk
+	memcpy(bitmap_buf->data, bitmap, BLOCK_SIZE);	
+	buffer_write(bitmap_buf);								
+	// Free our bitmaps
+	free(bitmap);				
+	return num + 1;	// 1 indexed				
+
+}
+
+
+
+void ext2_touch(char* name, char* data, size_t n) {
 	/* 
 	Things we need to do:
 		* Find the first free inode # and free blocks needed
@@ -80,61 +131,51 @@ void ext2_touch() {
 		* Update directory structures
 	*/
 
-	block_group_descriptor* bg = ext2_blockdesc(1);
 	superblock* s = ext2_superblock(1);
+	block_group_descriptor* bg = ext2_blockdesc(1);
+	uint32_t inode_num = ext2_alloc_inode();
 
-	buffer* bbm = buffer_read(1, bg->block_bitmap);
-	buffer* ibm = buffer_read(1, bg->inode_bitmap);
+	int sz = n;
 
-	uint32_t* block_bitmap = malloc(BLOCK_SIZE);
-	uint32_t* inode_bitmap = malloc(BLOCK_SIZE);
-
-	memcpy(block_bitmap, bbm->data, BLOCK_SIZE);
-	memcpy(inode_bitmap, ibm->data, BLOCK_SIZE);
-
-	uint32_t block_num = ext_first_free(block_bitmap, 1024);
-	uint32_t inode_num = ext_first_free(inode_bitmap, 1024);
-
-
-	char* data = "My name is Michael and this is an inode!";
-
-	block_bitmap[block_num / 32] |= (1<<(block_num % 32));
-	inode_bitmap[inode_num / 32] |= (1<<(inode_num % 32));
-
-	memcpy(bbm->data, block_bitmap, BLOCK_SIZE);	// Update bitmaps
-	memcpy(ibm->data, inode_bitmap, BLOCK_SIZE);
-
-	buffer_write(bbm);								// Write to disk
-	buffer_write(ibm);
-	free(block_bitmap);								// Free()
-	free(inode_bitmap);
-
-	/*
-	Inodes are indexed starting at 1
-	bitmap does not take this into account
-	*/
-	inode_num++;		
-	block_num++;
-
+	if (sz / BLOCK_SIZE > 12) {
+		/* NEED INDIRECT */
+	}
 	/* Allocate a new inode and set it up
 	*/
 	inode* i = malloc(sizeof(inode));
 	i->mode = 0x81C0;		// File, User mask
-	i->size = strlen(data);
+	i->size = n;
 	i->atime = time();
 	i->ctime = time();
 	i->mtime = time();
 	i->links_count = 0;
-	i->block[0] = block_num;
-	i->blocks = 2;			// 2 sectors per block
 
-	buffer* b = buffer_read(1, block_num);
-	memset(b->data, 0, BLOCK_SIZE);
-	memcpy(b->data, data, strlen(data));
+	printf("Writing %d bytes to new inode #%d\n", n, inode_num);
+/* SECTION: BLOCK ALLOCATION AND DATA WRITING */
+	int q = 0;
+	while(sz) {
+		uint32_t block_num = ext2_alloc_block();
 
-	buffer_write(b);
+		int c = (sz >= BLOCK_SIZE) ? BLOCK_SIZE : sz;
 
+		i->block[q] = block_num;
+		i->blocks += 2;			// 2 sectors per block
 
+		printf("Writing %d bytes to block %d\n", c, block_num);
+		
+		/* Go ahead and write the data to disk */
+		buffer* b = buffer_read(1, block_num);
+		memset(b->data, 0, BLOCK_SIZE);
+		memcpy(b->data, (uint32_t) data + (q * BLOCK_SIZE), c);
+		buffer_write(b);
+		q++;
+		sz -= c;
+	}
+
+	for (int q = 0; q < i->blocks/2; q++)
+		printf("Inode Block[%d] = %d\n", q, i->block[q]);
+
+/* SECTION: INODE ALLOCATION AND DATA WRITING */
 	int block_group = (inode_num - 1) / s->inodes_per_group; // block group #
 	int index 		= (inode_num - 1) % s->inodes_per_group; // index into block group
 	int block 		= (index * INODE_SIZE) / BLOCK_SIZE; 
@@ -151,28 +192,29 @@ void ext2_touch() {
 	inode* rootdir = ext2_inode(1, 2);
 
 	buffer* rootdir_buf = buffer_read(1, rootdir->block[0]);
-	printf("roodir block %d\n", rootdir->block[0]);
+
 	dirent* d = (dirent*) rootdir_buf->data;
 	int sum = 0;
 	int calc = 0;
+	int new_entry_len = (sizeof(dirent) + strlen(name) + 4) & ~0x3;
 	do {
 		
-		//d->name[d->name_len] = '\0';
-	if (!d->rec_len)
-			break;
-
-	
+		// Calculate the 4byte aligned size of each entry
 		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
-	//	printf("name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
 		sum += d->rec_len;
-		if (d->rec_len != calc) {
-			sum -= d->rec_len;
-			d->rec_len = calc;
-			printf("LAST name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
 
+		if (d->rec_len != calc && sum == 1024) {
+			/* if the calculated value doesn't match the given value,
+			then we've reached the final entry on the block */
+			sum -= d->rec_len;
+			if (sum + new_entry_len > 1024) {
+				/* we need to allocate another block for the parent
+				directory*/
+				printf("PANIC! out of room");
+				return NULL;
+			}
+			d->rec_len = calc; 		// Resize this entry to it's real size
 			d = (dirent*)((uint32_t) d + d->rec_len);
-printf("LAST name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
-	
 			break;
 		}
 
@@ -180,20 +222,21 @@ printf("LAST name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_l
 
 
 	} while(sum < 1024);
-	//dirent* entry = malloc((sizeof(dirent) + strlen("newfile") + 4) & ~0x3);
+
+	/* d is now pointing at a blank entry, right after the resized last entry */
 	d->rec_len = BLOCK_SIZE - ((uint32_t)d - (uint32_t)rootdir_buf->data);
 	d->inode = inode_num;
 	d->file_type = 1;
-	d->name[0] = 'N';
-//	memcpy(d->name, "newfile");
-	d->name_len = strlen("1");
+	d->name_len = strlen(name);
 
+	/* memcpy() causes a page fault */
+	for (int i = 0; i < strlen(name); i++)
+		d->name[i] = name[i];
 
+	/* Write the buffer to the disk */
 	buffer_write(rootdir_buf);
 
-	printf("name: %s\tinode %d\trec %d\ttype %d\n", d->name, d->inode, d->rec_len, d->file_type);
-		
-
+	/* Update superblock information */
 	s->free_blocks_count--;
 	s->free_inodes_count--;
 	s->wtime = time();

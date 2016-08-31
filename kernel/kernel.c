@@ -121,10 +121,16 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	*/
 
+	uint32_t* data = malloc(2048);
+	for (int i = 0; i < 0x2048 / 4; i++) {
+		data[i] = i % 127;
+	}
+	ext2_touch("data-file.txt", data, 2048);
+	
 
-	ext2_touch();
 	printf("\nROOT TEST\n");
 	lsroot();
+	inode_dump(ext2_inode(1, 12));
 //	asm volatile ("int $0x80");
 	for(;;);
 }
