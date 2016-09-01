@@ -333,7 +333,7 @@ void* malloc(size_t n) {
 
 		// Check if we need to call sbrk
 		if (K_LAST_ALLOC + n >= K_HEAP_TOP) 
-			sbrk((n + K_LAST_ALLOC) - K_HEAP_TOP);
+			sbrk(2*((n + K_LAST_ALLOC) - K_HEAP_TOP));
 
 		ptr = (void*) K_LAST_ALLOC;
 		K_LAST_ALLOC += n;

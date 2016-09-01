@@ -117,28 +117,59 @@ inode* ext2_inode(int dev, int i) {
 	return in;
 }
 
+
 void* ext2_open(inode* in) {
 	assert(in);
 	if(!in)
 		return NULL;
+
 	int num_blocks = in->blocks / (BLOCK_SIZE/SECTOR_SIZE);	
+	printf("NUMBLOCKS: %d\n", num_blocks);
+	printf("13: %d\n", in->block[12]);
+		printf("14: %d\n", in->block[13]);
+			printf("15: %d\n", in->block[14]);
 	assert(num_blocks != 0);
-	if (!num_blocks){
+	if (!num_blocks) 
 		return NULL;
-	}
+
 
 	size_t sz = BLOCK_SIZE*num_blocks;
 	void* buf = malloc(sz);
-	memset(buf, sz, 0);
 	assert(buf != NULL);
+
+	/* Singly-indirect block pointer */
+	if (num_blocks > 12) {
+
+	}
 
 	for (int i = 0; i < num_blocks; i++) {
 		buffer* b = buffer_read(1, in->block[i]);
-
+	
 		memcpy((uint32_t) buf + (i * BLOCK_SIZE), b->data, BLOCK_SIZE);
+		//printf("%x\n", b->data[i]);
 	}
-
 	return buf;
+}
+
+
+
+void* ext2_file_seek(inode* in, size_t n, size_t offset) {
+	int nblocks 	= ((n-1 + BLOCK_SIZE & ~(BLOCK_SIZE-1)) / BLOCK_SIZE);
+	int off_block 	= (offset / BLOCK_SIZE);	// which block
+	int off 		= offset % BLOCK_SIZE;		// offset in block
+
+	void* buf = malloc(nblocks*BLOCK_SIZE);		// round up to whole block size
+
+	assert(nblocks <= in->blocks/2);
+	assert(off_block <= in->blocks/2);
+	for (int i = 0; i < nblocks; i++) {
+		buffer* b = buffer_read(1, in->block[off_block+i]);
+		memcpy(buf + (i*BLOCK_SIZE), b->data + off, BLOCK_SIZE);
+		printf("Read @ block %d (%d)\n",in->block[off_block+i], off_block);
+		off = 0;	// Eliminate offset after first block
+	}
+	return buf;
+
 }
 
 void ls(dirent* d) {

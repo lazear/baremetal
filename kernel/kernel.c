@@ -91,63 +91,8 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-//	lsroot();
-	//sb_dump(ext2_superblock(1));
-	//inode_dump(ext2_inode(1,11));
+elf_load();
 
-	
-	uint32_t* data = ext2_open(ext2_inode(1,12));
-/*		for (int i =0; i < 30; i++) {
-		printf("%x ", byte_order(data[i]));
-	}*/
-	//char* data = & _binary_app_sso_start;
-	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
-	assert(ehdr->e_ident[0] == ELF_MAGIC);
-	printf("r->e_ident %x\t",ehdr->e_ident[0]);     
-	printf("dr->e_type %x\t", ehdr->e_type);                
-	printf(">e_machine %x\n", ehdr->e_machine);              
-	printf(">e_version %x\t",ehdr->e_version);              
-	printf("r->e_entry %x\t",ehdr->e_entry);                
-	printf("r->e_phoff %x\n",ehdr->e_phoff);                
-	printf("r->e_shoff %x\t",ehdr->e_shoff);                
-	printf("r->e_flags %x\t",ehdr->e_flags);           
-	printf("->e_ehsize %x\n", ehdr->e_ehsize);               
-	printf("_phentsize %x\t", ehdr->e_phentsize);            
-	printf("r->e_phnum %x\t", ehdr->e_phnum);                
-	printf("_shentsize %x\n", ehdr->e_shentsize);            
-	printf("r->e_shnum %x\t", ehdr->e_shnum);               
-	printf("e_shstrndx %x\n", ehdr->e_shstrndx);    
-
-
-	elf32_phdr* phdr = (elf32_phdr*) ((uint32_t) data + ehdr->e_phoff);
-	printf("LOAD: off 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x\n",
-		 				phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz);
-	k_paging_map(k_page_alloc(), phdr->p_vaddr, 0x7);
-	memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
-	phdr++;
-	printf("LOAD: off 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x\n",
-		 				phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz);
-	k_paging_map( k_page_alloc(), phdr->p_vaddr, 0x7);
-	memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
-	
-
-
-	traverse_blockchain();
-	//buffer_traverse();
-
-	void (*entry)(void);
-	entry = (void(*)(void))(ehdr->e_entry);
-
-	free(data);
-
-	printf("entry: %x\n", entry);
-
-	entry();
-
-
-	//int i = ext2_touch("data", 'Hello, World!', 13);
-
-	lsroot();
 
 //	asm volatile ("int $0x80");
 	for(;;);

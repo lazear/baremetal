@@ -36,9 +36,15 @@ Each block group has a backup superblock as it's first block
 #ifndef __baremetal_ext2__
 #define __baremetal_ext2__
 
+#ifndef BLOCK_SIZE
+#define BLOCK_SIZE 		1024
+#endif
+
 #define EXT2_BOOT		0			// Block 0 is bootblock
 #define EXT2_SUPER		1			// Block 1 is superblock
 #define EXT2_MAGIC		0x0000EF53
+#define EXT2_INDIRECT	(BLOCK_SIZE / sizeof(uint32_t));
+
 
 typedef struct superblock_s {
 	uint32_t inodes_count;			// Total # of inodes

@@ -253,17 +253,16 @@ loop:
 
 	/* Block not in cache. See if we can find a block that is not busy,
 	and not dirty, and then return it. */
-	for (b = cache.list; b; b = b->next) {
+/*	for (b = cache.list; b; b = b->next) {
 		if ((b->flags & B_DIRTY) == 0 && (b->flags & B_BUSY) == 0) {
 			b->dev = dev;
 			b->block = block;
 			b->flags = B_BUSY;
-			
 			release(&cache.lock);
 			return b;
 		}
 	}
-
+*/
 	/* Worst case scenario - no free blocks. So we malloc a new block, and 
 	add it to the end of the list */
 
@@ -275,7 +274,7 @@ loop:
 	(*bp)->block = block;
 	(*bp)->flags = B_BUSY;
 	//(*bp)->next = NULL;
-//	printf("Making new buffer\n");
+	
 	release(&cache.lock);
 	return *bp;
 }
