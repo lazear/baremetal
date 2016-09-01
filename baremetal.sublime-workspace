@@ -4,260 +4,288 @@
 		"selected_items":
 		[
 			[
-				"e",
-				"e_shentsize"
+				"i",
+				"inode_num"
 			],
 			[
-				"str",
-				"string_table"
-			],
-			[
-				"e_s",
-				"e_shstrndx"
-			],
-			[
-				"el",
-				"elf32_phdr"
-			],
-			[
-				"e_ph",
-				"e_phentsize"
-			],
-			[
-				"elf",
-				"elf32_ehdr"
-			],
-			[
-				"k_pagin",
-				"k_paging_map"
-			],
-			[
-				"ext",
-				"ext2util"
-			],
-			[
-				"p",
-				"phdr"
-			],
-			[
-				"bitm",
-				"bitmap_buf"
-			],
-			[
-				"block",
-				"block_num"
-			],
-			[
-				"rec",
-				"rec_len"
-			],
-			[
-				"file",
-				"file_type"
+				"inde",
+				"indirect"
 			],
 			[
 				"inode",
 				"inode_num"
 			],
 			[
-				"root",
-				"rootdir_buf"
+				"fil",
+				"file_name"
 			],
 			[
-				"EXT",
-				"EXT2_SUPER"
+				"ext2_writ",
+				"ext2_write_inode"
 			],
 			[
-				"fr",
-				"free_inodes_count"
+				"ext2_wr",
+				"ext2_write_inode"
 			],
 			[
-				"free",
-				"free_blocks_count"
-			],
-			[
-				"buff",
-				"buffer_write"
-			],
-			[
-				"bloc",
-				"block_num-1"
-			],
-			[
-				"links",
-				"links_count"
-			],
-			[
-				"uint",
-				"uint32_t"
-			],
-			[
-				"_bi",
-				"_binary_ConsoleFont_raw_start"
-			],
-			[
-				"_",
-				"_binary_ConsoleFont_raw_end"
-			],
-			[
-				"_b",
-				"_binary_ConsoleFont_raw_start"
-			],
-			[
-				"R",
-				"RTC_DATA"
-			],
-			[
-				"BLOCK",
-				"BLOCK_SIZE"
-			],
-			[
-				"et",
+				"ext2",
 				"ext2_inode"
 			],
 			[
-				"buffer",
-				"buffer_dump"
+				"boot",
+				"bootloader"
 			],
 			[
-				"EXT2",
-				"EXT2_MAGIC"
+				"boo",
+				"bootloader"
 			],
 			[
-				"name",
-				"name_len"
+				"LD",
+				"LDFLAGS"
 			],
 			[
-				"Cu",
-				"CURRENT_X"
-			],
-			[
-				"cu",
-				"CURRENT_X"
-			],
-			[
-				"blo",
-				"block_group_descriptor"
-			],
-			[
-				"suo",
-				"superblock"
-			],
-			[
-				"size",
-				"sizeof"
-			],
-			[
-				"dev",
-				"device_info_s"
-			],
-			[
-				"de",
-				"device"
-			],
-			[
-				"re",
-				"rec_len"
-			],
-			[
-				"bl",
-				"block_group_descriptor"
-			],
-			[
-				"blocks_",
-				"blocks_per_group"
+				"C",
+				"CCFLAGS"
 			],
 			[
 				"uin",
 				"uint32_t"
 			],
 			[
-				"byt",
-				"byte_order"
+				"ide_",
+				"ide_read"
+			],
+			[
+				"ext",
+				"ext2_bootloader"
+			],
+			[
+				"buff",
+				"buffer"
+			],
+			[
+				"uint",
+				"uint32_t"
+			],
+			[
+				"size",
+				"size_t"
+			],
+			[
+				"block",
+				"blocknum"
+			],
+			[
+				"arg",
+				"argv"
+			],
+			[
+				"BLOCK",
+				"BLOCK_SIZE"
+			],
+			[
+				"siz",
+				"sizeof"
+			],
+			[
+				"free",
+				"free_inodes_count"
+			],
+			[
+				"buffer",
+				"buffer_write"
+			],
+			[
+				"blo",
+				"block_group_descriptor"
+			],
+			[
+				"inod",
+				"inode_num"
+			],
+			[
+				"e_ph",
+				"e_phoff"
+			],
+			[
+				"elf",
+				"elf32_phdr"
+			],
+			[
+				"vfs",
+				"vfs_entry"
+			],
+			[
+				"ino",
+				"inode_dump"
+			],
+			[
+				"ext2_open",
+				"ext2_open_dir"
+			],
+			[
+				"RTYC",
+				"RTC_DAY"
+			],
+			[
+				"year",
+				"years"
+			],
+			[
+				"day",
+				"days"
+			],
+			[
+				"hor",
+				"hours"
+			],
+			[
+				"time",
+				"time_t"
+			],
+			[
+				"RTC",
+				"RTC_SEC"
+			],
+			[
+				"fr",
+				"free_inodes_count"
 			],
 			[
 				"ide",
 				"idequeue"
 			],
 			[
-				"check",
-				"check_buf"
-			],
-			[
-				"ino",
-				"inode_bitmap"
-			],
-			[
-				"inodes",
-				"inodes_per_group"
-			],
-			[
-				"ET",
-				"EXT2_MAGIC"
+				"bu",
+				"buffer_get"
 			],
 			[
 				"B_",
-				"B_DIRTY"
+				"B_BUSY"
 			],
 			[
-				"stat",
-				"status"
+				"ac",
+				"acquire"
 			],
 			[
-				"IDE",
-				"IDE_CMD"
+				"ma",
+				"markov"
 			],
 			[
-				"ide_",
-				"ide_wait"
+				"wor",
+				"wordlist"
 			],
 			[
-				"IDE_CMD",
-				"IDE_CMD_READ"
+				"tot",
+				"total_words"
 			],
 			[
-				"sec",
-				"sector"
+				"nex",
+				"nextw	statement"
 			],
 			[
-				"ID",
-				"IDE_IO"
+				"ne",
+				"nextw	statement"
 			],
 			[
-				"q",
-				"queue"
+				"rad",
+				"readline	function"
+			],
+			[
+				"k_pa",
+				"k_page_alloc"
+			],
+			[
+				"_ini",
+				"_init_pd	label"
 			],
 			[
 				"KE",
-				"KERNEL_PAGE_NUMBER"
+				"KERNEL_VIRT"
 			],
 			[
-				"_bini",
-				"_binary_initcode_start"
+				"KERNEL",
+				"KERNEL_VIRT"
 			],
 			[
-				"tss",
-				"tss_swap"
+				"_",
+				"_init_pt"
 			],
 			[
-				"SEG_",
-				"SEG_TSS"
+				"KERNE",
+				"KERNEL_VIRT"
+			],
+			[
+				"K",
+				"KERNEL_PAGE_DIRECTORY"
+			],
+			[
+				"KER",
+				"KERNEL_VIRT"
+			],
+			[
+				"KERN",
+				"KERNEL_VIRT"
+			],
+			[
+				"MM",
+				"MM_CURRENT_PD"
+			],
+			[
+				"_in",
+				"_init_pd"
+			],
+			[
+				"stack",
+				"stack_top"
+			],
+			[
+				"sta",
+				"stack_top"
+			],
+			[
+				"kerne",
+				"kernel_initialize"
+			],
+			[
+				"PF",
+				"PF_RW"
+			],
+			[
+				"add",
+				"address"
+			],
+			[
+				"_init",
+				"_init_pd"
+			],
+			[
+				"CU",
+				"CURRENT_PAGE_DIRECTORY"
+			],
+			[
+				"0x",
+				"0x00000010"
+			],
+			[
+				"chil",
+				"child_esp"
+			],
+			[
+				"te",
+				"test_user_function"
 			],
 			[
 				"sys",
 				"system_tss"
 			],
 			[
-				"_pagi",
-				"_paging_unmap"
-			],
-			[
-				"curre",
-				"current_pid"
-			],
-			[
 				"page",
 				"pagedir"
+			],
+			[
+				"re",
+				"release"
 			],
 			[
 				"pare",
@@ -316,10 +344,6 @@
 				"k_paging_unmap"
 			],
 			[
-				"k_pa",
-				"k_page_alloc"
-			],
-			[
 				"_paging",
 				"_paging_map_more"
 			],
@@ -340,20 +364,8 @@
 				"0x3FF"
 			],
 			[
-				"KERN",
-				"KERNEL_PAGE_DIRECTORY"
-			],
-			[
 				"is",
 				"is_mapped"
-			],
-			[
-				"KER",
-				"KERNEL_PAGE_DIRECTORY"
-			],
-			[
-				"C",
-				"CURRENT_PAGE_DIRECTORY"
 			],
 			[
 				"pa",
@@ -396,10 +408,6 @@
 				"current_pid"
 			],
 			[
-				"nex",
-				"nextpid"
-			],
-			[
 				"pro",
 				"proc_link"
 			],
@@ -416,8 +424,8 @@
 				"free_vpage"
 			],
 			[
-				"K",
-				"K_CURRENT_PAGE_DIRECTORY"
+				"bloc",
+				"blockchain_add"
 			],
 			[
 				"K_HE",
@@ -426,10 +434,6 @@
 			[
 				"swa",
 				"swap_to"
-			],
-			[
-				"ne",
-				"nextpid"
 			],
 			[
 				"iq",
@@ -448,8 +452,8 @@
 				"context"
 			],
 			[
-				"MM",
-				"MM_CURRENT_PT"
+				"curre",
+				"current_thread"
 			],
 			[
 				"ff",
@@ -492,10 +496,6 @@
 				"BLOCKCHAIN_START"
 			],
 			[
-				"siz",
-				"size_t"
-			],
-			[
 				"BL",
 				"BLOCKCHAIN_START"
 			],
@@ -520,50 +520,90 @@
 	"buffers":
 	[
 		{
+			"file": "/D/Documents/GitHub/ext2util/Makefile",
+			"settings":
+			{
+				"buffer_size": 1579,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/bootloader/ext2.h",
+			"settings":
+			{
+				"buffer_size": 5853,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/ext2util/ext2.c",
+			"settings":
+			{
+				"buffer_size": 16309,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/ext2util/ext2_debug.c",
+			"settings":
+			{
+				"buffer_size": 4093,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "kernel/elf.c",
+			"settings":
+			{
+				"buffer_size": 4004,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/osdev-test/cboot.c",
+			"settings":
+			{
+				"buffer_size": 105,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/bootloader/ext2_bootloader.c",
+			"settings":
+			{
+				"buffer_size": 6939,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/bootloader/boot.img",
+			"settings":
+			{
+				"buffer_size": 20480,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/bootloader/bootstrap.asm",
+			"settings":
+			{
+				"buffer_size": 3868,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/bootloader/stage2.asm",
+			"settings":
+			{
+				"buffer_size": 3423,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "kernel/ext2.c",
 			"settings":
 			{
-				"buffer_size": 5358,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/malloc.c",
-			"settings":
-			{
-				"buffer_size": 11983,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/paging.c",
-			"settings":
-			{
-				"buffer_size": 11168,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/include/elf.h",
-			"settings":
-			{
-				"buffer_size": 3656,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/ide.c",
-			"settings":
-			{
-				"buffer_size": 7664,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/lib/printf.c",
-			"settings":
-			{
-				"buffer_size": 3594,
+				"buffer_size": 6299,
 				"line_ending": "Windows"
 			}
 		},
@@ -576,58 +616,18 @@
 			}
 		},
 		{
-			"file": "kernel/ext2_debug.c",
+			"file": "kernel/arch/x86.c",
 			"settings":
 			{
-				"buffer_size": 9532,
+				"buffer_size": 5716,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Makefile",
+			"file": "/D/Documents/GitHub/bootloader/Makefile",
 			"settings":
 			{
-				"buffer_size": 1897,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/include/ext2.h",
-			"settings":
-			{
-				"buffer_size": 4438,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/kernel.c",
-			"settings":
-			{
-				"buffer_size": 4752,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/elf.c",
-			"settings":
-			{
-				"buffer_size": 4284,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/vfs.c",
-			"settings":
-			{
-				"buffer_size": 2002,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "kernel/syscall.c",
-			"settings":
-			{
-				"buffer_size": 2000,
+				"buffer_size": 932,
 				"line_ending": "Windows"
 			}
 		}
@@ -656,31 +656,11 @@
 	"command_palette":
 	{
 		"height": 392.0,
-		"last_filter": "hex",
+		"last_filter": "pack",
 		"selected_items":
 		[
 			[
-				"hex",
-				"Hex Viewer: Toggle Endianness (Big|Little)"
-			],
-			[
-				"install ",
-				"Package Control: Install Package"
-			],
-			[
-				"nasm",
-				"Set Syntax: Assembly x86 (NASM)"
-			],
-			[
-				"package",
-				"Package Control: Install Package"
-			],
-			[
-				"package control:",
-				"Package Control: Discover Packages"
-			],
-			[
-				"packa",
+				"pack",
 				"Package Control: Install Package"
 			],
 			[
@@ -781,150 +761,147 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Mike/Documents/GitHub/markov/ll.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mm.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/paging.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/Makefile",
-		"/C/Users/Mike/Documents/GitHub/ext2util/test.bin",
-		"/C/Users/Mike/Documents/GitHub/ext2util/link.ld",
-		"/C/Users/Mike/Documents/GitHub/baremetal/Makefile",
-		"/C/Users/Mike/Documents/GitHub/ext2util/test.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mp.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/bootmain.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/ide.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/linker.ld",
-		"/C/Users/Mike/Documents/GitHub/ext2util/Makefile",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vfs.c",
-		"/C/Users/Mike/Documents/GitHub/test.s",
-		"/C/Users/Mike/Documents/GitHub/ext2util/test.o",
-		"/C/Users/Mike/Documents/GitHub/ext2util/test.elf",
-		"/E/data-file.txt",
-		"/E/new",
-		"/C/Users/Mike/Documents/GitHub/baremetal/ext2",
-		"/E/N",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/mp.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/x86.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/lapic.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/param.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/int32_test.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/ioapic.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/mp.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/x86.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/proc.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/vectors.s",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/defs.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/types.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/font.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/.gitignore",
-		"/C/Users/Mike/Downloads/ConsoleFont.bmp",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/mmu.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/memlayout.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/main.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/entryother.S",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/entry.S",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/start.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/rtc.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/ext2_debug.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/stage2.asm",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/bootstrap.asm",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/int32.s",
-		"/C/Users/Mike/Downloads/ConsoleFont.raw",
-		"/C/Users/Mike/AppData/Local/Temp/7zO808B4A19/ftrend1.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/stage2",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/bootstrap",
-		"/C/Users/Mike/Documents/GitHub/baremetal/exttrunc",
-		"/C/Users/Mike/Documents/GitHub/baremetal/ext.img",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/ext2.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/fs.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/ide.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/kernel.c",
-		"/C/Users/Mike/Downloads/cp437.bin",
-		"/C/Users/Mike/AppData/Local/Temp/7zO8AA62A7D/bdf2c.c",
-		"/C/Users/Mike/Downloads/int32_test.c",
-		"/C/Users/Mike/Documents/GitHub/os/asm/bootsect.asm",
-		"/C/Users/Mike/AppData/Local/Temp/7zO8F5DD39A/CirrusClk.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/test.img",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/int32.asm",
-		"/C/Users/Mike/Downloads/int32.asm",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/asm/bootsect.asm",
-		"/C/Users/Mike/Documents/GitHub/os/drivers/clock/rtc.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/stat.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/bio.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/proc.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/fs.c",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/trap.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vga.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/string.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/ext2.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/trap.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/assert.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/ide.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/stdlib.h",
-		"/C/Users/Mike/Downloads/kernel.bin",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/switch_to_user.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/sched.s",
-		"/C/Users/Mike/Documents/kryos/snapshot.06.10.09/drivers/disk/hdd.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/initcode",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/x86.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/sched.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/initcode.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/ctype.h",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/fs.img",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/buf.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/traps.h",
-		"/C/Users/Mike/Downloads/ata/ATAIOREG.C",
-		"/C/Users/Mike/Downloads/ata/EXAMPLE1.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOISA.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOINT.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOSUB.C",
-		"/C/Users/Mike/Downloads/ata/ATAIOTMR.C",
-		"/C/Users/Mike/Documents/GitHub/xv6-public/vm.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/syscall.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/fork.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/proc.h",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/proc.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/initcode",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdio.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/timer.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/keyboard.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/malloc.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/pic.c",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/trap_handler.s",
-		"/C/Users/Mike/Documents/GitHub/baremetal/bin/kernel.bin",
+		"/D/Documents/GitHub/xv6-public/bootmain.c",
+		"/D/Documents/GitHub/bootloader/defs.h",
+		"/D/Documents/GitHub/osdev-test/bootstrap.asm",
+		"/D/Documents/GitHub/baremetal/kernel/ide.c",
+		"/D/Documents/GitHub/xv6-public/bootasm.S",
+		"/D/Documents/GitHub/xv6-public/Makefile",
+		"/D/Documents/GitHub/osdev-test/Makefile",
+		"/D/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
+		"/D/Documents/GitHub/bootloader/boot.img",
+		"/D/Documents/GitHub/bootloader/bootloader",
+		"/D/Documents/GitHub/ext2util/ext2_bootloader.c",
+		"/D/Documents/GitHub/baremetal/Makefile",
+		"/D/Documents/GitHub/ext2util/elf.h",
+		"/D/Documents/GitHub/baremetal/kernel/include/ide.h",
+		"/D/Documents/GitHub/ext2util/ext2_debug.c",
+		"/D/Documents/GitHub/baremetal/kernel/ext2.c",
+		"/D/Documents/GitHub/markov/markov.c",
+		"/D/Documents/GitHub/baremetal/kernel/ext2_bootloader.c",
+		"/D/Documents/GitHub/baremetal/kernel/lib/string.c",
+		"/D/Documents/GitHub/baremetal/kernel/ext2_debug.c",
+		"/D/Documents/GitHub/ext2util/README.md",
+		"/D/Documents/GitHub/ext2util/ide.h",
+		"/D/Documents/GitHub/baremetal/kernel/vga.c",
+		"/D/Documents/GitHub/baremetal/kernel/malloc.c",
+		"/D/Documents/GitHub/osdev-test/elfloader.c",
+		"/D/Documents/GitHub/baremetal/kernel/vfs.c",
+		"/D/Documents/GitHub/baremetal/kernel/stage2.asm",
+		"/D/Documents/GitHub/baremetal/kernel/include/ext2.h",
+		"/D/Documents/GitHub/baremetal/kernel/kernel.c",
+		"/D/Documents/GitHub/echo/echo.asm",
+		"/D/Documents/GitHub/baremetal/kernel/include/types.h",
+		"/D/Documents/GitHub/ext2util/ext2.h",
+		"/D/Documents/GitHub/osdev-test/cboot.c",
+		"/D/Documents/GitHub/baremetal/ext2.img",
+		"/D/Documents/GitHub/osdev-test/test.c",
+		"/D/Documents/GitHub/osdev-test/bootstrap",
+		"/D/Documents/GitHub/baremetal/kernel/app.asm",
+		"/D/Documents/GitHub/baremetal/kernel/paging.c",
+		"/D/Documents/GitHub/baremetal/kernel/include/elf.h",
+		"/D/Documents/GitHub/baremetal/kernel/int32_test.c",
+		"/D/Documents/GitHub/baremetal/kernel/rtc.c",
+		"/D/Documents/GitHub/baremetal/linker.ld",
+		"/D/Documents/GitHub/baremetal/kernel/arch/trap.c",
+		"/D/Documents/GitHub/baremetal/kernel/arch/x86.c",
+		"/D/Documents/GitHub/baremetal/kernel/syscall.c",
+		"/D/Documents/GitHub/osdev-test/boot",
+		"/D/Documents/GitHub/baremetal/app.sso",
+		"/D/Documents/GitHub/baremetal/app.ld",
+		"/D/Documents/GitHub/baremetal/kernel/app.o",
+		"/D/Documents/GitHub/baremetal/kernel/bootstrap",
+		"/D/Documents/GitHub/baremetal/kernel/include/elf32.h",
+		"/D/Documents/GitHub/xv6-public/elf.h",
+		"/D/Documents/GitHub/osdev-test/linker.ld",
+		"/D/Downloads/snapshot.06.10.09/asm/bootsect.asm",
+		"/D/Documents/GitHub/osdev-test/boot.s",
+		"/D/Documents/GitHub/baremetal/ext.img",
+		"/D/Documents/GitHub/baremetal/fs.img",
+		"/D/Documents/GitHub/baremetal/kernel/include/ctype.h",
+		"/D/Documents/GitHub/baremetal/kernel/include/assert.h",
+		"/D/Documents/GitHub/markov/plot",
+		"/D/Documents/GitHub/markov/exac",
+		"/D/Documents/GitHub/markov/markov.py",
+		"/D/Documents/GitHub/markov/test",
+		"/D/Documents/GitHub/markov/LICENSE",
+		"/D/Documents/GitHub/markov/Makefile",
+		"/D/Documents/GitHub/baremetal/kernel/timer.c",
+		"/D/Documents/GitHub/baremetal/kernel/keyboard.c",
+		"/D/Documents/GitHub/baremetal/kernel/arch/start.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/switch_to_user.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/sched.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/vectors.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/trap_handler.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/syscall.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/pic.c",
+		"/D/Documents/GitHub/baremetal/kernel/arch/initcode.s",
+		"/D/Documents/GitHub/baremetal/kernel/lib/printf.c",
+		"/D/Documents/GitHub/baremetal/kernel/lib/stdio.c",
+		"/D/Documents/GitHub/baremetal/kernel/mutex.c",
+		"/D/Documents/GitHub/baremetal/kernel/mm.c",
+		"/D/Downloads/snapshot.06.10.09/asm/higherhalf.s",
+		"/D/Documents/GitHub/baremetal/kernel/include/x86.h",
+		"/D/Documents/GitHub/baremetal/kernel/include/kernel.h",
+		"/D/Documents/GitHub/baremetal/kernel/fork.c",
+		"/D/Documents/GitHub/baremetal/kernel/sched.c",
+		"/D/Documents/GitHub/baremetal/kernel/include/proc.h",
+		"/D/Documents/GitHub/xv6-public/proc.c",
+		"/D/Documents/GitHub/baremetal/kernel/bio.c",
+		"/D/Documents/GitHub/baremetal/kernel/fs.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/Find Results",
-		"/C/Users/Mike/Documents/GitHub/baremetal/tools/i686-elf-as",
-		"/C/Users/Mike/Documents/GitHub/baremetal/map.txt",
-		"/C/Users/Mike/Documents/GitHub/baremetal/vectors.py",
-		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/syscall.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/keyboard.c",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/paging.h",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/start.s",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/x86.c",
+		"/C/Users/Mike/Documents/GitHub/xv6-public/Makefile",
+		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs.c",
 		"/C/Users/Mike/Documents/GitHub/xv6-public/mkfs",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/arch/sched.s",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/mutex.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/mutex.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/assert.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/include/types.h",
 		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/thread.c",
 		"/C/Users/Mike/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/timer.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdio.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/vfs.c",
+		"/C/Users/Mike/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
 		"/D/Downloads/snapshot.06.10.09/core/task/taskapi.c",
 		"/D/Downloads/snapshot.06.10.09/core/task/task.c",
 		"/D/Downloads/snapshot.06.10.09/core/task/sched.c",
-		"/D/Documents/GitHub/baremetal/kernel/arch/pswitch.s"
+		"/D/Documents/GitHub/baremetal/kernel/arch/pswitch.s",
+		"/D/Documents/GitHub/baremetal/kernel/arch/pswith.s",
+		"/D/Documents/GitHub/baremetal/include/types.h",
+		"/D/Documents/GitHub/baremetal/include/stdio.h",
+		"/D/Documents/GitHub/baremetal/kernel/lib/stdio/stdio.c",
+		"/D/Documents/GitHub/baremetal/heap.c",
+		"/D/Documents/GitHub/baremetal/include/string.h",
+		"/D/Documents/GitHub/baremetal/x86.c",
+		"/D/Documents/GitHub/baremetal/kernel.c",
+		"/D/Documents/GitHub/baremetal/stdlib.c",
+		"/D/Documents/GitHub/baremetal/mm.c",
+		"/D/Documents/GitHub/baremetal/keyboard.c",
+		"/D/Documents/GitHub/baremetal/string.c",
+		"/D/Documents/GitHub/baremetal/include/x86.h",
+		"/D/Documents/GitHub/baremetal/include/ctype.h",
+		"/D/Documents/GitHub/baremetal/include/kernel.h",
+		"/D/Documents/GitHub/baremetal/include/signal.h",
+		"/D/Documents/GitHub/baremetal/include/assert.h"
 	],
 	"find":
 	{
-		"height": 27.0
+		"height": 36.0
 	},
 	"find_in_files":
 	{
 		"height": 102.0,
 		"where_history":
 		[
-			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal\\",
-			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal\\,C:\\Users\\Mike\\Documents\\GitHub\\xv6-public",
-			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal\\",
-			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal",
-			"<current file>,<open folders>",
 			"<current file>",
+			"D:\\Documents\\GitHub\\xv6-public",
+			"D:\\Documents\\GitHub\\baremetal",
 			"C:\\Users\\Mike\\Documents\\GitHub\\baremetal",
 			"D:\\Documents\\GitHub\\baremetal\\",
 			"D:\\Documents\\GitHub\\baremetal",
@@ -936,106 +913,54 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"SHT",
-			"entry",
-			"uint ",
-			"uint",
-			"ushort",
-			"uchar",
-			"\n	",
-			"vectors",
-			"rtc_read()",
-			"rtc_dec",
-			"RtcReadDecimal",
-			"RtcReadByte",
-			"RtcSendByte",
-			"outportb",
-			" %x",
-			"\\n",
-			"buffer*",
-			" %x",
-			" %d",
-			" ",
-			"\\n",
-			"n",
-			"present",
-			"4865",
-			"48",
-			"4d",
-			"4d6",
-			"4d",
-			"dump",
-			"i-",
+			"argv[2]",
+			"rootd",
+			"i ",
 			"i",
-			"x\\n",
-			"n",
-			"uint16_t",
-			"qnext",
-			"inode",
-			"x",
-			")\n",
-			";\n",
-			"sb",
-			"	printf(\"%x\\n\", sb->inodes_count;\n",
-			"sb",
-			"inodes_count",
-			"sb",
-			"uint16_t",
+			"0000",
+			"ph",
 			"uint32_t",
-			"b",
-			"idequeue",
-			"wakeup",
-			"sleep",
-			"dev",
-			"inline",
-			"static",
-			"insl",
-			"NBUF",
-			"BootPageDirectory",
-			"kalloc",
-			"ptable",
-			"uint",
-			"uchar",
-			"uint",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
-			"Proc",
-			"proc",
-			"PROC",
-			"proc",
-			"Proc",
-			"proc",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
-			"PROC",
-			"proc",
+			"uint16_t",
+			"                 ",
+			"                ",
+			"               ",
+			"              ",
+			"             ",
+			"            ",
+			"           ",
+			"          ",
+			"         ",
+			"        ",
+			"       ",
+			"      ",
+			"     ",
+			"    ",
+			"Elf32_Half",
+			"Elf32_Off",
+			"4865",
+			"time",
+			"days",
+			"RtcGetMinute",
+			"rtc_send",
+			"** ",
+			"16",
+			"</i>",
+			"<i>",
+			"- KERNEL_VIRT",
 			"0x23",
-			"0x28",
+			"bread",
+			"reads",
+			"uint",
+			"0x2B",
+			"tss",
 			"0x10",
-			"tf",
-			"cpu->",
-			"uint",
-			"c->",
-			"outportb",
-			"outport",
-			"inportb",
-			"inportw",
-			"inportb",
-			"outportb",
-			"T_",
-			"$",
-			"outb",
-			"ushort",
-			"uint",
-			"idt",
-			"ushort",
-			"uint",
+			"system_tss",
+			"0x2B",
+			"SEG_UCODE",
+			"(;;);\n",
+			"rev",
+			"vga_kputs",
+			"vga_kputc",
 			"regs_t",
 			"regs",
 			"struct regs",
@@ -1063,7 +988,46 @@
 			"heap \n",
 			"heap\n",
 			"|\n",
-			"block"
+			"block",
+			"k_heap_alloc",
+			"kprintx",
+			"getch",
+			"ISR_ERRCODE",
+			"Reverse_",
+			"Reverse",
+			"()\n",
+			",",
+			"0005524",
+			"GO:0005524",
+			"q13526",
+			"Q9Y383",
+			"cerve",
+			"xenopus trop",
+			"xenopus",
+			"P51888",
+			":001015",
+			"001015",
+			"GO_hie",
+			"table",
+			"TABLE",
+			"init",
+			"uniprot",
+			"mirage",
+			"print",
+			"0",
+			"sub.table",
+			"sub.table$f",
+			"vn1",
+			"vn2",
+			"r2.cutoff",
+			"surfact",
+			"'GO:0016209'",
+			"GO:0005215",
+			".-",
+			"ggatcc",
+			"ttcgaa",
+			"lint",
+			"console"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1071,9 +1035,6 @@
 		"regex": false,
 		"replace_history":
 		[
-			"out",
-			"inb",
-			"outb",
 			"",
 			"%x\\n",
 			"K",
@@ -1091,111 +1052,52 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "kernel/ext2.c",
+					"file": "/D/Documents/GitHub/ext2util/Makefile",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5358,
+						"buffer_size": 1579,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3810,
-								3810
+								496,
+								496
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 2004.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "kernel/malloc.c",
+					"file": "/D/Documents/GitHub/bootloader/ext2.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11983,
+						"buffer_size": 5853,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10175,
-								10175
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 6798.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "kernel/paging.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11168,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4087,
-								4087
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 2451.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "kernel/include/elf.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3656,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1518,
-								1518
+								4634,
+								4634
 							]
 						],
 						"settings":
@@ -1204,27 +1106,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 57.0,
+						"translation.y": 2339.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 12,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "kernel/ide.c",
+					"buffer": 2,
+					"file": "/D/Documents/GitHub/ext2util/ext2.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7664,
+						"buffer_size": 16309,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6158,
-								6158
+								1515,
+								1515
 							]
 						],
 						"settings":
@@ -1233,19 +1135,140 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3619.0,
+						"translation.y": 240.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/D/Documents/GitHub/ext2util/ext2_debug.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4093,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2421,
+								2421
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 240.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 6,
+			"sheets":
+			[
+				{
+					"buffer": 4,
+					"file": "kernel/elf.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4004,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1780,
+								1780
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 600.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/D/Documents/GitHub/osdev-test/cboot.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 105,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								103,
+								15
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "kernel/lib/printf.c",
+					"buffer": 6,
+					"file": "/D/Documents/GitHub/bootloader/ext2_bootloader.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3594,
+						"buffer_size": 6939,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1490,
+								1490
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 280.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/D/Documents/GitHub/bootloader/boot.img",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 20480,
 						"regions":
 						{
 						},
@@ -1258,18 +1281,105 @@
 						],
 						"settings":
 						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/D/Documents/GitHub/bootloader/bootstrap.asm",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3868,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2095,
+								2095
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/NASM x86 Assembly/Assembly x86.tmLanguage",
+							"tab_size": 8,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/D/Documents/GitHub/bootloader/stage2.asm",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3423,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								783,
+								783
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/NASM x86 Assembly/Assembly x86.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 180.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "kernel/ext2.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6299,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4289,
+								3592
+							]
+						],
+						"settings":
+						{
 							"syntax": "Packages/C++/C.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1311.0,
+						"translation.y": 2320.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 11,
 					"file": "kernel/lib/string.c",
 					"semi_transient": false,
 					"settings":
@@ -1281,8 +1391,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								1489,
+								1347
 							]
 						],
 						"settings":
@@ -1291,148 +1401,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1539.0,
+						"translation.y": 310.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "kernel/ext2_debug.c",
+					"buffer": 12,
+					"file": "kernel/arch/x86.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9532,
+						"buffer_size": 5716,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6363,
-								6363
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 2907.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "Makefile",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1897,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								421,
-								421
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 57.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 2,
-			"sheets":
-			[
-				{
-					"buffer": 9,
-					"file": "kernel/include/ext2.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4438,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4022,
-								4022
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "kernel/kernel.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4752,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4704,
-								4704
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1250.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "kernel/elf.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4284,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1286,
-								1286
+								3259,
+								3058
 							]
 						],
 						"settings":
@@ -1440,68 +1429,39 @@
 							"syntax": "Packages/C++/C.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 19.0,
+						"translation.y": 1800.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
-					"file": "kernel/vfs.c",
+					"buffer": 13,
+					"file": "/D/Documents/GitHub/bootloader/Makefile",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2002,
+						"buffer_size": 932,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1814,
-								1814
+								467,
+								467
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"auto_name": "",
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "kernel/syscall.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2000,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1719,
-								1719
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 456.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
+					"stack_index": 9,
 					"type": "text"
 				}
 			]
@@ -1509,11 +1469,11 @@
 	],
 	"incremental_find":
 	{
-		"height": 27.0
+		"height": 28.0
 	},
 	"input":
 	{
-		"height": 35.0
+		"height": 36.0
 	},
 	"layout":
 	{
@@ -1535,7 +1495,7 @@
 		"cols":
 		[
 			0.0,
-			0.490625,
+			0.460937500001,
 			1.0
 		],
 		"rows":
@@ -1547,21 +1507,17 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 30.0
+		"height": 332.0
 	},
 	"output.find_results":
 	{
 		"height": 0.0
 	},
-	"output.hex_viewer_inspector":
-	{
-		"height": 130.0
-	},
 	"pinned_build_system": "Packages/Python/Python.sublime-build",
 	"project": "baremetal.sublime-project",
 	"replace":
 	{
-		"height": 50.0
+		"height": 52.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1584,9 +1540,13 @@
 	"select_project":
 	{
 		"height": 500.0,
-		"last_filter": "kegg",
+		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"",
+				"D:\\Documents\\GitHub\\baremetal\\baremetal.sublime-project"
+			],
 			[
 				"kegg",
 				"C:\\Users\\Mike\\Documents\\GitHub\\kegg\\kegg.sublime-project"
@@ -1615,6 +1575,5 @@
 	"status_bar_visible": true,
 	"template_settings":
 	{
-		"max_columns": 2
 	}
 }

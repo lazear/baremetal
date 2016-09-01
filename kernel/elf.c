@@ -38,6 +38,16 @@ void elf_objdump(void* data) {
 	assert(ehdr->e_machine 	== EM_386);
 	assert(ehdr->e_type		== ET_EXEC);
 
+	printf("OBJDUMP\n");
+	printf("ELF ident\t%x\t",ehdr->e_ident[0]);     
+	printf("Type\t%x\t", ehdr->e_type);                
+	printf("Machine\t%x\n", ehdr->e_machine);              
+	printf("Version \t%x\t",ehdr->e_version);              
+	printf("Entry\t%x\t",ehdr->e_entry);                
+         
+	printf("Flags\t%x\n",ehdr->e_flags);           
+	
+
 	/* Parse the program headers */
 	elf32_phdr* phdr 		= (uint32_t) data + ehdr->e_phoff;
 	elf32_phdr* last_phdr 	= (uint32_t) phdr + (ehdr->e_phentsize * ehdr->e_phnum);
@@ -47,10 +57,10 @@ void elf_objdump(void* data) {
 		phdr++;
 	} 
 
-	uint32_t* buf = ext2_file_seek(ext2_inode(1,14), BLOCK_SIZE, ehdr->e_shoff);
+	//uint32_t* buf = ext2_file_seek(ext2_inode(1,14), BLOCK_SIZE, ehdr->e_shoff);
 
 	/* Parse the section headers */
-	elf32_shdr* shdr 		= (uint32_t) buf + ehdr->e_shoff;
+	elf32_shdr* shdr 		= (uint32_t) data + ehdr->e_shoff;
 	elf32_shdr* sh_str		= (uint32_t) shdr + (ehdr->e_shentsize * ehdr->e_shstrndx);
 	elf32_shdr* last_shdr 	= (uint32_t) shdr + (ehdr->e_shentsize * ehdr->e_shnum);
 
@@ -67,32 +77,17 @@ void elf_objdump(void* data) {
 		shdr++;
 	}
 
-	free(buf);
+	//free(buf);
 }
 
 
 void elf_load() {
-	uint32_t* data = ext2_open(ext2_inode(1,14));
+	uint32_t* data = ext2_open(ext2_inode(1,12));
 
 
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
-	printf("ELF ident\t%x\t",ehdr->e_ident[0]);     
-	printf("Type\t%x\t", ehdr->e_type);                
-	printf("Machine\t%x\n", ehdr->e_machine);              
-	printf("Version  \t%x\t",ehdr->e_version);              
-	printf("Entry\t%x\t",ehdr->e_entry);                
-	printf("PH off\t%x\n",ehdr->e_phoff);                
-	printf("SH off\t\t%x\t",ehdr->e_shoff);                
-	printf("Flags\t%x\t",ehdr->e_flags);           
-	printf("EH size\t%x\n", ehdr->e_ehsize);               
-	printf("PH ent size\t%x\t", ehdr->e_phentsize);            
-	printf("PH #\t%x\t", ehdr->e_phnum);                
-	printf("SH ent size\t%x\n", ehdr->e_shentsize);            
-	printf("SH #\t%x\t", ehdr->e_shnum);               
-	printf("SH str\t%x\n", ehdr->e_shstrndx);    
-
 
 	elf_objdump(data);
 

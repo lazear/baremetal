@@ -124,10 +124,7 @@ void* ext2_open(inode* in) {
 		return NULL;
 
 	int num_blocks = in->blocks / (BLOCK_SIZE/SECTOR_SIZE);	
-	printf("NUMBLOCKS: %d\n", num_blocks);
-	printf("13: %d\n", in->block[12]);
-		printf("14: %d\n", in->block[13]);
-			printf("15: %d\n", in->block[14]);
+
 	assert(num_blocks != 0);
 	if (!num_blocks) 
 		return NULL;
@@ -137,19 +134,28 @@ void* ext2_open(inode* in) {
 	void* buf = malloc(sz);
 	assert(buf != NULL);
 
+	int indirect = 0;
+
 	/* Singly-indirect block pointer */
 	if (num_blocks > 12) {
-
+		indirect = in->block[12];
 	}
 
+	int blocknum = 0;
 	for (int i = 0; i < num_blocks; i++) {
-		buffer* b = buffer_read(1, in->block[i]);
-	
+		if (i < 12) 
+			blocknum = in->block[i];
+		else
+			blocknum = ext2_read_indirect(indirect, i-12);
+		if (!blocknum)
+			break;
+		buffer* b = buffer_read(1, blocknum);
 		memcpy((uint32_t) buf + (i * BLOCK_SIZE), b->data, BLOCK_SIZE);
 		//printf("%x\n", b->data[i]);
 	}
 	return buf;
 }
+
 
 
 

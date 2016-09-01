@@ -95,6 +95,16 @@ uint32_t ext2_alloc_inode() {
 	return num + 1;	// 1 indexed				
 }
 
+void ext2_write_indirect(uint32_t indirect, uint32_t link, size_t block_num) {
+	buffer* b = buffer_read(1, indirect);
+	*(uint32_t*) ((uint32_t) b->data + block_num*4)  = link;
+	buffer_write(b);
+}
+
+uint32_t ext2_read_indirect(uint32_t indirect, size_t block_num) {
+	buffer* b = buffer_read(1, indirect);
+	return *(uint32_t*) ((uint32_t) b->data + block_num*4);
+}
 
 
 int ext2_touch(char* name, char* data, size_t n) {
@@ -113,10 +123,8 @@ int ext2_touch(char* name, char* data, size_t n) {
 	uint32_t inode_num = ext2_alloc_inode();
 
 	int sz = n;
+	int indirect = 0;
 
-	if (sz / BLOCK_SIZE > 12) {
-		/* NEED INDIRECT */
-	}
 	/* Allocate a new inode and set it up
 	*/
 	inode* i = malloc(sizeof(inode));
@@ -127,32 +135,55 @@ int ext2_touch(char* name, char* data, size_t n) {
 	i->mtime = time();
 	i->dtime = 0;
 	i->links_count = 1;		/* Setting this to 0 = BIG NO NO */
-
 /* SECTION: BLOCK ALLOCATION AND DATA WRITING */
 	int q = 0;
+
 	while(sz) {
 		uint32_t block_num = ext2_alloc_block();
 
 		// Do we write BLOCK_SIZE or sz bytes?
 		int c = (sz >= BLOCK_SIZE) ? BLOCK_SIZE : sz;
 
-		i->block[q] = block_num;
+		if (q < 12) {
+			i->block[q] = block_num;
+		} else if (q == 12) {
+			indirect = block_num;
+			i->block[q] = indirect;
+			printf("Indirect block allocated: %d\n", indirect);
+			block_num = ext2_alloc_block();
+			printf("Next data block allocated: %d\n", block_num);
+			ext2_write_indirect(indirect, block_num, 0);
+		} else if(q > 12 && q < ((BLOCK_SIZE/sizeof(uint32_t)) + 12)) {
+			ext2_write_indirect(indirect, block_num, q - 12);
+		}
+
 		i->blocks += 2;			// 2 sectors per block
+
 
 		/* Go ahead and write the data to disk */
 		buffer* b = buffer_read(1, block_num);
 		memset(b->data, 0, BLOCK_SIZE);
 		memcpy(b->data, (uint32_t) data + (q * BLOCK_SIZE), c);
 		buffer_write(b);
-
+		printf("[%d]\twrite from offset %d to block %d, indirect %d\n", q, q*BLOCK_SIZE, block_num, indirect);
 		q++;
 		sz -= c;	// decrease bytes to write
 		s->free_blocks_count--;		// Update Superblock
 		bg->free_blocks_count--;	// Update BG
+
+	}
+	ext2_write_indirect(indirect, 0, i->blocks/2);
+	i->blocks+=2;
+	printf("%d\n", i->blocks);
+	for (int q = 0; q <= i->blocks/2; q++) {
+		if (q < 12)
+			printf("Direct   Block[%d] = %d\n", q, i->block[q]);
+		else if (q == 12)
+			printf("Indirect Block is @= %d\n", i->block[q]);
+		else if (q > 12)
+			printf("Indirect Block[%d] = %d\n", q - 13, ext2_read_indirect(indirect, q-13));
 	}
 
-	for (int q = 0; q < i->blocks/2; q++)
-		printf("Inode Block[%d] = %d\n", q, i->block[q]);
 
 /* SECTION: INODE ALLOCATION AND DATA WRITING */
 	int block_group = (inode_num - 1) / s->inodes_per_group; // block group #
@@ -220,13 +251,14 @@ int ext2_touch(char* name, char* data, size_t n) {
 
 	/* Update superblock information */
 	s->free_inodes_count--;
-	s->wtime = time();
+	s->wtime = time(NULL);
 	ext2_superblock_rw(1,s);
 
 	/* Update block group descriptors */
 	bg->free_inodes_count--;
 	ext2_blockdesc_rw(1, bg);
 
+	//free(i);
 	return inode_num;
 }
 
