@@ -69,6 +69,9 @@ entry:
 	cmp ecx, 0x00400000		; Loop until we hit 4 MB
 jne .loop
 
+	xor eax, eax
+	mov eax, (_init_pd - VIRT)
+
 	mov cr3, eax			; Eax is still our page directory address
 	
 	mov ecx, cr0
@@ -79,12 +82,10 @@ jne .loop
 	jmp ecx					; jmp to start
 
 start:
-
-	call gdt_init			; C function, initialize GDT
-	call idt_init			; C function, initialize IDT
-
 	mov eax, stack_top 		; Establish the 16K kernel stack
 	mov esp, eax
+	call gdt_init			; C function, initialize GDT
+	call idt_init			; C function, initialize IDT
 
 	push kernel_end			; pass kernel end to our function
 	call kernel_initialize
