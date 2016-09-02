@@ -129,6 +129,7 @@ struct segdesc {
 { ((lim) >> 12) & 0xffff, (uint32_t)(base) & 0xffff,      \
   ((uint32_t)(base) >> 16) & 0xff, type, 1, dpl, 1,       \
   (uint32_t)(lim) >> 28, 0, 0, 1, 1, (uint32_t)(base) >> 24 }
+  
 #define SEG16(type, base, lim, dpl) (struct segdesc)  \
 { (lim) & 0xffff, (uint32_t)(base) & 0xffff,              \
   ((uint32_t)(base) >> 16) & 0xff, type, 1, dpl, 1,       \
