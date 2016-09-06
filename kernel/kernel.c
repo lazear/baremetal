@@ -70,7 +70,9 @@ void kernel_initialize(uint32_t kernel_end) {
 			- Utilizes both k_page_alloc() and k_paging_map() to generate a continous
 				virtual address space.
 			- Public heap starts at 3GB. This should be changed when higher half is implemented
-	4.	Todo - initialize multithreading.
+	4.	Todo - initialize:
+			* APIC/ACPI/Multiple processors
+			* multitasking.
 	*/
 
 	KERNEL_END = kernel_end;
@@ -91,8 +93,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-elf_load();
+	//elf_load();
 
+	traverse_blockchain();
 
 //	asm volatile ("int $0x80");
 	for(;;);

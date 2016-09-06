@@ -44,20 +44,21 @@ void syscall(regs_t *r)
 	{
 
 	case 1:	// syscall write()
-		//printf("Syscall write() %x", r->edx);
+		printf("Syscall write() %x", r->edx);
 		printf("%s\n", (char*) r->edx);
 		break;
-
+	case 2:
+		vga_putc(r->edx);
+		break;
 	default:
 		printf("syscall 0x80, eax 0x%x\n", r->eax);
 		//ret = fork();
 		break;
 	}
 	//print_regs(cp);
-	r->eax = ret;
+	//r->eax = 0xDEAD;
 	//r->eax = 0xDEADBEEF;
-	pushcli();
-	asm volatile("hlt");
+
 }
 
 void syscall_init(void)

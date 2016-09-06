@@ -352,7 +352,7 @@ void page_copy(uint32_t* dest, uint32_t* src, uint32_t virt, size_t n) {
 }
 
 /* 
-Map until end of kernel, no pages allocated. Scratch that, map until 2Mb. 
+Map until end of kernel, no pages allocated. Scratch that, map until 4Mb. 
 End of kernel was not working, likely because there is important information 
 stored directly after the kernel (bitmaps, stack, etc)
 */

@@ -82,7 +82,7 @@ void elf_objdump(void* data) {
 
 
 void elf_load() {
-	uint32_t* data = ext2_open(ext2_inode(1,12));
+	uint32_t* data = ext2_open(ext2_inode(1,14));
 
 
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
@@ -91,31 +91,35 @@ void elf_load() {
 
 	elf_objdump(data);
 
-	free(data);
-	return;
 
-
-	elf32_phdr* phdr = (elf32_phdr*) ((uint32_t) data + ehdr->e_phoff);
-	printf("LOAD: off 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x\n",
-		 				phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz);
-	k_paging_map(k_page_alloc(), phdr->p_vaddr, 0x7);
-	memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
-
-	phdr++;
-	printf("LOAD: off 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x\n",
-		 				phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz);
-	k_paging_map(k_page_alloc(), phdr->p_vaddr, 0x7);
-	memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
+	elf32_phdr* phdr 		= (uint32_t) data + ehdr->e_phoff;
+	elf32_phdr* last_phdr 	= (uint32_t) phdr + (ehdr->e_phentsize * ehdr->e_phnum);
 	
+	uint32_t off = (phdr->p_vaddr - phdr->p_paddr);
 
 
-	void (*entry)(void);
+	while(phdr < last_phdr) {
+		printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
+		 	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
+		
+		k_paging_map(k_page_alloc(), phdr->p_vaddr, 0x7);
+
+		memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
+		phdr++;
+	} 
+
+	int (*entry)(char*, int);
 	entry = (void(*)(void))(ehdr->e_entry);
 
 	free(data);
 
 	printf("entry: %x\n", entry);
+	char d[] = "Hello Worldmmmmm";
+	char* ptr = malloc(strlen(d));
 
-	entry();
-
+	strcpy(ptr, d);
+	extern uint32_t* KERNEL_PAGE_DIRECTORY;
+	int i = entry(ptr, 0x10);
+	printf("(BACK) %x\n", i);
+	//k_swap_pd(KERNEL_PAGE_DIRECTORY);
 }
