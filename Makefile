@@ -11,9 +11,9 @@ LD		= /home/lazear/opt/cross/bin/i686-elf-ld
 AS		= nasm
 AR		= /home/lazear/opt/cross/bin/i686-elf-as
 CP		= cp
-
+LIBGCC	= /home/lazear/opt/cross/lib/gcc/i686-elf/4.9.1/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
-LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) -b binary $(INIT)
+LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT)
 ASFLAGS = -f elf 
 
 all: compile link clean

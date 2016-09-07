@@ -311,3 +311,12 @@ void buffer_free(buffer* b) {
 	free(b);
 	release(&cache.lock);
 }
+
+/*
+
+brainstorming new buffer scheme:
+find a way to recycle buffers like xv6, but prevent important
+blocks from being recycled (superblock, group desc, etc).
+Maybe don't allocate all 16 blocks at once?
+
+Keep DIRTY flag, add a CRITICAL flag (superblock) */

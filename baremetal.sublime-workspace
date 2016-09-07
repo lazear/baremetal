@@ -520,21 +520,26 @@
 	"buffers":
 	[
 		{
-			"file": "kernel/elf.c",
+			"file": "/D/Documents/GitHub/markov/ll.c",
 			"settings":
 			{
-				"buffer_size": 4096,
+				"buffer_size": 2847,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "/*\nide.c\n================================================================================\nMIT License\nCopyright (c) 2007-2016 Michael Lazear\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n================================================================================\nDisk buffer cache/LBA read/write support ala XV6\n*/\n\n#include <types.h>\n#include <x86.h>\n#include <mutex.h>\n#include <traps.h>\n#include <ide.h>\n#include <assert.h>\n\nvoid sleep(void* channel, mutex* m) {}\nvoid wake(void* channel) {} \n\n\nmutex idelock = {.lock = 0};		// spinlock for disk access\nbuffer* idequeue;					// cache of buffer access\nint IDE_STATUS = 0;				// Dev 1 present?\n\n/*\nWait for IDE device to become ready\ncheck =  0, do not check for errors\ncheck != 0, return -1 if error bit set\n*/\nint ide_wait(int check) {\n	char r;\n\n	// Wait while drive is busy. Once just ready is set, exit the loop\n	while (((r = (char)inb(IDE_IO | IDE_CMD)) & (IDE_BSY | IDE_RDY)) != IDE_RDY);\n\n	// Check for errors\n	if (check && (r & (IDE_DF | IDE_ERR)) != 0)\n		return -1;\n	return 0;\n}\n\n// Delay 400 ns\n int ide_delay() {\n	char ret = 0;\n	for (int i = 0; i < 5; i++)\n		ret = (char)inb(IDE_ALT);\n	return ret;\n}\n\nstatic void ide_op(buffer* b) {\n	if (!b)\n		panic(\"ide_op\");\n	//printf(\"Begin op on dev %d block %d\\n\", b->dev, b->block );\n\n	assert(b->dev);\n	int sector_per_block = BLOCK_SIZE / SECTOR_SIZE;	// 1\n	int sector = b->block * sector_per_block;\n\n	ide_wait(0);\n	outb(IDE_ALT, 0);	// Generate interrupt\n	outb(IDE_IO | IDE_SECN, sector_per_block);	// # of sectors\n	outb(IDE_IO | IDE_LOW, LBA_LOW(sector));\n	outb(IDE_IO | IDE_MID, LBA_MID(sector));\n	outb(IDE_IO | IDE_HIGH, LBA_HIGH(sector));\n	// Slave/Master << 4 and last 4 bits\n	outb(IDE_IO | IDE_HEAD, 0xE0 | ((b->dev & 1) << 4) | LBA_LAST(sector));	\n\n	if (b->flags & B_DIRTY) {						// Need to write\n		outb(IDE_IO | IDE_CMD, IDE_CMD_WRITE);\n		outsl(IDE_IO, b->data, BLOCK_SIZE / 4);		// Write in 4 byte chunks\n	} else {										// Read only\n		outb(IDE_IO | IDE_CMD, IDE_CMD_READ);\n	}\n}\n\n/*\nActual reading of data takes place in the interrupt handler\n*/\nvoid ide_handler() {\n	acquire(&idelock);\n	//vga_pretty(\"IDE: \", 0xC);\n	buffer* b = idequeue;\n\n	assert(b);\n	if(!b) {\n		release(&idequeue);\n		return;\n	}\n	idequeue = b->q;\n	//assert(idequeue);\n\n	//if dirty is not set, and no errors, read data\n	int stat = ide_wait(1);\n	assert(stat >= 0);\n\n	if (!(b->flags & B_DIRTY) && stat >= 0) {\n		insl(0x1f0, b->data, BLOCK_SIZE/4);\n		//printf(\"Reading data to buffer %x dev %d block %d\\n\", b, b->dev, b->block);\n	}\n\n	b->flags |= B_VALID;	// set valid flag\n	b->flags &= ~B_DIRTY;	// clear dirty flag\n	ide_delay();\n	wake(b);\n	// Move to next item in queue\n	//assert(idequeue != 0);\n	if (idequeue != 0)\n		ide_op(idequeue);\n\n	release(&idelock);\n}\n\nvoid ide_init() {\n	acquire(&idelock);\n\n	pic_enable(IRQ_IDE);\n	ide_wait(0);\n\n	// Is disk 1 present?\n	outb(IDE_IO | IDE_HEAD, (1<<4));\n\n	for (int i = 0; i < 1000; i++) {\n		if (inb(IDE_IO | IDE_CMD)) {\n			IDE_STATUS = 1;\n			break;\n		}\n	}\n\n\n	printf(\"IDE status: %d\\n\", IDE_STATUS);\n	//outb(IDE_IO | IDE_HEAD, 0xE0 | (0<<4));\n	release(&idelock);\n}\n\nint check_buf(buffer* b) {\n	return (b->flags & (B_VALID | B_DIRTY) != B_VALID);\n}\n	\nint ide_rw(buffer* b) {\n	if ((b->flags & (B_VALID | B_DIRTY)) == B_VALID)\n		return -1;	// only valid is set, nothing to read or write\n	if (b->dev != 1)\n		return -2;\n\n	buffer** pp;\n	b->q = 0;\n	for(pp = &idequeue; *pp; pp = &(*pp)->q) \n		;	// Cycle through all valid next's.\n	*pp = b;	// b is now appended.\n\n	//assert(idequeue == b);\n	if (idequeue == b)\n		ide_op(b);	// If this is only item in queue, start operation.\n	\n	//assert( b->flags & (B_VALID | B_DIRTY) != B_VALID);\n//	while(check_buf(b))\n		sleep(b, &idelock);	// Sleep until VALID is set and DIRTY is clear\n	assert(ide_wait(1) == 0);\n	return 0;\n}\n\n\nstruct {\n	mutex lock;\n	buffer* list;\n} cache;\n\nvoid buffer_init() {\n	cache.list = malloc(sizeof(buffer) * MAX_OP_BLOCKS);\n	int i = 0;\n	buffer* b;\n	for (b = cache.list; b < (cache.list + MAX_OP_BLOCKS - 1); b++) {\n		b->next = b+1;\n		b->dev = -1;\n	}\n	//b++;\n	b->next = NULL;\n	b->dev = -1;\n}\n\n// Converts to same endian-ness as sublime for hex viewing\nuint32_t byte_order(uint32_t i) {\n	uint32_t x;\n	uint8_t* bytes = (uint8_t*) &x;\n	bytes[0] = i >> 24 & 0xFF;\n	bytes[1] = i >> 16 & 0xFF;\n	bytes[2] = i >> 8 & 0xFF;\n	bytes[3] = i & 0xFF;\n	return x;\n}\n\nvoid buffer_dump(buffer *b) {\n	assert(b);\n	assert(b->flags & B_VALID);\n	//assert(idequeue == b);\n	for (int i = 0; i < BLOCK_SIZE; i += 4) {\n		if (i % 32 == 0 && i)\n			vga_putc('\\n');\n		int o = byte_order(*(uint32_t*)((uint32_t)b->data + i));\n		if(o)\n		printf(\"%x \", o);\n\n\n	}\n}\n\n/* For debugging purposes */\nvoid buffer_traverse() {\n	buffer** b;\n	int i = 0;\n	for (b = &cache.list; *b; b = &(*b)->next) {\n		printf(\"%d this %x that %x\\n\", i++, *b, (*b)->next);\n	}\n	printf(\"IDEque %x\\n\", idequeue);\n}\n\nbuffer* buffer_get(uint32_t dev, uint32_t block) {\n	buffer* b;\n	acquire(&cache.lock);\nloop:\n	for (b = cache.list; b; b = b->next) {\n		if (b->dev == dev && b->block == block) {\n			//printf(\"Buffer found\\n\");\n			if (!(b->flags & B_BUSY)) {		// Is buffer free?\n				b->flags |= B_BUSY;			// Mark buffer as in-use\n				release(&cache.lock);\n				return b;\n			}\n			sleep(b, &cache.lock);			// Wait until that block is free\n			release(&cache.lock);\n			return b;\n		//	goto loop;					// Without MT, this freezes\n		}\n	}\n\n	/* Block not in cache. See if we can find a block that is not busy,\n	and not dirty, and then return it. */\n/*	for (b = cache.list; b; b = b->next) {\n		if ((b->flags & B_DIRTY) == 0 && (b->flags & B_BUSY) == 0) {\n			b->dev = dev;\n			b->block = block;\n			b->flags = B_BUSY;\n			release(&cache.lock);\n			return b;\n		}\n	}\n*/\n	/* Worst case scenario - no free blocks. So we malloc a new block, and \n	add it to the end of the list */\n\n	buffer** bp;\n	for (bp = &cache.list; *bp; bp = &(*bp)->next)\n		; \n	*bp = malloc(sizeof(buffer));\n	(*bp)->dev = dev;\n	(*bp)->block = block;\n	(*bp)->flags = B_BUSY;\n	//(*bp)->next = NULL;\n	\n	release(&cache.lock);\n	return *bp;\n}\n\nbuffer* buffer_read(uint32_t dev, uint32_t block) {\n	buffer* b = buffer_get(dev, block);\n	int i = -1;\n	if ( !(b->flags & B_VALID)) 	// Block not read yet\n		i = ide_rw(b);\n\n	if (i == -1 &  !(b->flags & B_VALID) ) {\n		ide_delay();\n		buffer_read(dev, block);\n	}\n	//ide_wait(1);\n	// /printf(\"Escape\\n\");\n	return b;\n}\n\nvoid buffer_write(buffer* b) {\n	//assert((b->flags & B_BUSY) == 0);\n	b->flags |= B_DIRTY; 		// Set write flag\n	ide_rw(b);\n}\n\nvoid buffer_free(buffer* b) {\n	buffer* bp;\n	acquire(&cache.lock);\n	for (bp = cache.list; bp != b; bp = bp->next);\n	bp++;\n	bp->flags = 0;\n	bp->block = -1;\n	memset(bp->data, 0, BLOCK_SIZE);\n	free(b);\n	release(&cache.lock);\n}\n\n/*\n\nbrainstorming new buffer scheme:\nfind a way to recycle buffers like xv6, but prevent important\nblocks from being recycled (superblock, group desc, etc).\nMaybe don't allocate all 16 blocks at once?\n\nKeep DIRTY flag, add a CRITICAL flag (superblock)",
-			"file": "kernel/ide.c",
-			"file_size": 7944,
-			"file_write_time": 131171723322315762,
+			"file": "/D/Documents/GitHub/markov/markov.c",
 			"settings":
 			{
-				"buffer_size": 7885,
+				"buffer_size": 2795,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Documents/GitHub/ext2util/ext2.c",
+			"settings":
+			{
+				"buffer_size": 9634,
 				"line_ending": "Windows"
 			}
 		}
@@ -680,6 +685,8 @@
 	},
 	"file_history":
 	[
+		"/D/Documents/GitHub/baremetal/kernel/elf.c",
+		"/D/Documents/GitHub/baremetal/kernel/ide.c",
 		"/D/Documents/GitHub/baremetal/kernel/mp.c",
 		"/D/Documents/GitHub/xv6-public/init.c",
 		"/D/Documents/GitHub/xv6-public/kbd.c",
@@ -752,12 +759,10 @@
 		"/D/Documents/GitHub/baremetal/kernel/lib/string.c",
 		"/D/Documents/GitHub/baremetal/kernel/ext2.c",
 		"/D/Documents/GitHub/osdev-test/cboot.c",
-		"/D/Documents/GitHub/baremetal/kernel/elf.c",
 		"/D/Documents/GitHub/ext2util/ext2_debug.c",
 		"/D/Documents/GitHub/xv6-public/bootmain.c",
 		"/D/Documents/GitHub/bootloader/defs.h",
 		"/D/Documents/GitHub/osdev-test/bootstrap.asm",
-		"/D/Documents/GitHub/baremetal/kernel/ide.c",
 		"/D/Documents/GitHub/xv6-public/bootasm.S",
 		"/D/Documents/GitHub/osdev-test/Makefile",
 		"/D/Documents/GitHub/baremetal/kernel/lib/stdlib.c",
@@ -833,6 +838,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"fp_add",
+			"argv[1]",
+			"argv[1])",
+			"argv[1]",
 			"consoleintr",
 			"stderr",
 			"stdin",
@@ -956,11 +965,7 @@
 			"                  ",
 			"                 ",
 			"                ",
-			"               ",
-			"              ",
-			"             ",
-			"            ",
-			"           "
+			"               "
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -985,24 +990,29 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"sheets":
+			[
+			]
+		},
+		{
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "kernel/elf.c",
+					"file": "/D/Documents/GitHub/markov/ll.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4096,
+						"buffer_size": 2847,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2793,
-								2793
+								537,
+								537
 							]
 						],
 						"settings":
@@ -1011,27 +1021,56 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1143.0,
+						"translation.y": 969.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/D/Documents/GitHub/markov/markov.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2795,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2782,
+								2782
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 285.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "kernel/ide.c",
+					"buffer": 2,
+					"file": "/D/Documents/GitHub/ext2util/ext2.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7885,
+						"buffer_size": 9634,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7834,
-								7834
+								7651,
+								7428
 							]
 						],
 						"settings":
@@ -1040,23 +1079,18 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 5408.0,
+						"translation.y": 4607.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				}
-			]
-		},
-		{
-			"sheets":
-			[
 			]
 		}
 	],
 	"incremental_find":
 	{
-		"height": 28.0
+		"height": 35.0
 	},
 	"input":
 	{
@@ -1150,7 +1184,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 1,
+	"selected_group": 0,
 	"settings":
 	{
 	},
