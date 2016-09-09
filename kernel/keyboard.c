@@ -1,7 +1,34 @@
+/*
+keyboard.c
+===============================================================================
+MIT License
+Copyright (c) 2007-2016 Michael Lazear
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+===============================================================================
+*/
+
 #include <x86.h>
 #include <types.h>
 #include <stdio.h>
 #include <mutex.h>
+#include <traps.h>
 
 uint8_t keyboard[] =
 {
@@ -41,7 +68,8 @@ void keyboard_handler(regs_t *r)
 		idx = 0;
 
 
-    scancode = inportb(0x60);
+    scancode = inb(0x60);
+  	uint8_t  data = inb(0x60);
     if (scancode & 0x80)
 	{
 		scancode &= ~0x80;		/* Get rid of key-release code */
@@ -57,9 +85,9 @@ void keyboard_handler(regs_t *r)
 				break;
 			}
 			while(1)
-				if (!(inportb(0x64) & 2)) break;
-			outportb(0x60, 0xed);			/* Write command */
-			outportb(0x60, (shift << 2));	/* Caps lock light */
+				if (!(inb(0x64) & 2)) break;
+			outb(0x60, 0xed);			/* Write command */
+			outb(0x60, (shift << 2));	/* Caps lock light */
 		}
 	}
     else 
@@ -70,7 +98,7 @@ void keyboard_handler(regs_t *r)
 			key = keyboard[scancode];
 
 			vga_putc(key);
-			fputc(kb, key);
+		//	fputc(kb, key);
 			if (key == '\n')	// line return
 			{
 			//	sched_asm();
@@ -106,5 +134,5 @@ void keyboard_install()
 {
 	kb = k_new_stream(0x1000);
 	buffer = (char*)malloc(0x400);		// allocate and zero the buffer
-    irq_install_handler(1, keyboard_handler);
+	pic_enable(IRQ_KBD);
 }

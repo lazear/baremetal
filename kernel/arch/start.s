@@ -1,6 +1,28 @@
 ;start.s
-;2007-2016, Michael Lazear
-;combine ISRs, IRQ, GDT setup into a multiboot sector
+;===============================================================================
+;MIT License
+;Copyright (c) 2007-2016 Michael Lazear
+;
+;Permission is hereby granted, free of charge, to any person obtaining a copy
+;of this software and associated documentation files (the "Software"), to deal
+;in the Software without restriction, including without limitation the rights
+;to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+;copies of the Software, and to permit persons to whom the Software is
+;furnished to do so, subject to the following conditions:
+;
+;The above copyright notice and this permission notice shall be included in all
+;copies or substantial portions of the Software.
+;
+;THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;SOFTWARE.
+;===============================================================================
+
+; Initialize paging with 4KB pages, give control to kernel
 
 [BITS 32]
 
@@ -12,12 +34,60 @@ extern kernel_end
 global entry
 entry:
 
-	call gdt_init
-	call idt_init
-	call enableA20
-	mov eax, stack_top
+	mov eax, (_init_pd - VIRT)		; eax = page directory address
+	mov ebx, (_init_pt - VIRT)		; ebx = page table address
+
+	or ebx, 3
+	mov [eax], ebx					; identity map 0-4MB
+	xor ebx, 3
+
+; Calculate the page directory offset
+	push eax				; Save eax
+
+	mov eax, PDE 			; Set eax = (0xC0000000 >> 22), page directory index
+	mov ecx, 4				; Set muliplier = 4 (32 bits)
+	mul ecx					; eax = ecx * eax
+	mov ecx, eax			; move result back to ecx
+
+	pop eax					; Restore old value of eax (Page directory)
+	add eax, ecx			; Increase PD address by offset of 0xC0000000
+
+	or ebx, 3				; Set PF_PRESENT & PF_RW flags
+	mov [eax], ebx			; Use the same 0-4MB page table for 3 GB entry
+	xor ebx, 3				; reset ebx
+
+	xor ecx, ecx			; clear ecx before entering the loop
+
+; Begin a loop to identity map the first 4 MB of virtual address space
+.loop:	
+
+	or ecx, 0x000000003 	; set PF_PRESENT, PF_RW
+	mov [ebx], ecx			; set page table entry to value in ecx (phys addr)
+	xor ecx, 0x00000003 	; clear the bit
+	add ebx, 4				; increment by 32 bits
+	add ecx, 0x1000			; increment the physical address by 4 KB
+	cmp ecx, 0x00400000		; Loop until we hit 4 MB
+jne .loop
+
+	xor eax, eax
+	mov eax, (_init_pd - VIRT)
+
+	mov cr3, eax			; Eax is still our page directory address
+	
+	mov ecx, cr0
+	or ecx, 0x80000000		; Enable paging
+	mov cr0, ecx
+
+	lea ecx, [start]		; load effective address 
+	jmp ecx					; jmp to start
+
+start:
+	mov eax, stack_top 		; Establish the 16K kernel stack
 	mov esp, eax
-	push kernel_end
+	call gdt_init			; C function, initialize GDT
+	call idt_init			; C function, initialize IDT
+
+	push kernel_end			; pass kernel end to our function
 	call kernel_initialize
 	jmp $
 
@@ -36,195 +106,28 @@ multiboot:
 	dd MULTIBOOT_HEADER_FLAGS
 	dd MULTIBOOT_CHECKSUM
 
-SIZE equ	0x4000
 
-%macro ISR_MACRO 1
-	global isr%1
-	isr%1:
-		cli
-		push byte %1
-		jmp irqstub
-%endmacro
+VIRT 	equ 0xC0000000
+PDE 	equ	(VIRT >> 22)
+SIZE 	equ	0x4000
 
-; No error ISR macro
-%macro ISR_NMACRO 1
-	global isr%1
-	isr%1:
-		cli
-		push byte 0
-		push byte %1
-		jmp irqstub
-%endmacro
+section .data
+align 0x1000
+; We will statically allocate the initial page table
+; and page directory. Should take 8 KB total
 
-%macro IRQ_MACRO 2
-	global irq%1
-	irq%1:
-		cli
-		push byte 0
-		push byte %2
-		jmp irqstub
-%endmacro
+global _init_pt
+global _init_pd
+_init_pt:				; 4 MB page table
+	times 1024 dd 0
+_init_pd:
+	times 1024 dd 0
 
-ISR_NMACRO 0
-ISR_NMACRO 1
-ISR_NMACRO 2
-ISR_NMACRO 3
-ISR_NMACRO 4
-ISR_NMACRO 5
-ISR_NMACRO 6
-ISR_NMACRO 7
-ISR_NMACRO 8
-
-ISR_MACRO 9
-ISR_MACRO 10
-ISR_MACRO 11
-ISR_MACRO 12
-ISR_MACRO 13
-ISR_MACRO 14
-ISR_MACRO 15
-ISR_MACRO 16
-ISR_MACRO 17
-ISR_MACRO 18
-ISR_MACRO 19
-ISR_MACRO 20
-ISR_MACRO 21
-ISR_MACRO 22
-ISR_MACRO 23
-ISR_MACRO 24
-ISR_MACRO 25
-ISR_MACRO 26
-ISR_MACRO 27
-ISR_MACRO 28
-ISR_MACRO 29
-ISR_MACRO 30
-ISR_MACRO 31
-
-IRQ_MACRO 0, 32
-IRQ_MACRO 1, 33
-IRQ_MACRO 2, 34
-IRQ_MACRO 3, 35
-IRQ_MACRO 4, 36
-IRQ_MACRO 5, 37
-IRQ_MACRO 6, 38
-IRQ_MACRO 7, 39
-IRQ_MACRO 8, 40
-IRQ_MACRO 9, 41
-IRQ_MACRO 10, 42
-IRQ_MACRO 11, 43
-IRQ_MACRO 12, 44
-IRQ_MACRO 13, 45
-IRQ_MACRO 14, 46
-IRQ_MACRO 15, 47
-
-extern irq_handler
-irqstub:
-	pusha
-	push ds
-	push es
-	push fs
-	push gs
-
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov eax, esp
-
-	push eax
-	mov eax, irq_handler
-	call eax
-
-	pop eax
-;	mov esp, eax
-
-	pop gs
-	pop fs
-	pop es
-	pop ds
-	popa
-	add esp, 8
-	iret
-
-extern idt_pointer
-global idt_load
-
-idt_load:
-	lidt [idt_pointer]
-
-extern gdt_pointer
-global gdt_flush
-
-gdt_flush:
-	lgdt [gdt_pointer]
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov ss, ax
-	jmp 0x08:flush
-flush:
-	ret
-
-global tss_flush
-tss_flush:
-	mov ax, 0x2B
-	ltr ax
-	ret
-
-enableA20:
-	in al, 0x92
-	or al, 2
-	out 0x92, al
-	ret
-
-
-global read_stack_pointer
-read_stack_pointer:
-	push ebp
-	mov ebp, esp
-
-	mov eax, esp
-	;add eax, 8
-	pop ebp
-	ret
-
-global k_paging_load_directory
-k_paging_load_directory:
-	push ebp
-	mov ebp, esp
-	mov eax, [esp+8]
-	mov cr3, eax
-	mov esp, ebp
-	pop ebp
-	ret
-
-global k_paging_enable
-k_paging_enable:
-	push ebp
-	mov ebp, esp
-	mov eax, cr0
-	or eax, 0x80000000
-	mov cr0, eax
-	mov esp, ebp
-	pop ebp
-	ret
-
-global k_read_cr3
-k_read_cr3:
-	push ebp
-	mov ebp, esp
-	mov eax, cr3
-	mov esp, ebp
-	pop ebp
-	ret
-
-
-
-
+; We will also statically allocate a 16 Kb stack
 section .bss
 align 32
+global stack_bottom
+global stack_top
 
 stack_bottom:
 	resb SIZE

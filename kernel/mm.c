@@ -1,7 +1,28 @@
 /*
 mm.c
 
-Michael Lazear, 2016
+===============================================================================
+MIT License
+Copyright (c) 2007-2016 Michael Lazear
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+===============================================================================
 
 Physical memory management - keep track of physical memory used,
 this will enable the usage of a virtual memory/page mapped heap.
@@ -30,7 +51,7 @@ But there is no freeing capability, so we must be careful. Maybe use the kernel 
 */
 uint32_t* MM_HEAP = 0;
 // MM_HEAP_MAX is 2mb. After 2mb, page_alloc is enabled.
-uint32_t* MM_HEAP_MAX = 0x00200000;
+uint32_t* MM_HEAP_MAX = 0xC0300000;
 
 /*
 This function should ONLY be used to set up the initial memory manager tables.
@@ -234,75 +255,16 @@ void* k_mm_init(uint32_t heap) {
 	TODO: Change this to actual end-of-kernel space, so everything can be in agreement.
 	*/
 
-	for (int i = 0; i < 512; i++)
-		mm_bitmap_set_bit(MM_CURRENT_PT, i);	
+/*	for (int i = 0; i < 512; i++)
+		mm_bitmap_set_bit(MM_CURRENT_PT, i);	*/
 
+	mm_bitmap_set_bit(MM_CURRENT_PD, 0);
 	uint32_t* addr = mm_page_alloc(MM_CURRENT_PD, MM_CURRENT_PT);
 
 	//kprintx("Initial addr:", addr);
 	//kprintb("PT bm:", MM_CURRENT_PT[31]);
 	return addr;
 }
-
-
-
-void memtesttr() {
-	int i = 1;
-	int t = 0;
-	vga_pretty("Beginning physical memory test! Expect system crash\n", VGA_LIGHTGREEN);
-	vga_kputs("PT", 0, 22);
-	vga_kputs("PD", 0, 23);
-	vga_kputs("Phys addr", 0, 24);
-	vga_kputs("Cycles/tick", 110, 24);
-	void *buf = malloc(32);
-	while(1) {
-		void* ptr = k_page_alloc();
-		if (!ptr) {
-			//traverse_blockchain();
-			free(buf);
-			die();
-		}
-		
-		ftoa((double)i/t, buf);
-		vga_kputs(buf, 140, 24);
-
-
-	//	memset(buf, 0, 32);
-		itoa(ptr, buf, 16);
-		vga_kputs(buf, 20, 24);
-		
-		int _pti = mm_first_free(MM_CURRENT_PT)/32;
-		int _pdi = mm_first_free(MM_CURRENT_PD)/32;
-		uint32_t ptidx = MM_CURRENT_PT[_pti];
-		uint32_t pdidx = MM_CURRENT_PD[_pdi];
-
-	//	memset(buf, 0, 32);
-		itoa(pdidx, buf, 2);
-		vga_kputs(buf, 20, 23);
-
-	//	memset(buf, 0, 32);
-		itoa(_pdi, buf, 10);
-		vga_kputs(buf, 10, 23);
-
-	//	memset(buf, 0, 32);
-		itoa(ptidx, buf, 2);
-		vga_kputs(buf, 20, 22);
-
-	//	memset(buf, 0, 32);
-		itoa(_pti, buf, 10);
-		vga_kputs(buf, 10, 22);
-
-		//printf("%x -- %d %d (Cycles per tick: %e)\n", ptr, i, t, ((double)i/ t));
-		free(ptr);
-		t = get_ticks();
-		i++;
-		//wait(5);
-		yield();
-
-
-	}
-}
-
 
 /*
 Function to play around with and test the physical mem manager.
@@ -340,8 +302,5 @@ void mm_test() {
 		printf("Current ff_pdb: 0x%x\n", ff_pdb);
 		printf("Current bitmap value: %b\n", MM_CURRENT_PD[1]);
 	}
-
-
-	spawn("pmm-test", memtesttr);
 
 }
