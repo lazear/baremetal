@@ -1,35 +1,15 @@
 /*
 vga.c
-===============================================================================
-MIT License
-Copyright (c) 2007-2016 Michael Lazear
+Michael Lazear, 2007-2016
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-===============================================================================
-Implementation of text-mode vga driver for baremetal
+Implementation of vga driver for baremetal
 */
 
 #include <vga.h>
 #include <types.h>
 #include <ctype.h>
 
-char* VGA_MEMORY = 0xC00B8000;
+char* VGA_MEMORY = 0x000B8000;
 
 
 int CURRENT_X = 0;
@@ -45,10 +25,10 @@ void vga_move_cursor( uint16_t x, uint16_t y ) {
 	unsigned temp;
 	temp = (y * 80) + x;
 
-	outb(0x3D4, 14);
-	outb(0x3D5, temp >> 8);
-	outb(0x3D4, 15);
-	outb(0x3D5, temp);
+	outportb(0x3D4, 14);
+	outportb(0x3D5, temp >> 8);
+	outportb(0x3D4, 15);
+	outportb(0x3D5, temp);
 }
 
 void vga_update_cursor() {
@@ -134,18 +114,8 @@ void vga_putc(char c) {
 		return;
 	}
 	if (c == '\t') {
-		while(CURRENT_X % 16)
-			CURRENT_X++;
-		CURRENT_X += 2;
-
-			if (CURRENT_X >= 160) {
-		CURRENT_X = 0;
-		CURRENT_Y += 1;
-	}
+		CURRENT_X += 8;
 		return;
-	}
-	if (c=='\q') {
-
 	}
 	vga_kputc(c, CURRENT_X, CURRENT_Y);
 	CURRENT_X += 2;
@@ -163,7 +133,7 @@ void vga_pretty(char* s, int color) {
 
 	vga_puts(s);
 
-	vga_overwrite_color(color, start_x, start_y, 80, CURRENT_Y);
+	vga_overwrite_color(color, start_x, start_y, CURRENT_X, CURRENT_Y);
 
 }
 

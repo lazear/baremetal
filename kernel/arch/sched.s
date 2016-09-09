@@ -49,8 +49,7 @@ acquire:
 	mov 	ecx,	[esp+4]
 	mov 	eax,	1
 	xchg	eax,	[ecx]
-	test 	eax,	eax   
-	pause   
+	test 	eax,	eax      
 	jnz		acquire
 
 	ret 
