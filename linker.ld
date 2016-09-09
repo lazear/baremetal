@@ -4,22 +4,22 @@ OUTPUT_ARCH(i386)
 ENTRY(entry)
 SECTIONS
 {
-	. = 0xC0100000;
+	. = 0x00100000;
 	start = .;
-	.text :	AT(ADDR(.text) - 0xC0000000)
+	.text :	
 	{
 		*(.text)
 		. = ALIGN(4096);
 	}
 
-	.data :AT(ADDR(.data) - 0xC0000000)
+	.data :
 	{
 		*(.data)
 		*(.rodata)
 		. = ALIGN(4096);
 	}
 	
-	.bss :AT(ADDR(.bss) - 0xC0000000)
+	.bss :
 	{
 		*(.bss)
 		*(stack_bottom)

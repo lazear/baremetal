@@ -1,27 +1,6 @@
 /*
 string.c
-===============================================================================
-MIT License
-Copyright (c) 2007-2016 Michael Lazear
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-===============================================================================
+Michael Lazear, 2007-2016
 
 Implementation of string library for baremetal project
 */
@@ -164,47 +143,25 @@ int memcmp(const uint8_t* s1, const uint8_t* s2, size_t n) {
 	return ( *(uint8_t*)s1 - *(uint8_t*)s2 );
 }
 
-char* strpbrk(char* s, const char* delim) {
-	while(*s++) 
-		for (int q = 0; q < strlen(delim); q++)
-			if (*s == delim[q]) 
-				return s;
-	return NULL;
-}
 
-char* strstr(char* s1, const char* s2) {
-	while(*s1++) 
-		if (strncmp(s1, s2, strlen(s2)) == 0)
-			return s1;
-	return NULL;
-}
-
-int strspn(const char* s1, const char* s2) {
-	for (int i = 0; i < strlen(s1); i++)
-		if (strchr(s2, s1[i]) == NULL)
-			return i;
-	return strlen(s1);
-}
-
-/* new and improved strtok, using strspn and strpbrk */
 char* strtok(char* s, const char* delim) {
-	char* tmp = NULL;
-	static char* ptr;
+	char* b = NULL;
+	static char* ptr, d = NULL;
+
 
 	if (s) 
 		ptr = s;
+
 	if (!ptr && !s)
 		return NULL;
-	ptr = (unsigned int) ptr + strspn(ptr, delim);
-	char* t = strpbrk(ptr, delim);
-
-	if (t) {
-		*t++ = 0;
-		tmp = ptr;
-		ptr = t;
-	} else {
-		tmp = ptr;
-		ptr = NULL;
+	for (int i = 0; i < strlen(delim); i++) {
+		b = ptr;
+		ptr = strchr(ptr, delim[i]);
+		if (!ptr && !b) 
+			return NULL;
+		*--ptr = '\0';
+		ptr++;
+		return b;
 	}
-	return tmp;
+	return NULL;
 }

@@ -1,27 +1,7 @@
 /*
 malloc.c
-===============================================================================
-MIT License
-Copyright (c) 2007-2016 Michael Lazear
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-===============================================================================
+Michael Lazear, 2016
 
 Experimental psuedo-bitmap "blockchain" memory allocator
 
@@ -90,8 +70,8 @@ LAST_ALLOC is basically the current used top, the next address allocated will be
 |_____BOTTOM_____|0xC0000000
 */
 
-static const uint32_t K_HEAP_BOTTOM = 	0xC0300000;	// 3 GB + 16 MB - 1 KB
-static const uint32_t K_HEAP_MAX 	=	0xFFFFF000;
+static const uint32_t K_HEAP_BOTTOM = 0x01000000;	// 16 MB
+static const uint32_t K_HEAP_MAX = 0xF0000000;
 
 uint32_t K_HEAP_TOP = 0;
 uint32_t K_LAST_ALLOC =  0;
@@ -333,7 +313,7 @@ void* malloc(size_t n) {
 
 		// Check if we need to call sbrk
 		if (K_LAST_ALLOC + n >= K_HEAP_TOP) 
-			sbrk(2*((n + K_LAST_ALLOC) - K_HEAP_TOP));
+			sbrk((n + K_LAST_ALLOC) - K_HEAP_TOP);
 
 		ptr = (void*) K_LAST_ALLOC;
 		K_LAST_ALLOC += n;
@@ -419,7 +399,7 @@ void k_heap_init() {
 	K_HEAP_TOP = K_HEAP_BOTTOM;
 	K_LAST_ALLOC = K_HEAP_BOTTOM;
 
-	sbrk(0x10000);
+	sbrk(0x4000);
 }
 
 

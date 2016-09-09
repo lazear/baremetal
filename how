@@ -1,0 +1,53 @@
+[33mcommit acde231fd2a995903d2cca33e8cc17c1ade439f5[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Wed Aug 17 19:12:03 2016 -0700
+
+    Need to reimplement mutexes/spinlocks
+
+[33mcommit e0a9e4db3ba42d99a73b4ed8b49a32d413b6d899[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Wed Aug 17 18:46:45 2016 -0700
+
+    more MT work
+
+[33mcommit a2b6a719e40760f36a298b04490506765d217546[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Wed Aug 17 15:02:48 2016 -0700
+
+    Cleanup
+
+[33mcommit d3184f2626fa599f9a298ccd1668383722203425[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Wed Aug 17 09:16:23 2016 -0700
+
+    Dead threads return to main loop
+
+[33mcommit 394c642e519d3d1aec3bcff2550379b3fe269966[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Wed Aug 17 09:08:25 2016 -0700
+
+    Now to add a real queue
+
+[33mcommit e2c87b585591611a54434a10b9534d3e405bbd5c[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Wed Aug 17 08:41:49 2016 -0700
+
+    Improvements in MT
+
+[33mcommit c88c1fef6c09999da1078ab294d2fe70b9092b17[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Tue Aug 16 18:38:19 2016 -0700
+
+    Seems like MT is working better
+
+[33mcommit a7482579f3e9c823c78315d83d717c5c3600e57a[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Tue Aug 16 18:19:16 2016 -0700
+
+    inching towards better tasking
+
+[33mcommit 4caad53a1d25bc424d6d862fab67a95195e0a136[m
+Author: Michael Lazear <lazear@scripps.edu>
+Date:   Tue Aug 16 00:37:41 2016 -0700
+
+    redoing tasking

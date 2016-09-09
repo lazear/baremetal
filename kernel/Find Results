@@ -1,0 +1,29 @@
+Searching 51 files for "struct regs"
+
+C:\Users\Mike\Documents\GitHub\baremetal\kernel\arch\x86.c:
+   92  
+   93  /* This installs a custom IRQ handler for the given IRQ */
+   94: void irq_install_handler(int irq, void (*handler)(regs_t *r))
+   95  {
+   96      irq_routines[irq] = handler;
+   ..
+  117  }
+  118  
+  119: void irq_handler(regs_t *r)
+  120  {
+  121  
+  ...
+  127  
+  128      /* This is a blank function pointer */
+  129:     void (*handler)(regs_t *r);
+  130  
+  131      /* Find out if we have a custom handler to run for this
+
+C:\Users\Mike\Documents\GitHub\baremetal\kernel\include\x86.h:
+   95  
+   96  
+   97: extern void irq_handler(regs_t *r);
+   98  extern void outportb(uint16_t port, uint16_t data);
+   99  // The following functions are from start.s, ISR and IRQ macros
+
+4 matches across 2 files
