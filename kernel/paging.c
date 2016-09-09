@@ -1,17 +1,38 @@
 /*
 paging.c
+===============================================================================
+MIT License
+Copyright (c) 2007-2016 Michael Lazear
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+===============================================================================
 
 WARNING: Page tables and directories are currently being mapped out by mm_alloc
 as a shortcut. This can only support ~240 such calls. Need to implement a way 
 to k_page_alloc() them and then map those pages to the current page directory.
-
 
 */
 
 #include <types.h>
 #include <x86.h>
 #include <paging.h>
-
+#include <kernel.h>
 
 /*
 Page directory -> Page table -> Page
@@ -27,7 +48,7 @@ uint32_t* CURRENT_PAGE_DIRECTORY = 0;
 
 void k_swap_pd(uint32_t* pd) {
 	CURRENT_PAGE_DIRECTORY = pd;
-	k_paging_load_directory(pd);
+	asm volatile("movl %0, %%cr3" : : "r"(pd));
 }
 
 
@@ -118,8 +139,12 @@ void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, uint8_t flags) {
 	if ( dir[_pdi] & ~0x3FF ) {
 		pt = dir[_pdi] & ~0x3FF;
 	} else {
-	//	vga_puts("SHOULD NOT SEE THIS");
-		pt = mm_alloc(0x1000);//k_page_alloc();
+
+		/*
+		I have discovered through thorough testing that it is critical
+		to convert back to the base address.
+		*/
+		pt = mm_alloc(0x1000) - KERNEL_VIRT;
 	}
 
 	pt[_pti] = ((phys) | flags | PF_PRESENT );
@@ -134,28 +159,11 @@ uint32_t* k_phys_to_virt(uint32_t phys) {
 	return _phys_to_virt(CURRENT_PAGE_DIRECTORY, phys);
 }
 
+
 void k_paging_init(uint32_t* dir_addr) {
-	/* load a custom ISR14 handler for page faults */
-	idt_set_gate(14, k_page_fault, 0x08, 0x8E);
-
+	/* Moved initial paging functions to starts.s */
+	KERNEL_PAGE_DIRECTORY = dir_addr;
 	CURRENT_PAGE_DIRECTORY = dir_addr;
-	memset(CURRENT_PAGE_DIRECTORY, 0, 4096);
-	//uint32_t* table = k_heap_alloca(4096);
-
-	uint32_t* table = k_page_alloc();
-	
-	for (int i = 0; i < 1024; i++) {
-		table[i] = (i * 0x1000) | 0x3;
-	}
-
-
-	CURRENT_PAGE_DIRECTORY[0] = (uint32_t) table | 3;
-	CURRENT_PAGE_DIRECTORY[1023] = (uint32_t) CURRENT_PAGE_DIRECTORY | 3;
-
-
-	KERNEL_PAGE_DIRECTORY = CURRENT_PAGE_DIRECTORY;
-	k_paging_load_directory(CURRENT_PAGE_DIRECTORY);
-	k_paging_enable();
 }
 
 /* 
@@ -180,7 +188,7 @@ uint32_t* k_copy_pagedir(uint32_t* dest, uint32_t* src) {
 			if (dest[i] & ~0x3FF)
 				dest_pt = dest[i] & ~0x3FF;
 			else 
-				dest_pt = k_page_alloc(); 
+				dest_pt = mm_alloc(0x1000) - KERNEL_VIRT; 
 			
 			for (int q = 0; q < 1024; q++) {
 				if (src_pt[q] & ~0x3FF) {
@@ -227,7 +235,7 @@ void _paging_map_more(uint32_t* pd, uint32_t virt, uint32_t numpages, int flags)
 
 			uint32_t _pdi = ((virt + (i * 0x1000 * 0x400)) >> 22);
 			if (!(pd[i] & ~0x3FF)) {
-				uint32_t* pt = mm_alloc(0x1000);//k_page_alloc();
+				uint32_t* pt = mm_alloc(0x1000) - KERNEL_VIRT;//k_page_alloc();
 				pd[_pdi] = ((uint32_t) pt | flags );
 			}
 		}
@@ -344,22 +352,22 @@ void page_copy(uint32_t* dest, uint32_t* src, uint32_t virt, size_t n) {
 }
 
 /* 
-Map until end of kernel, no pages allocated. Scratch that, map until 2Mb. 
+Map until end of kernel, no pages allocated. Scratch that, map until 4Mb. 
 End of kernel was not working, likely because there is important information 
 stored directly after the kernel (bitmaps, stack, etc)
 */
 void k_map_kernel(uint32_t* pd) {
-	for (int i = 0; i < 0x00200000; i+=0x1000)
-		_paging_map(pd, i, i, 0x7);
+	for (int i = 0; i < 0x00400000; i+=0x1000)
+		_paging_map(pd, i, i + KERNEL_VIRT, 0x3);
 }
 
 uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
-	uint32_t* pd = mm_alloc(0x1000);	// 0xFFFF0000 virtual address
+	uint32_t* pd = mm_alloc(0x1000) - KERNEL_VIRT;	// 0xFFFF0000 virtual address
 	//uint32_t* table = k_page_alloc();	// 0xFFC00000 virtual address
 	memset(pd, 0, 0x1000);
 	//memset(table, 0, 0x1000);
 
-	pd[1023] = (uint32_t) pd | flags;
+	//pd[1023] = (uint32_t) pd | flags;
 
 	uint32_t phys = 0;
 
@@ -379,7 +387,7 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 
 			uint32_t _pdi = ((virt + (i * 0x1000 * 0x400)) >> 22);
 			printf("%d pdi\n", _pdi);
-			uint32_t* pt = mm_alloc(0x1000);//k_page_alloc();
+			uint32_t* pt = mm_alloc(0x1000) - KERNEL_VIRT ;//k_page_alloc();
 			
 			pd[_pdi] = ((uint32_t) pt | flags );
 			printf("%x\n", pd[_pdi]);

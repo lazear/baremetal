@@ -1,5 +1,5 @@
 /*
-mutex.c
+trap.c
 ===============================================================================
 MIT License
 Copyright (c) 2007-2016 Michael Lazear
@@ -22,34 +22,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ===============================================================================
-*/ 
-
+*/
 #include <types.h>
-#include <mutex.h>
+#include <x86.h>
+#include <traps.h>
 
-static int ncli = 0;
+/* Should switch back to using an array of handlers */
+void trap(regs_t* r) {
+	switch (r->int_no) {
+		case 14:
+			k_page_fault(r);
+			break;
+		case IRQ0 + IRQ_TIMER:
+			timer(r);
+			break;
+		case IRQ0 + IRQ_KBD:
+			keyboard_handler(r);
+			break;
+		case IRQ0 + IRQ_IDE:
+			ide_handler();
+			break;
+		case 0x80:
+			syscall(r);
+			break;
+	}
 
-void pushcli() {
-
-	asm volatile("cli");
-	ncli++;
-}
-
-void popcli() {
-
-	if(--ncli < 0)
-		panic("popcli without push");
-	if(ncli == 0)
-		asm volatile("sti");
-}
-
-void mutex_test() {
-	mutex ml = {.lock = 0};
-
-	acquire(&ml);
-
-	printf("acquire: %d\n", ml.lock);
-
-	release(&ml);
-	printf("release: %d\n", ml.lock);
+	if (r->int_no > 40)
+		outb(0xA0, 0x20);
+	
+	outb(0x20, 0x20);
 }
