@@ -164,25 +164,47 @@ int memcmp(const uint8_t* s1, const uint8_t* s2, size_t n) {
 	return ( *(uint8_t*)s1 - *(uint8_t*)s2 );
 }
 
+char* strpbrk(char* s, const char* delim) {
+	while(*s++) 
+		for (int q = 0; q < strlen(delim); q++)
+			if (*s == delim[q]) 
+				return s;
+	return NULL;
+}
 
+char* strstr(char* s1, const char* s2) {
+	while(*s1++) 
+		if (strncmp(s1, s2, strlen(s2)) == 0)
+			return s1;
+	return NULL;
+}
+
+int strspn(const char* s1, const char* s2) {
+	for (int i = 0; i < strlen(s1); i++)
+		if (strchr(s2, s1[i]) == NULL)
+			return i;
+	return strlen(s1);
+}
+
+/* new and improved strtok, using strspn and strpbrk */
 char* strtok(char* s, const char* delim) {
-	char* b = NULL;
-	static char* ptr, d = NULL;
-
+	char* tmp = NULL;
+	static char* ptr;
 
 	if (s) 
 		ptr = s;
-
 	if (!ptr && !s)
 		return NULL;
-	for (int i = 0; i < strlen(delim); i++) {
-		b = ptr;
-		ptr = strchr(ptr, delim[i]);
-		if (!ptr) 
-			return b;
-		*--ptr = '\0';
-		ptr++;
-		return b;
+	ptr = (unsigned int) ptr + strspn(ptr, delim);
+	char* t = strpbrk(ptr, delim);
+
+	if (t) {
+		*t++ = 0;
+		tmp = ptr;
+		ptr = t;
+	} else {
+		tmp = ptr;
+		ptr = NULL;
 	}
-	return NULL;
+	return tmp;
 }
