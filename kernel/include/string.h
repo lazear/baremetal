@@ -2,8 +2,8 @@
 string.h
 */
 #include <types.h>
-#ifndef __baremetal_string__
-#define __baremetal_string__
+#ifndef __crunchy_string__
+#define __crunchy_string__
 
 extern size_t strlen();
 extern char* strcat( char* destination, const char* source );

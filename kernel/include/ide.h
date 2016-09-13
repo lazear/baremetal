@@ -8,8 +8,8 @@ with xv6 inspired queueing
 
 #include <types.h>
 
-#ifndef __baremetal_ide__
-#define __baremetal_ide__
+#ifndef __crunchy_ide__
+#define __crunchy_ide__
 
 #define BLOCK_SIZE		1024
 #define SECTOR_SIZE		512

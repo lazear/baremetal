@@ -1,5 +1,5 @@
 /*
-paging.h
+crunch.h
 ===============================================================================
 MIT License
 Copyright (c) 2007-2016 Michael Lazear
@@ -24,31 +24,24 @@ SOFTWARE.
 ===============================================================================
 */
 
+/*
+Defines common types for data structures passed from the bootloader to the kernel
+*/
+
 #include <types.h>
 
-#ifndef __crunchy_paging__
-#define __crunchy_paging__
-
-#define PF_PRESENT		0x1
-#define PF_RW			0x2
-#define PF_USER			0x4
-#define PF_ACCESSED		0x10	// Bit 5 - PDE/PTE was used for translation
-#define PF_DIRTY		0x20	// Bit 6 - PTE only
-
-/* 
-assembly functions
-*/
-extern void k_paging_enable();
-extern void k_paging_load_directory(uint32_t* dir);
-
-extern int k_paging_unmap(uint32_t virt);
-extern void k_paging_map(uint32_t phys, uint32_t virt, uint8_t flags);
-
-extern void k_paging_init(uint32_t* dir_addr);
-extern uint32_t* k_virt_to_phys(uint32_t virt);
-
-extern uint32_t* k_phys_to_virt(uint32_t phys);
-extern uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) ;
+typedef struct _boot_mmap
+{
+	uint64_t base;
+	uint64_t len;
+	uint64_t type;
+} mmap;
 
 
-#endif
+typedef struct _gfx_context {
+	uint16_t pitch;
+	uint16_t width;
+	uint16_t height;
+	uint8_t bpp;
+	uint32_t framebuffer;
+} gfx_context;

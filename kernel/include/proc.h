@@ -3,8 +3,8 @@
 #include <types.h>
 #include <x86.h>
 
-#ifndef __baremetal_thread__
-#define __baremetal_thread__
+#ifndef __crunchy_thread__
+#define __crunchy_thread__
 
 // Segments in proc->gdt.
 #define NSEGS     7

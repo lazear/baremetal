@@ -2,11 +2,11 @@
 iso646.h
 
 Michael Lazear, 2007-2016
-baremetal
+crunchy
 */
 
-#ifndef __baremetal_iso646__
-#define __baremetal_iso646__
+#ifndef __crunchy_iso646__
+#define __crunchy_iso646__
 
 #define and			&&
 #define and_eq		&=

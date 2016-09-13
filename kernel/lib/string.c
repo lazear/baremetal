@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ===============================================================================
 
-Implementation of string library for baremetal project
+Implementation of string library for crunchy project
 */
 
 #include <string.h>

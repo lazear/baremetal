@@ -2,8 +2,8 @@
 
 #include <types.h>
 
-#ifndef __baremetal_x86__
-#define __baremetal_x86__
+#ifndef __crunchy_x86__
+#define __crunchy_x86__
 
 
 

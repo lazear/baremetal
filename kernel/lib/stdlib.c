@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ===============================================================================
 
-Implementation of stdlib for baremetal
+Implementation of stdlib for crunchy
 */
 
 #include <types.h>

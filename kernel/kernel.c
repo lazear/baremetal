@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include <kernel.h>
+#include <crunch.h>
 #include <vga.h>
 #include <x86.h>
 #include <stdlib.h>
@@ -93,10 +94,10 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	elf_load();
+	//elf_load();
 
-	//traverse_blockchain();
-	dprint(KERNEL_PAGE_DIRECTORY, " %x");
+	traverse_blockchain();
+	//dprint(KERNEL_PAGE_DIRECTORY, " %x");
 //	asm volatile ("int $0x80");
 	for(;;);
 }

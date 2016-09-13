@@ -1,5 +1,5 @@
 /*
-paging.h
+vfs.c
 ===============================================================================
 MIT License
 Copyright (c) 2007-2016 Michael Lazear
@@ -22,33 +22,42 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ===============================================================================
+
+Begin work on implementing virtual filesystem. Use a *NIX-ish approach, with 
+everything mounted under "/" (root)
 */
 
 #include <types.h>
+#include <ext2.h>
 
-#ifndef __crunchy_paging__
-#define __crunchy_paging__
+#define VFS_DIR		2
+#define VFS_FILE	1
 
-#define PF_PRESENT		0x1
-#define PF_RW			0x2
-#define PF_USER			0x4
-#define PF_ACCESSED		0x10	// Bit 5 - PDE/PTE was used for translation
-#define PF_DIRTY		0x20	// Bit 6 - PTE only
+typedef struct __io_file {
+	uint8_t *ptr;	/* Next character from/to here in buffer */
+	size_t count;	/* Number of available chars in buffer */
+	uint8_t *base;	/* the buffer */
+	uint8_t flag;	
+	uint8_t fd;		/* File descriptor */
+} file;
 
-/* 
-assembly functions
-*/
-extern void k_paging_enable();
-extern void k_paging_load_directory(uint32_t* dir);
+#define EOF	(-1)
 
-extern int k_paging_unmap(uint32_t virt);
-extern void k_paging_map(uint32_t phys, uint32_t virt, uint8_t flags);
+typedef struct vfs_entry_s {
+	int dev;
+	int inode;
+	int type;
+	char* name;
+	struct vfs_entry_s* parent;
+} vfs_entry;
 
-extern void k_paging_init(uint32_t* dir_addr);
-extern uint32_t* k_virt_to_phys(uint32_t virt);
+vfs_entry* root = NULL;
 
-extern uint32_t* k_phys_to_virt(uint32_t phys);
-extern uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) ;
-
-
-#endif
+void vfs_init() {
+	root = malloc(sizeof(vfs_entry));
+	root->dev 	= 1;
+	root->inode = 2;
+	root->type 	= VFS_DIR;
+	root->parent = NULL;
+	strcpy(root->name, "/");
+}

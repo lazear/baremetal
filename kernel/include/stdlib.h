@@ -2,8 +2,8 @@
 stdlib.h
 */
 
-#ifndef __baremetal_stdlib__
-#define __baremetal_stdlib__
+#ifndef __crunchy_stdlib__
+#define __crunchy_stdlib__
 
 #include <types.h>
 

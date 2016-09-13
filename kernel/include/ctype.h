@@ -2,11 +2,11 @@
 iso646.h
 
 Michael Lazear, 2007-2016
-baremetal
+crunchy
 */
 
-#ifndef __baremetal_ctype__
-#define __baremetal_ctype__
+#ifndef __crunchy_ctype__
+#define __crunchy_ctype__
 
 #define isascii(c)		(c >= 0 && c <= 127)
 #define isdigit(c)		(c >= '0' && c <= '9')

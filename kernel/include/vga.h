@@ -4,8 +4,8 @@ vga.h
 header file for interfacing with VGA text drivers.
 */
 
-#ifndef __baremetal_vga__
-#define __baremetal_vga__
+#ifndef __crunchy_vga__
+#define __crunchy_vga__
 
 // vga_console_object structure allows us to track the current x and y position, as well as color
 

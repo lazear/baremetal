@@ -33,6 +33,8 @@ extern kernel_end
 
 global entry
 entry:
+	xor eax, eax
+	mov ebx, eax
 
 	mov eax, (_init_pd - VIRT)		; eax = page directory address
 	mov ebx, (_init_pt - VIRT)		; ebx = page table address
@@ -87,6 +89,10 @@ start:
 	call gdt_init			; C function, initialize GDT
 	call idt_init			; C function, initialize IDT
 
+	;mov eax, [vmap]
+	;push eax
+	;mov eax, [mmap]
+	;push eax
 	push kernel_end			; pass kernel end to our function
 	call kernel_initialize
 	jmp $
@@ -112,6 +118,8 @@ PDE 	equ	(VIRT >> 22)
 SIZE 	equ	0x4000
 
 section .data
+
+
 align 0x1000
 ; We will statically allocate the initial page table
 ; and page directory. Should take 8 KB total
@@ -123,9 +131,11 @@ _init_pt:				; 4 MB page table
 _init_pd:
 	times 1024 dd 0
 
+
 ; We will also statically allocate a 16 Kb stack
 section .bss
 align 32
+
 global stack_bottom
 global stack_top
 

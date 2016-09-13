@@ -2,8 +2,8 @@
 types.h
 */
 
-#ifndef __baremetal_types__
-#define __baremetal_types__
+#ifndef __crunchy_types__
+#define __crunchy_types__
 
 typedef unsigned char uint8_t;			// 1 byte
 typedef unsigned short uint16_t;		// 2 bytes

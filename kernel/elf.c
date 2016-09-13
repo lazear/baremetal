@@ -97,7 +97,7 @@ void* elf_objdump(void* data) {
 		vga_pretty("ERROR: Could not load symbol table", 0x4);
 		return;
 	}
-	
+
 	elf32_sym* sym 		= (uint32_t) data + symtab->sh_offset;
 	elf32_sym* last_sym = (uint32_t) sym + symtab->sh_size;
 	void* strtab_d 		= (uint32_t) data + strtab->sh_offset;
@@ -119,8 +119,7 @@ void elf_load() {
 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
 
-	int (*func)(int) =  (void(*)(void)) elf_objdump(data);
-
+	elf_objdump(data);
 
 	elf32_phdr* phdr 		= (uint32_t) data + ehdr->e_phoff;
 	elf32_phdr* last_phdr 	= (uint32_t) phdr + (ehdr->e_phentsize * ehdr->e_phnum);
@@ -140,12 +139,10 @@ void elf_load() {
 
 	int (*entry)(int, char**);
 	entry = (void(*)(void))(ehdr->e_entry);
-	printf("FUNC2 %x, ENTRY %x\n", func, entry);
+
 	//printf("func2 result: %d\n", func(2));
 	char* d[] = { "user.elf", "HELLO WORLD" };
 	entry(2, d);
-	int x = func(2);
-	printf("func2 returned: %d\n", x);
 	//free(data);
 
 	//k_swap_pd(KERNEL_PAGE_DIRECTORY);

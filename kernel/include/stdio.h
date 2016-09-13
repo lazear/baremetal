@@ -2,8 +2,8 @@
 stdio.h
 */
 
-#ifndef __baremetal_stdio__
-#define __baremetal_stdio__
+#ifndef __crunchy_stdio__
+#define __crunchy_stdio__
 
 typedef struct k_stream_object {
 	char* data;

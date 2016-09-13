@@ -1,10 +1,10 @@
-#baremetal makefile
+#crunchy makefile
 #2007-2016, Michael Lazear
 
 FINAL	= bin/kernel.bin	# Output binary
 START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
-AOBJS	= vectors.so trap_handler.so sched.so syscall.so int32.so font.so
+AOBJS	= vectors.so trap_handler.so sched.so syscall.so font.so
 INIT 	= initcode
 CC	    = /home/lazear/opt/cross/bin/i686-elf-gcc
 LD		= /home/lazear/opt/cross/bin/i686-elf-ld
@@ -18,10 +18,10 @@ ASFLAGS = -f elf
 EXTUTIL = ../ext2util/ext2util
 IMAGE	= ext2
 
-user: userland
 all: compile link clean
 build: compile link 
 emu: compile link clean run
+user: userland
 
 userland:
 	$(CC) $(CCFLAGS) user/user.c 
@@ -39,8 +39,8 @@ boot:
 
 compile:
 	#Compile C source
-	$(CC) $(CCFLAGS) */*.c		# Compile top level
-	$(CC) $(CCFLAGS) */*/*.c
+	$(CC) $(CCFLAGS) kernel/*.c		# Compile top level
+	$(CC) $(CCFLAGS) kernel/*/*.c
 	#$(CC) $(CCFLAGS) */*/*/*.c
 	#Assembly
 	$(AS) $(ASFLAGS) kernel/arch/start.s -o start.so
@@ -48,7 +48,6 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/syscall.s -o syscall.so
 	$(AS) $(ASFLAGS) kernel/arch/trap_handler.s -o trap_handler.so
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
-	$(AS) $(ASFLAGS) kernel/arch/int32.s -o int32.so
 	$(AS) $(ASFLAGS) kernel/font.s -o font.so
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
 

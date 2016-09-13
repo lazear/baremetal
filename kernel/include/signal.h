@@ -5,8 +5,8 @@ Michael Lazear, 2016
 Public Domain
 */
 
-#ifndef __baremetal_signal__
-#define __baremetal_signal__
+#ifndef __crunchy_signal__
+#define __crunchy_signal__
 
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */

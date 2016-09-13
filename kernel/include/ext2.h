@@ -33,8 +33,8 @@ Each block group has a backup superblock as it's first block
 
 #include <types.h>
 
-#ifndef __baremetal_ext2__
-#define __baremetal_ext2__
+#ifndef __crunchy_ext2__
+#define __crunchy_ext2__
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE 		1024
