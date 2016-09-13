@@ -30,7 +30,16 @@ SOFTWARE.
 #include <ide.h>
 #include <elf.h>
 
-void elf_objdump(void* data) {
+
+char* elf_findsymbol_by_address(void* addr) {
+
+}
+
+void* elf_findsymbol_by_name(char* symbol) {
+
+}
+
+void* elf_objdump(void* data) {
 	elf32_ehdr *ehdr = (elf32_ehdr*) data;
 
 	/* Make sure the file ain't fucked */
@@ -64,6 +73,9 @@ void elf_objdump(void* data) {
 	elf32_shdr* sh_str		= (uint32_t) shdr + (ehdr->e_shentsize * ehdr->e_shstrndx);
 	elf32_shdr* last_shdr 	= (uint32_t) shdr + (ehdr->e_shentsize * ehdr->e_shnum);
 
+	elf32_shdr* strtab 		= NULL;
+	elf32_shdr* symtab		= NULL;
+
 	char* string_table 		= (uint32_t) data + sh_str->sh_offset;
 
 	shdr++;					// Skip null entry
@@ -74,22 +86,40 @@ void elf_objdump(void* data) {
 		printf("%d:   %s\t%x\t%x\t%d\t%x\n", 
 			q++, string_table + shdr->sh_name, shdr->sh_size,
 			shdr->sh_addr, shdr->sh_offset, shdr->sh_addralign);
+		if (strcmp(string_table + shdr->sh_name, ".symtab") == 0) 
+			symtab = shdr;
+		if (strcmp(string_table + shdr->sh_name, ".strtab") == 0)
+			strtab = shdr;
 		shdr++;
 	}
 
-	//free(buf);
+	if (!strtab || !symtab) {
+		vga_pretty("ERROR: Could not load symbol table", 0x4);
+		return;
+	}
+	
+	elf32_sym* sym 		= (uint32_t) data + symtab->sh_offset;
+	elf32_sym* last_sym = (uint32_t) sym + symtab->sh_size;
+	void* strtab_d 		= (uint32_t) data + strtab->sh_offset;
+	void* func;
+	/* Output symbol information*/
+	while(sym < last_sym) {
+		if (sym->st_name) 
+			printf("%s\t0x%x\n", sym->st_name + strtab_d, sym->st_value);
+		sym++;
+	}
 }
 
 
 void elf_load() {
-	uint32_t* data = ext2_open(ext2_inode(1,14));
+	uint32_t* data = ext2_open(ext2_inode(1,12));
 
 
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
 
-	elf_objdump(data);
+	int (*func)(int) =  (void(*)(void)) elf_objdump(data);
 
 
 	elf32_phdr* phdr 		= (uint32_t) data + ehdr->e_phoff;
@@ -99,8 +129,8 @@ void elf_load() {
 
 
 	while(phdr < last_phdr) {
-		printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
-		 	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
+	//	printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
+	//	 	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
 		
 		k_paging_map(k_page_alloc(), phdr->p_vaddr, 0x7);
 
@@ -108,18 +138,15 @@ void elf_load() {
 		phdr++;
 	} 
 
-	int (*entry)(char*, int);
+	int (*entry)(int, char**);
 	entry = (void(*)(void))(ehdr->e_entry);
+	printf("FUNC2 %x, ENTRY %x\n", func, entry);
+	//printf("func2 result: %d\n", func(2));
+	char* d[] = { "user.elf", "HELLO WORLD" };
+	entry(2, d);
+	int x = func(2);
+	printf("func2 returned: %d\n", x);
+	//free(data);
 
-	free(data);
-
-	printf("entry: %x\n", entry);
-	char d[] = "Hello Worldmmmmm";
-	char* ptr = malloc(strlen(d));
-
-	strcpy(ptr, d);
-	extern uint32_t* KERNEL_PAGE_DIRECTORY;
-	int i = entry(ptr, 0x10);
-	printf("(BACK) %x\n", i);
 	//k_swap_pd(KERNEL_PAGE_DIRECTORY);
 }

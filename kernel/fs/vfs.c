@@ -39,11 +39,9 @@ typedef struct __io_file {
 	uint8_t *base;	/* the buffer */
 	uint8_t flag;	
 	uint8_t fd;		/* File descriptor */
-} FILE;
-
+} file;
 
 #define EOF	(-1)
-
 
 typedef struct vfs_entry_s {
 	int dev;

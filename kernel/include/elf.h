@@ -95,5 +95,21 @@ typedef struct {
 	uint32_t p_align;
 } elf32_phdr;
 
+// table index 0 is reserved
+typedef struct {
+	uint16_t st_name;
+	uint32_t st_value;
+	uint16_t st_size;
+	uint8_t st_info;
+	uint8_t st_other;
+	uint16_t st_shndx;
+} elf32_sym;
 
+#define STB_LOCAL 	0
+#define STB_GLOBAL 	1
+#define STT_NOTYPE	0
+#define STT_OBJECT	1
+#define STT_FUNC	2
+#define STT_SECTION	3
+#define STT_FILE	4
 
