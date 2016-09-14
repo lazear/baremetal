@@ -26,75 +26,8 @@ SOFTWARE.
 #include <types.h>
 #include <x86.h>
 #include <assert.h>
+#include <acpi.h>
 
-typedef struct  {
-	char signature[8];
-	uint8_t checksum;
-	char oemid[6];
-	uint8_t rev;
-	uint32_t rsdt_ptr;		
-	uint32_t length;
-	uint64_t* xsdt_ptr;
-	uint8_t extchecksum;
-	uint8_t pad[3];
-} rsdp_header __attribute__((packed));
-
-
-typedef struct {
-	char signature[4];
-	uint32_t length;
-	uint8_t rev;
-	uint8_t checksum;
-	char oemid[6];
-	char oemtableid[8];
-	uint32_t oemrev;
-	uint32_t creatorid;
-	uint32_t creatorrev;
-} acpi_header __attribute__((packed));
-
-typedef struct {
-	acpi_header h;
-	uint32_t tableptrs[];
-} rsdt_header __attribute__((packed));
-
-
-typedef struct {
-	uint8_t type;			// ==0;
-	uint8_t rec_len;
-	uint8_t acpi_proc_id;
-	uint8_t apic_id;
-	uint32_t flags;
-} acpi_lapic;
-
-typedef struct {
-	uint8_t type;			// ==1
-	uint8_t rec_len;
-	uint8_t ioapic_id;
-	uint8_t res;
-	uint32_t ioapic_addr;
-	uint32_t gsib;			// Global System Interrupt Bus
-} acpi_ioapic;
-
-typedef struct {
-	uint8_t type;		// ==2
-	uint8_t rec_len;	// Record len;
-	uint8_t bus_src;	// Bus source
-	uint8_t irq_src;	// IRQ source
-	uint8_t gsi;		// Global System Interrupt
-	uint16_t flags;
-} acpi_iso;				// Int. source override
-
-typedef struct  {
-	acpi_header h;
-	uint32_t lca;		// local controller address;
-	uint32_t flags;
-	// union {
-	// 	acpi_iso iso;
-	// 	acpi_ioapic ioapic;
-	// 	acpi_lapic lapic;
-	// } entries[];
-	uint8_t entries[];
-} madt_header;
 
 int acpi_checksum(char* ptr) {
 	int sum = 0;
@@ -105,37 +38,29 @@ int acpi_checksum(char* ptr) {
 }
 
 void acpi_parse_madt(madt_header* madt) {
-	printf("%s\tflags %d\n", madt->h.signature, (madt->h.length - sizeof(madt_header)));
-	int type = 0;
-	int i = 0;
-	do {		
-		int type = madt->entries[i];
-		int len = madt->entries[i+1];
-
-		printf("type: %d len %d\n", type, len);
+	char* entries = (char*) ((uint32_t) madt + sizeof(madt_header));
+	while( (uint32_t) entries < (madt->h.length - sizeof(madt_header)) + (uint32_t)madt) {		
+		int type = *entries;
+		int len = *(entries+1);
 		switch(type) {
 			case 0: {
-				acpi_lapic *x = (acpi_lapic*) (uint32_t) madt->entries + i;
-				printf("LAPIC: processor id %d %d %d\n", x->acpi_proc_id, x->apic_id, x->flags);
+				acpi_lapic *x = (acpi_lapic*) entries;// + i;
+				printf("LAPIC: processor id %d\tapic id%d\tflags:%d\n", x->acpi_proc_id, x->apic_id, x->flags);
 				break;
 			}
 			case 1: {
-				acpi_ioapic *x = (acpi_ioapic*) (uint32_t) madt->entries + i;
-				//printf("LAPIC: processor id %d %d\n", x->ioapic_id, x->ioapic_addr);
+				acpi_ioapic *x = (acpi_ioapic*) entries;// + i;
+				printf("I/O APIC: id %d\taddress:0x%x\n", x->ioapic_id, x->ioapic_addr);
 				break;
 			}
 			case 2: {
-				acpi_iso *x = (acpi_iso*) (uint32_t) madt->entries + i;
-				//printf("LAPIC: processor id %d %d\n", x->ioapic_id, x->ioapic_addr);
+				acpi_iso *x = (acpi_iso*)  entries;// + i;
+				printf("IRQ src %d BUS src %d GSI %d\n", x->irq_src, x->bus_src, x->gsi);
 				break;
 			}
-			default:
-				return;
 		}
-				i += len;
-	} while(type < 3);
-
-
+		entries += len;
+	} 
 } 
 
 
