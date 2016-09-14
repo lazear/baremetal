@@ -12,14 +12,19 @@ typedef unsigned long long uint64_t;	// 8 bytes
 
 typedef unsigned long size_t;			// 4 bytes
 
-
-
-
 typedef int bool;
 #define true	1
 #define false	0
 
 #define NULL	((void*) 0)
 #define panic(a)	(printf("PANIC: %s (%s:%d:%s)\n", a, __FILE__, __LINE__, __func__))
+#define nelem(x) (sizeof(x)/sizeof((x)[0]))
 
+
+#ifndef KERNEL_VIRT
+#define KERNEL_VIRT		0xC0000000
+#endif
+
+// Convert physical to higher half.
+#define P2V(x)	((uint32_t) x + KERNEL_VIRT)
 #endif

@@ -25,69 +25,151 @@ SOFTWARE.
 */
 #include <types.h>
 #include <x86.h>
+#include <assert.h>
 
-struct mp {             // floating pointer
-  uint8_t signature[4];           // "_MP_"
-  void *physaddr;               // phys addr of MP config table
-  uint8_t length;                 // 1
-  uint8_t specrev;                // [14]
-  uint8_t checksum;               // all bytes must add up to 0
-  uint8_t type;                   // MP system config type
-  uint8_t imcrp;
-  uint8_t reserved[3];
-};
+typedef struct  {
+	char signature[8];
+	uint8_t checksum;
+	char oemid[6];
+	uint8_t rev;
+	uint32_t rsdt_ptr;		
+	uint32_t length;
+	uint64_t* xsdt_ptr;
+	uint8_t extchecksum;
+	uint8_t pad[3];
+} rsdp_header __attribute__((packed));
 
-struct mpconf {         // configuration table header
-  uint8_t signature[4];           // "PCMP"
-  uint16_t length;                // total table length
-  uint8_t version;                // [14]
-  uint8_t checksum;               // all bytes must add up to 0
-  uint8_t product[20];            // product id
-  uint32_t *oemtable;               // OEM table pointer
-  uint16_t oemlength;             // OEM table length
-  uint16_t entry;                 // entry count
-  uint32_t *lapicaddr;              // address of local APIC
-  uint16_t xlength;               // extended table length
-  uint8_t xchecksum;              // extended table checksum
-  uint8_t reserved;
-};
 
-struct mpproc {         // processor table entry
-  uint8_t type;                   // entry type (0)
-  uint8_t apicid;                 // local APIC id
-  uint8_t version;                // local APIC verison
-  uint8_t flags;                  // CPU flags
-    #define MPBOOT 0x02           // This proc is the bootstrap processor.
-  uint8_t signature[4];           // CPU signature
-  uint32_t feature;                 // feature flags from CPUID instruction
-  uint8_t reserved[8];
-};
+typedef struct {
+	char signature[4];
+	uint32_t length;
+	uint8_t rev;
+	uint8_t checksum;
+	char oemid[6];
+	char oemtableid[8];
+	uint32_t oemrev;
+	uint32_t creatorid;
+	uint32_t creatorrev;
+} acpi_header __attribute__((packed));
 
-struct mpioapic {       // I/O APIC table entry
-  uint8_t type;                   // entry type (2)
-  uint8_t apicno;                 // I/O APIC id
-  uint8_t version;                // I/O APIC version
-  uint8_t flags;                  // I/O APIC flags
-  uint32_t *addr;                  // I/O APIC address
-};
+typedef struct {
+	acpi_header h;
+	uint32_t tableptrs[];
+} rsdt_header __attribute__((packed));
 
-struct cpu {
-  uint8_t id;                    // Local APIC ID; index into cpus[] below
-  //struct context *scheduler;   // swtch() here to enter scheduler
-  //struct taskstate ts;         // Used by x86 to find stack for interrupt
-  struct segdesc gdt[8];   // x86 global descriptor table
-  volatile uint32_t started;       // Has the CPU started?
-  int ncli;                    // Depth of pushcli nesting.
-  int intena;                  // Were interrupts enabled before pushcli?
-  
-  // Cpu-local storage variables; see below
-  struct cpu *cpu;
-  //struct proc *proc;           // The currently-running process.
-} cpus[8];
 
-// Table entry types
-#define MPPROC    0x00  // One per processor
-#define MPBUS     0x01  // One per bus
-#define MPIOAPIC  0x02  // One per I/O APIC
-#define MPIOINTR  0x03  // One per bus interrupt source
-#define MPLINTR   0x04  // One per system interrupt source
+typedef struct {
+	uint8_t type;			// ==0;
+	uint8_t rec_len;
+	uint8_t acpi_proc_id;
+	uint8_t apic_id;
+	uint32_t flags;
+} acpi_lapic;
+
+typedef struct {
+	uint8_t type;			// ==1
+	uint8_t rec_len;
+	uint8_t ioapic_id;
+	uint8_t res;
+	uint32_t ioapic_addr;
+	uint32_t gsib;			// Global System Interrupt Bus
+} acpi_ioapic;
+
+typedef struct {
+	uint8_t type;		// ==2
+	uint8_t rec_len;	// Record len;
+	uint8_t bus_src;	// Bus source
+	uint8_t irq_src;	// IRQ source
+	uint8_t gsi;		// Global System Interrupt
+	uint16_t flags;
+} acpi_iso;				// Int. source override
+
+typedef struct  {
+	acpi_header h;
+	uint32_t lca;		// local controller address;
+	uint32_t flags;
+	// union {
+	// 	acpi_iso iso;
+	// 	acpi_ioapic ioapic;
+	// 	acpi_lapic lapic;
+	// } entries[];
+	uint8_t entries[];
+} madt_header;
+
+int acpi_checksum(char* ptr) {
+	int sum = 0;
+	for (int i = 0; i < 20; ++i)
+		sum += ptr[i];
+	return (char) sum;
+
+}
+
+void acpi_parse_madt(madt_header* madt) {
+	printf("%s\tflags %d\n", madt->h.signature, (madt->h.length - sizeof(madt_header)));
+	int type = 0;
+	int i = 0;
+	do {		
+		int type = madt->entries[i];
+		int len = madt->entries[i+1];
+
+		printf("type: %d len %d\n", type, len);
+		switch(type) {
+			case 0: {
+				acpi_lapic *x = (acpi_lapic*) (uint32_t) madt->entries + i;
+				printf("LAPIC: processor id %d %d %d\n", x->acpi_proc_id, x->apic_id, x->flags);
+				break;
+			}
+			case 1: {
+				acpi_ioapic *x = (acpi_ioapic*) (uint32_t) madt->entries + i;
+				//printf("LAPIC: processor id %d %d\n", x->ioapic_id, x->ioapic_addr);
+				break;
+			}
+			case 2: {
+				acpi_iso *x = (acpi_iso*) (uint32_t) madt->entries + i;
+				//printf("LAPIC: processor id %d %d\n", x->ioapic_id, x->ioapic_addr);
+				break;
+			}
+			default:
+				return;
+		}
+				i += len;
+	} while(type < 3);
+
+
+} 
+
+
+void acpi_init() {
+
+    uint8_t *ptr = (uint8_t *)0x000E0000;
+	while (ptr < 0x000FFFFF) {
+		uint64_t signature = *(uint64_t *)ptr;
+		if (signature == 0x2052545020445352) { // 'RSD PTR '
+			printf("FOUND THE ACPI BITCH\n");
+			break;
+		}
+		ptr += 16;
+	}
+	rsdp_header* h = (rsdp_header*) ptr;
+	printf("ACPI OEM: %s\n", h->oemid);
+
+	assert(acpi_checksum(h) == 0);
+
+	rsdt_header* r = (rsdt_header*) h->rsdt_ptr; // + 0xC0000000;
+
+	k_paging_map(h->rsdt_ptr, P2V(h->rsdt_ptr), 0x7);
+	r = P2V(r);
+	printf("RSDT: %s\t# of tables: %d\n", r->h.signature, (r->h.length - sizeof(acpi_header)) /4 );
+
+	for (int i = 0; i < (r->h.length - sizeof(acpi_header)) /4; i++) {
+	//	printf("Table[%d]: 0x%x\n", i, r->tableptrs[i]);
+		acpi_header* entry = (acpi_header*) P2V(r->tableptrs[i]);
+		k_paging_map(r->tableptrs[i], P2V(r->tableptrs[i]), 0x7);
+		if (!strncmp(entry->signature, "APIC", 4)) {
+			printf("FOUND APIC FINALLY THANK FUCKING GOD\n");
+			acpi_parse_madt(entry);
+			break;
+		}
+	}
+
+}
