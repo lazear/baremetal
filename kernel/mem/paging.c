@@ -201,9 +201,6 @@ uint32_t* k_copy_pagedir(uint32_t* dest, uint32_t* src) {
 	return src;
 }
 
-
-
-
 void walk_pagedir(uint32_t* pd) {
 	for (int i = 0; i < 1024; i++) {
 		if (pd[i] & ~0x3FF) {
@@ -247,7 +244,7 @@ void _paging_map_more(uint32_t* pd, uint32_t virt, uint32_t numpages, int flags)
 	}
 }
 
-
+/* Free the physical bindings of a page table */
 void free_pagedir(uint32_t* pd) {
 	for (int i = 0; i < 1024; i++) {
 		if (pd[i] & ~0x3FF) {
@@ -361,8 +358,10 @@ void k_map_kernel(uint32_t* pd) {
 		_paging_map(pd, i, i + KERNEL_VIRT, 0x3);
 }
 
+/* Returns the physical address (in first 4 mb, currently) of a new pagedir */
 uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
-	uint32_t* pd = mm_alloc(0x1000) - KERNEL_VIRT;	// 0xFFFF0000 virtual address
+	uint32_t* pd = V2P(mm_alloc(0x1000));	// 0xFFFF0000 virtual address
+	//k_paging_map(pd, )
 	//uint32_t* table = k_page_alloc();	// 0xFFC00000 virtual address
 	memset(pd, 0, 0x1000);
 	//memset(table, 0, 0x1000);
@@ -387,7 +386,7 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 
 			uint32_t _pdi = ((virt + (i * 0x1000 * 0x400)) >> 22);
 			printf("%d pdi\n", _pdi);
-			uint32_t* pt = mm_alloc(0x1000) - KERNEL_VIRT ;//k_page_alloc();
+			uint32_t* pt = V2P(mm_alloc(0x1000));//k_page_alloc();
 			
 			pd[_pdi] = ((uint32_t) pt | flags );
 			printf("%x\n", pd[_pdi]);
@@ -401,6 +400,10 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 			panic("MM error");
 		_paging_map(pd, phys, virt + (i* 0x1000), flags);
 	}
+
+	pd[1022] = (( (uint32_t) KERNEL_PAGE_DIRECTORY > 0xC0000000) ? \
+		V2P(KERNEL_PAGE_DIRECTORY) : ((uint32_t) KERNEL_PAGE_DIRECTORY)) | 3;
+	pd[1023] = (uint32_t) pd | 3;
 
 	return pd;
 }

@@ -34,7 +34,7 @@ char* VGA_MEMORY = 0xC00B8000;
 
 int CURRENT_X = 0;
 int CURRENT_Y = 0;
-int CURRENT_ATTRIB = VGA_COLOR(VGA_WHITE, VGA_BLACK);
+int CURRENT_ATTRIB = VGA_COLOR(VGA_LIGHTGREY, VGA_BLACK);
 
 int vga_current_x() { return CURRENT_X; }
 int vga_current_y() { return CURRENT_Y; }
@@ -79,7 +79,7 @@ void vga_scroll()
 		uint8_t* vga_addr = VGA_MEMORY;
 		uint8_t temp = CURRENT_Y - 24;
 		memcpy(vga_addr, vga_addr + temp * 160, (25 - temp) * 160 * 2);
-		//memset(vga_addr + 24 * 160, 0, 160);
+		memsetw(vga_addr + (24*160), 0 | (CURRENT_ATTRIB)<<8, 160);
 		CURRENT_Y = 24;
 	}
 	vga_update_cursor();
@@ -165,6 +165,11 @@ void vga_pretty(char* s, int color) {
 
 	vga_overwrite_color(color, start_x, start_y, 80, CURRENT_Y);
 
+}
+
+void vga_init() {
+	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
+	vga_clear();
 }
 
 void vga_test() {

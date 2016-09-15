@@ -54,8 +54,8 @@ compile:
 hd:
 	dd if=/dev/zero of=ext2 bs=1k count=16k
 	sudo mke2fs ext2
-	dd if=kernel/bootstrap of=ext2 conv=notrunc
-	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
+#	dd if=kernel/bootstrap of=ext2 conv=notrunc
+#	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
 
 run:
 	qemu-system-i386 -kernel bin/kernel.bin -hdb ext2 -curses -smp cpus=2

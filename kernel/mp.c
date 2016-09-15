@@ -39,6 +39,7 @@ int acpi_checksum(char* ptr) {
 
 void acpi_parse_madt(madt_header* madt) {
 	char* entries = (char*) ((uint32_t) madt + sizeof(madt_header));
+
 	while( (uint32_t) entries < (madt->h.length - sizeof(madt_header)) + (uint32_t)madt) {		
 		int type = *entries;
 		int len = *(entries+1);
@@ -63,38 +64,40 @@ void acpi_parse_madt(madt_header* madt) {
 	} 
 } 
 
-
 void acpi_init() {
-
+	/* Read through the extended bios data area (EBDA) and look at every 16-byte aligned
+	structure for the signature */
     uint8_t *ptr = (uint8_t *)0x000E0000;
 	while (ptr < 0x000FFFFF) {
 		uint64_t signature = *(uint64_t *)ptr;
 		if (signature == 0x2052545020445352) { // 'RSD PTR '
-			printf("FOUND THE ACPI BITCH\n");
 			break;
 		}
 		ptr += 16;
 	}
+
 	rsdp_header* h = (rsdp_header*) ptr;
 	printf("ACPI OEM: %s\n", h->oemid);
 
+	/* Make sure we have a valid ACPI table. lower byte of the sum of the first 20 bytes
+	(isn't that a mouthful?) need to sum to zero */
 	assert(acpi_checksum(h) == 0);
+	if (acpi_checksum(h))
+		return;
 
 	rsdt_header* r = (rsdt_header*) h->rsdt_ptr; // + 0xC0000000;
 
 	k_paging_map(h->rsdt_ptr, P2V(h->rsdt_ptr), 0x7);
 	r = P2V(r);
-	printf("RSDT: %s\t# of tables: %d\n", r->h.signature, (r->h.length - sizeof(acpi_header)) /4 );
 
 	for (int i = 0; i < (r->h.length - sizeof(acpi_header)) /4; i++) {
-	//	printf("Table[%d]: 0x%x\n", i, r->tableptrs[i]);
 		acpi_header* entry = (acpi_header*) P2V(r->tableptrs[i]);
 		k_paging_map(r->tableptrs[i], P2V(r->tableptrs[i]), 0x7);
 		if (!strncmp(entry->signature, "APIC", 4)) {
-			printf("FOUND APIC FINALLY THANK FUCKING GOD\n");
 			acpi_parse_madt(entry);
 			break;
 		}
 	}
+	k_paging_unmap(r);
 
 }

@@ -1,6 +1,5 @@
 /*
 mm.c
-
 ===============================================================================
 MIT License
 Copyright (c) 2007-2016 Michael Lazear
@@ -215,11 +214,13 @@ uint32_t* k_page_free(uint32_t* addr) {
 }
 
 void mm_debug() {
-	printf("Physical Memory Management Debug:\n");
+
 	int ptidx = mm_first_free(MM_CURRENT_PT);
 	int pdidx = mm_first_free(MM_CURRENT_PD);
-	printf("PT (%d): %b\n", ptidx%32, MM_CURRENT_PT[ptidx/32]);
-	printf("PD (%d): %b\n", pdidx%32, MM_CURRENT_PD[pdidx/32]);
+	printf("Physical Memory Manager: First free address: 0x%x\n", 
+		(pdidx * 0x00400000) + (ptidx*0x1000));
+	printf("PT (%d):\t%b\n", ptidx%32, MM_CURRENT_PT[ptidx/32]);
+	printf("PD (%d):\t%b\n", pdidx%32, MM_CURRENT_PD[pdidx/32]);
 }
 
 
@@ -230,6 +231,10 @@ This means that one 128 byte sized bitmap holds information for 4 MB of data
 One bitmap[32] represents one page table entry, of which there are 1024 in a 
 page directory;
 Each bitmap[i] entry represents 1024 pages.
+MM_CURRENT_PD as a whole represents 128 MB of physical address space, so this
+will have to be revamped at some point, to overcome the issue of allocating
+space that can never be freed if we switch to a new bitmap and destory the old
+one. Perhaps we can implement a linked list, or array of arrays?
 */
 
 /*

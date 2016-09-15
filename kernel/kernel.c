@@ -79,16 +79,14 @@ void kernel_initialize(uint32_t kernel_end) {
 	KERNEL_END = kernel_end;
 	k_mm_init(kernel_end);
 	k_heap_init();
-	k_paging_init(_init_pd);
+	k_paging_init(V2P(_init_pd));
 
 	keyboard_install();
 	timer_init();
 	syscall_init();
 
 	sti();
-
-	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
-	vga_clear();
+	vga_init();
 	//vga_pretty(logo, VGA_LIGHTGREEN);
 	vga_pretty("crunchy 0.1 locked and loaded!\n", VGA_LIGHTGREEN);
 
@@ -100,6 +98,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	traverse_blockchain();
 
 	acpi_init();
+
+
+	elf_load();
 	//dprint(KERNEL_PAGE_DIRECTORY, " %x");
 //	asm volatile ("int $0x80");
 	for(;;);

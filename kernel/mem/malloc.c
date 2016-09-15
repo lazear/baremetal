@@ -233,7 +233,7 @@ void traverse_blockchain() {
 		int used = (block_value >> 31);
 		int size = (block_value & ~(1<<31));
 		total_size += size;
-		printf("Block (%d) 0x%x | Used: %d | Size: %d | Link 0x%x\n", i, block, used, size, translate(block));
+		printf("Block (%d) 0x%x\tUsed: %d\tSize: %d\tLink 0x%x\n", i, block, used, size, translate(block));
 		block++;
 	}
 	printf("%d bytes allocated across %d blocks\n", (K_LAST_ALLOC - K_HEAP_BOTTOM), BLOCKS_ALLOCATED);

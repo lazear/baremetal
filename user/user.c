@@ -1,6 +1,6 @@
 
 int main(int argc, char* argv[]) {
-	//syscall_print(argv[argc-1]);
+	syscall_print(argv[argc-1]);
 	return 0;
 
 }
