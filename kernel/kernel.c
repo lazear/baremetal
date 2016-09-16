@@ -98,9 +98,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	traverse_blockchain();
 
 	acpi_init();
+	lapic_init();
 
-
-	elf_load();
+	//elf_load();
 	//dprint(KERNEL_PAGE_DIRECTORY, " %x");
 //	asm volatile ("int $0x80");
 	for(;;);

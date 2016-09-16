@@ -24,6 +24,7 @@ SOFTWARE.
 */
 
 
+
 #ifndef __crunchy_lapic__
 #define __crunchy_lapic__
 
@@ -35,6 +36,7 @@ SOFTWARE.
 #define LAPIC_APR		0x090 	// Arbitration Priority Register
 #define LAPIC_PPR 		0x0A0	// Processor Priority Register
 #define LAPIC_EOI		0x0B0	// EOI - Write Only
+#define LAPIC_SIV		0x0F0 	// Spurious Int. Vector
 #define LAPIC_ERR 		0x280	// Error Status Register
 #define LAPIC_ICRLO		0x300 	// Interrupt Command Register
 #define LAPIC_ICRHI		0x310 	// Interrupt Command Register
@@ -47,4 +49,8 @@ SOFTWARE.
 #define LAPIC_LINT0		0x350 	// Local Int 
 #define LAPIC_LINT1		0x360 	// Local Int
 #define LAPIC_LINTERR	0x370 	// LVT Errors
+
+#define LAPIC_INIT 		0x00000500
+#define LAPIC_STARTUP 	0x00000600
+
 #endif

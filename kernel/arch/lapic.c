@@ -22,43 +22,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ===============================================================================
 */
+
+/*
+BSP: Bootstrap processor - the core we are currently running on\
+AP: Application processor(s). Currently halted.
+*/
 #include <types.h>
 #include <acpi.h>
 #include <lapic.h>
+#include <traps.h>
+#include <x86.h>
 
+volatile uint32_t* LAPIC;
 
+static void lapic_write(int index, int value) {
+	LAPIC[index/4] = value;		// div by 4 for sizeof(int)
+	LAPIC[0x8];					// Wait by reading;
+}
 
-/*
-The local APIC can be enabled or disabled in either of two ways:
-1. Using the APIC global enable/disable flag in the IA32_APIC_BASE MSR (MSR address 1BH; see Figure 10-5):
-	— When IA32_APIC_BASE[11] is 0, the processor is functionally equivalent to an IA-32 processor without an
-	on-chip APIC. The CPUID feature flag for the APIC (see Section 10.4.2, “Presence of the Local APIC”) is also
-	set to 0.
-	— When IA32_APIC_BASE[11] is set to 0, processor APICs based on the 3-wire APIC bus cannot be generally
-	re-enabled until a system hardware reset. The 3-wire bus loses track of arbitration that would be necessary
-	for complete re-enabling. Certain APIC functionality can be enabled (for example: performance and
-	thermal monitoring interrupt generation).
-	— For processors that use Front Side Bus (FSB) delivery of interrupts, software may disable or enable the
-	APIC by setting and resetting IA32_APIC_BASE[11]. A hardware reset is not required to re-start APIC
-	functionality, if software guarantees no interrupt will be sent to the APIC as IA32_APIC_BASE[11] is
-	cleared.
-— When IA32_APIC_BASE[11] is set to 0, prior initialization to the APIC may be lost and the APIC may return
-to the state described in Section 10.4.7.1, “Local APIC State After Power-Up or Reset.”
-2. Using the APIC software enable/disable flag in the spurious-interrupt vector register (see Figure 10-23):
-	— If IA32_APIC_BASE[11] is 1, software can temporarily disable a local APIC at any time by clearing the APIC
-	software enable/disable flag in the spurious-interrupt vector register (see Figure 10-23). The state of the
-	local APIC when in this software-disabled state is described in Section 10.4.7.2, “Local APIC State After It
-	Has Been Software Disabled.”
-	— When the local APIC is in the software-disabled state, it can be re-enabled at any time by setting the APIC
-	software enable/disable flag to 1
-
-
-We're going for Method #2
-*/
-
-
+static uint32_t lapic_read(int index) {
+	return LAPIC[index/4];
+}
 
 /* Initilize the local advanced programmable interrupt chip */
 void lapic_init() {
+	LAPIC = LAPIC_BASE;
+	if (k_phys_to_virt(LAPIC_BASE))
+		vga_pretty("LAPIC_BASE is already mapped\n", 4);
+	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
+	printf("LAPIC id: %d\n", lapic_read(LAPIC_ID) >> 24);
+
+	/* Enable local APIC and set the spurious interrupt vector */
+	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
+
+	
+}
+
+/* Sends a start up IPI to the AP processor designated <apic_id>,
+telling it to start executing code at <address> */
+void lapic_start_AP(int apic_id, uint32_t address) {
 
 }
