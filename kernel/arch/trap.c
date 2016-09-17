@@ -51,4 +51,6 @@ void trap(regs_t* r) {
 		outb(0xA0, 0x20);
 	
 	outb(0x20, 0x20);
+
+	lapic_eoi();
 }

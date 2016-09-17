@@ -132,6 +132,7 @@ static inline void lidt(struct gatedesc *p, int size) {
 
 static inline void lgdt(struct segdesc *p, int size) {
 
+	// 16:32 bit pointer is required for lgdt/lidt
 	volatile uint16_t pd[3];
 	pd[0] = size-1;
 	pd[1] = (uint32_t)p;
@@ -162,6 +163,14 @@ void tss_swap(uint32_t stack, size_t n) {
 	ltr(SEG_TSS<<3);
 }
 
+struct cpu {
+	uint32_t id;
+	uint32_t stack;
+	uint32_t blah
+};
+
+extern struct cpu* cpuone asm("%gs:0");
+
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
 void gdt_init(void)
@@ -175,7 +184,9 @@ void gdt_init(void)
 	gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);					// SS = 0x10
 	gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x18
 	gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x20
-	
+	gdt[SEG_KCPU]  = SEG(STA_W, cpuone, 8, 0);
+
+	asm volatile("mov %0, %%gs" : : "r"(SEG_KCPU<<3));
 
 	lgdt(gdt, sizeof(gdt));
 	tss_swap(0, 0);

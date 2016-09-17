@@ -50,7 +50,4 @@ SOFTWARE.
 #define LAPIC_LINT1		0x360 	// Local Int
 #define LAPIC_LINTERR	0x370 	// LVT Errors
 
-#define LAPIC_INIT 		0x00000500
-#define LAPIC_STARTUP 	0x00000600
-
 #endif

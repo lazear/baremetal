@@ -1,26 +1,33 @@
 [BITS 16]
-
+org 0x8000
 global start
 start:
 	cli
-		xor ax, ax
-		mov ds, ax
-		mov es, ax
-		mov ss, ax
+	xor ax, ax 			; Clear AX register
+	mov ds, ax			; Set DS-register to 0 
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
 
-		lgdt gdt_desc
+;	mov ebx, [gdt_desc]
 
-		mov eax, cr0
-		or eax, 1				; enable protected mode
-		mov cr0, eax
+	lgdt [gdt_desc] 	; Load the Global Descriptor Table
 
-		jmp 0x8:start32
+	mov eax, cr0
+	or eax, 1               ; Set bit 0 
+	mov cr0, eax
 
+
+	mov ax, start32
+	jmp $
+
+	jmp 0x8:start32
 
 [BITS 32]
 
 start32:
-	mov ax, 0x10
+
+	mov ax, KERNEL_DATA
 	mov ds, ax
 	mov es, ax
 	mov ss, ax
@@ -48,7 +55,7 @@ gdt_null:
 	dd 0
 	dd 0
 
-;KERNEL_CODE equ $-gdt		; 0x08
+KERNEL_CODE equ $-gdt		; 0x08
 gdt_kernel_code:
 	dw 0FFFFh 	; Limit 0xFFFF
 	dw 0		; Base 0:15
@@ -57,8 +64,8 @@ gdt_kernel_code:
 	db 0CFh		; Page-granular
 	db 0 		; Base 24:31
 
-;KERNEL_DATA equ $-gdt
-gdt_kernel_data:                        
+KERNEL_DATA equ $-gdt
+gdt_kernel_data:
 	dw 0FFFFh 	; Limit 0xFFFF
 	dw 0		; Base 0:15
 	db 0		; Base 16:23
@@ -68,7 +75,6 @@ gdt_kernel_data:
 
 gdt_end:                        ; Used to calculate the size of the GDT
 
-gdt_desc:                       ; The GDT descriptor
+gdt_desc:                  ; The GDT descriptor
 	dw gdt_end - gdt - 1    ; Limit (size)
 	dd gdt                  ; Address of the GDT
-;================

@@ -13,7 +13,7 @@ AR		= /home/lazear/opt/cross/bin/i686-elf-as
 CP		= cp
 LIBGCC	= /home/lazear/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
-LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT)
+LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
 EXTUTIL = ../ext2util/ext2util
 IMAGE	= ext2
@@ -50,6 +50,9 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
 	$(AS) $(ASFLAGS) kernel/font.s -o font.so
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
+	$(AS) -f bin kernel/arch/ap_entry.s -o ap_entry
+	#$(LD) -N -e start -Ttext 0x8000 -o ap_entry.o ap_entry.elf
+	#objcopy -S -O binary -j .text ap_entry.o ap_entry
 
 hd:
 	dd if=/dev/zero of=ext2 bs=1k count=16k
