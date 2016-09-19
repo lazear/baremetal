@@ -83,8 +83,7 @@ char *Intel_Other[] = {
 	"Reserved"
 };
 
-void cpuid_vendor()
-{
+void cpuid_vendor() {
 	int i;
 	uint32_t unused, ebx, ecx, edx;
 	cpuid(0, unused, ebx, ecx, edx);
@@ -99,8 +98,7 @@ void cpuid_vendor()
 	printf("%s\n", vendor);
 }
 
-void cpuid_psn(void)
-{
+void cpuid_psn(void) {
 	uint32_t unused, eax, ecx, edx;
 	cpuid(1, eax, unused, unused, unused);	// signature
 	cpuid(3, unused, unused, ecx, edx);
@@ -110,8 +108,7 @@ void cpuid_psn(void)
 			(edx >> 16), (edx & 0xFFFF));
 }
 
-void cpuid_features(void)
-{
+void cpuid_features(void) {
 	uint32_t unused, edx;
 	cpuid(1, unused, unused, unused, edx);
 	printf("CPU Features (0x%X):\n", edx);
@@ -127,8 +124,7 @@ void cpuid_features(void)
 
 }
 
-void cpuid_detect(void)
-{
+void cpuid_detect(void) {
 	uint32_t eax, ebx, ecx, edx;
 	cpuid(0, eax, ebx, ecx, edx);
 	cpuid_vendor();
@@ -146,8 +142,7 @@ void cpuid_detect(void)
 	}
 }
 
-void cpuid_intel(void)
-{
+void cpuid_intel(void) {
 	uint32_t eax, ebx, ecx, edx, max_eax, unused, signature;
 	int model, family, type, brand, stepping, reserved;
 	int extended_family = -1;
@@ -194,8 +189,7 @@ void cpuid_intel(void)
 		printf("Pentium 4 ");
 		break;
 	}
-	if(family == 15) 
-	{
+	if(family == 15) {
 		extended_family = (eax >> 20) & 0xff;
 		printf("Extended family %d\n", extended_family);
 	}
@@ -277,20 +271,15 @@ void cpuid_intel(void)
 	}
 
 	cpuid(0x80000000, max_eax, unused, unused, unused);
-	if(brand > 0) 
-	{
+	if(brand > 0) {
 		printf("Brand %d - ", brand);
-		if(brand < 0x18) 
-		{
+		if(brand < 0x18) {
 			if(signature == 0x000006B1 || signature == 0x00000F13) 
-			{
 				printf("%s\n", Intel_Other[brand]);
-			} else {
+			else
 				printf("%s\n", Intel[brand]);
-			}
-		} else {
+		else 
 			printf("Reserved\n");
-		}
 	}
 	printf("Stepping: %d Reserved: %d\n", stepping, reserved);
 }

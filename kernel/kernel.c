@@ -98,7 +98,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	//elf_load();
 
 	//traverse_blockchain();
-	cpuid_detect();
+	//cpuid_detect();
 	acpi_init();
 	ioapicinit();
 	ioapicenable(0, 0);
