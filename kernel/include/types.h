@@ -25,7 +25,8 @@ typedef int bool;
 #define KERNEL_VIRT		0xC0000000
 #endif
 
+
 // Convert physical to higher half.
-#define P2V(x)	( ((uint32_t) x < KERNEL_VIRT) ? ((uint32_t) x + KERNEL_VIRT) : (uint32_t) x)
-#define V2P(x)	( ((uint32_t) x > KERNEL_VIRT) ? ((uint32_t) x - KERNEL_VIRT) : (uint32_t) x)
+#define P2V(x)	( ((uint32_t) (x) <= KERNEL_VIRT) ? ((uint32_t) (x) + KERNEL_VIRT) : (uint32_t) (x))
+#define V2P(x)	( ((uint32_t) (x) >= KERNEL_VIRT) ? ((uint32_t) (x) - KERNEL_VIRT) : (uint32_t) (x))
 #endif

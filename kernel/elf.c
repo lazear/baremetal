@@ -115,12 +115,13 @@ void* elf_objdump(void* data) {
 
 void elf_load() {
 	uint32_t* elf_pd = k_create_pagedir(0, 0, 0x7);	
+
 	k_map_kernel(elf_pd);
-	//k_swap_pd(elf_pd);
+	k_swap_pd(elf_pd);
 
 	uint32_t* data = ext2_open(ext2_inode(1,12));
 
-
+	printf("Data @ 0x%x\n", data);
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
@@ -134,21 +135,23 @@ void elf_load() {
 
 	// Make a new pagedirectory for the process to execute in.
 
-	printf("%x\n", elf_pd);
+
 
 //	k_paging_map(elf_pd, P2V(elf_pd), 0x3);
 
 
 	printf("%x\n", data);
 	while(phdr < last_phdr) {
-	//	printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
-	//	 	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
+		// printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
+		//  	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
 		
 		uint32_t phys = k_page_alloc();					// Allocate a physical page
+
 		k_paging_map(phys, phdr->p_vaddr, 0x7);			// Map that page in KPD
 		//_paging_map(elf_pd, phys, phdr->p_vaddr, 0x7);		// Map page in new PD
 		printf("Mapping %x to %x\n", phys, phdr->p_vaddr);
 		// We are still in the kernel page directory, so copy data now
+		
 		memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
 
 		// Unmap in kernel?

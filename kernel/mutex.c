@@ -27,7 +27,7 @@ SOFTWARE.
 #include <types.h>
 #include <mutex.h>
 
-static int ncli = 0;
+int ncli = 0;
 
 void pushcli() {
 
@@ -39,13 +39,27 @@ void popcli() {
 
 	if(--ncli < 0)
 		panic("popcli without push");
-	if(ncli == 0)
+	if(ncli == 0) {
 		asm volatile("sti");
-}
+	}
+	// else {
+	// 	char buf[32];
+	// 	itoa(ncli, buf, 10);
+	// 	vga_puts("NOCLI ");
+	// 	vga_puts(buf);
+	// }
+
+}	
+
+mutex ml = {.lock = 0};
+
+
+int nocli() { return ncli; }
 
 void mutex_test() {
-	mutex ml = {.lock = 0};
 
+
+	printf("Begin mutex test\n");
 	acquire(&ml);
 
 	printf("acquire: %d\n", ml.lock);

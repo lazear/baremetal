@@ -55,6 +55,9 @@ extern uint32_t stack_bottom[];
 
 #define dprint(e) (printf("%s: %x\n", #e, e) )
 
+
+mutex km = {.lock=0};
+
 void kernel_initialize(uint32_t kernel_end) {
 
 	/*
@@ -87,37 +90,17 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	uint32_t* newpd = k_create_pagedir(0, 0, 0x7);
-	dprint(newpd);
-	k_map_kernel(newpd);
-	//k_swap_pd(newpd);
-
-	dprint(newpd);
-	dprint(stack_bottom);
-	dprint(stack_top);
-
-	dprint(heap_brk());
-	malloc(10);
-	traverse_blockchain();
 	acpi_init();
-
-
-
-	k_paging_map(0xB8000, 0xDEAD0000, 3);
-	dprint(k_current_pd());
-
-
 	// ioapicinit();
 	// ioapicenable(0, 0);
 	// ioapicenable(0, 1);
 
 	//lapic_init();
 
-
 	//ap_entry_init();
 	//lapic_start_AP(1);
 
-	//elf_load();
+	elf_load();
 
 	for(;;);
 }

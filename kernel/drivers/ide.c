@@ -227,24 +227,31 @@ void buffer_traverse() {
 	buffer** b;
 	int i = 0;
 	for (b = &cache.list; *b; b = &(*b)->next) {
-		printf("%d this %x that %x\n", i++, *b, (*b)->next);
+		printf("%d this %x (%x) that %x\n", i++, *b, (*b)->flags, (*b)->next);
 	}
 	printf("IDEque %x\n", idequeue);
 }
 
+
+
+#define idemalloc(x) (mallock(x, __func__));
+
 buffer* buffer_get(uint32_t dev, uint32_t block) {
 	buffer* b;
 	acquire(&cache.lock);
+	printf("Cache lock acquired %d\n", block);
 loop:
 	for (b = cache.list; b; b = b->next) {
 		if (b->dev == dev && b->block == block) {
 			//printf("Buffer found\n");
 			if (!(b->flags & B_BUSY)) {		// Is buffer free?
 				b->flags |= B_BUSY;			// Mark buffer as in-use
+					printf("Cache lock release %d\n", block);
 				release(&cache.lock);
 				return b;
 			}
 			sleep(b, &cache.lock);			// Wait until that block is free
+			printf("Cache lock release %d\n", block);
 			release(&cache.lock);
 			return b;
 		//	goto loop;					// Without MT, this freezes
@@ -269,18 +276,21 @@ loop:
 	buffer** bp;
 	for (bp = &cache.list; *bp; bp = &(*bp)->next)
 		; 
-	*bp = malloc(sizeof(buffer));
+	//printf("Entering malloc (block %d)\n", block);
+	*bp = idemalloc(sizeof(buffer));
+	//printf("Returned from malloc (block %d) %x\n", block, bp);
 	(*bp)->dev = dev;
 	(*bp)->block = block;
 	(*bp)->flags = B_BUSY;
 	//(*bp)->next = NULL;
-	
+	//printf("Cache lock release %d\n", block);
 	release(&cache.lock);
 	return *bp;
 }
 
 buffer* buffer_read(uint32_t dev, uint32_t block) {
 	buffer* b = buffer_get(dev, block);
+	
 	int i = -1;
 	if ( !(b->flags & B_VALID)) 	// Block not read yet
 		i = ide_rw(b);
@@ -289,8 +299,7 @@ buffer* buffer_read(uint32_t dev, uint32_t block) {
 		ide_delay();
 		buffer_read(dev, block);
 	}
-	//ide_wait(1);
-	// /printf("Escape\n");
+
 	return b;
 }
 

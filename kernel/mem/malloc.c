@@ -125,6 +125,7 @@ in 0x1000 blocks.
 void* sbrk(size_t n) {
 	if (!n)
 		return NULL;
+
 	if (n + K_HEAP_TOP >= K_HEAP_MAX) {
 		printf("HEAP FULL\n");
 		return NULL;
@@ -140,9 +141,10 @@ void* sbrk(size_t n) {
 		Map that page to the top of the heap,
 		and increase the top of the heap by 4KB.
 		*/
-
 		uint32_t* phys = k_page_alloc();
+		vga_puts("Calling map");
 		k_paging_map(phys, K_HEAP_TOP, 0x3);
+		vga_puts("Mapped");
 		//printf("Mapping phys %x to virt %x\n", phys, K_HEAP_TOP);
 		K_HEAP_TOP += 0x1000;
 	}
@@ -309,38 +311,44 @@ void* malloc(size_t n) {
 	void* ptr = NULL;
 	uint32_t* block = NULL;
 
-	if (!n)
+	if (!n) 
 		return ptr;
-//	pushcli();
-	acquire(&memlock);
 
+	acquire(&memlock);
 	block = find_best_free(n);
 
 	if (block) {
 		/* We found a free block */
 		*block |= (1<<31);
 		ptr = translate(block);
+
 		//printf("Reuse, reduce, recycle %d bytes: @ 0x%x\n", n, ptr);
 	} else {
 		/* We couldn't find a free block, allocate a new one */
-		
+
 		int r = blockchain_add(n);
 		if (!r) {
 			release(&memlock);
-		//	popcli();
 			return NULL;
 		}
-
 		// Check if we need to call sbrk
+
 		if (K_LAST_ALLOC + n >= K_HEAP_TOP) 
 			sbrk(2*((n + K_LAST_ALLOC) - K_HEAP_TOP));
+
 
 		ptr = (void*) K_LAST_ALLOC;
 		K_LAST_ALLOC += n;
 	}
 
 	release(&memlock);
-//	popcli();
+	return ptr;
+}
+
+void* mallock(size_t n, char* func) {
+	printf("%s requesting %d bytes. Global ncli %d\n", func, n, nocli());
+	void* ptr = malloc(n);
+	printf("memlock status: %d\n", memlock.lock);
 	return ptr;
 }
 
@@ -419,7 +427,7 @@ void k_heap_init() {
 	K_HEAP_TOP = K_HEAP_BOTTOM;
 	K_LAST_ALLOC = K_HEAP_BOTTOM;
 
-	sbrk(0x4000);
+	sbrk(0xA000);
 }
 
 

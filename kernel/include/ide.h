@@ -11,9 +11,8 @@ with xv6 inspired queueing
 #ifndef __crunchy_ide__
 #define __crunchy_ide__
 
-#define BLOCK_SIZE		1024
 #define SECTOR_SIZE		512
-
+#define BLOCK_SIZE		1024	// Default block size
 #define B_BUSY	0x1		// buffer is locked by a process
 #define B_VALID	0x2		// buffer has been read from disk
 #define B_DIRTY	0x4		// buffer has been written to
@@ -49,7 +48,6 @@ with xv6 inspired queueing
 
 #define MAX_OP_BLOCKS	16	// Max # of blocks any operation can write (8 KB)
 
-
 typedef struct ide_buffer {
 	uint8_t flags;				// buffer flags
 	uint32_t dev;				// device number
@@ -58,6 +56,7 @@ typedef struct ide_buffer {
 	struct ide_buffer* q;
 	uint8_t data[BLOCK_SIZE];	// 1 disk sector of data
 } buffer;
+
 
 extern int IDE_STATUS;
 

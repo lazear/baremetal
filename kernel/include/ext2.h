@@ -37,7 +37,7 @@ Each block group has a backup superblock as it's first block
 #define __crunchy_ext2__
 
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE 		1024
+#define BLOCK_SIZE 		4096
 #endif
 
 #define EXT2_BOOT		0			// Block 0 is bootblock

@@ -134,7 +134,7 @@ void k_page_fault(regs_t * r) {
 	//traverse_blockchain();
 	k_paging_map(k_page_alloc(), cr2 & ~0x3FF, 0x3);
 	mm_debug();
-//	popcli();
+	//popcli();
 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
 	asm volatile("hlt");
 }
@@ -206,13 +206,19 @@ void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, int flags) {
 	uint32_t* pt;
 
 	if ( dir[_pdi] & ~0x3FF ) {
-		pt = dir[_pdi] & ~0x3FF;
+		pt = P2V(dir[_pdi] & ~0x3FF);
 	} else {
 		pt = mm_alloc(0x1000);
 	}
-
-	pt[_pti] = ((phys) | flags);
+	//vga_puts("one");
+	//char b[32];
+	//itoa(_pti, b, 16);
+	//vga_puts(b);
+	pt[_pti] = (phys| flags);
+	//vga_puts("two");
+	/* Make sure we use the physical address of the page table */
 	dir[_pdi] = ((uint32_t) V2P(pt) | flags);
+	//vga_puts("mapped");
 }
 
 uint32_t* k_virt_to_phys(uint32_t virt) {
@@ -431,7 +437,6 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 	uint32_t* pd = mm_alloc(0x1000);	// 0xFFFF0000 virtual address
 	//uint32_t* table = k_page_alloc();	// 0xFFC00000 virtual address
 
-	memset(pd, 0, 0x1000);
 	uint32_t phys = 0;
 
 	/*
@@ -450,9 +455,9 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 
 			uint32_t _pdi = ((virt + (i * 0x1000 * 0x400)) >> 22);
 			printf("%d pdi\n", _pdi);
-			uint32_t* pt = V2P(mm_alloc(0x1000));//k_page_alloc();
+			uint32_t* pt = mm_alloc(0x1000);//k_page_alloc();
 			
-			pd[_pdi] = ((uint32_t) pt | flags);
+			pd[_pdi] = ((uint32_t) V2P(pt) | flags);
 			printf("%x\n", pd[_pdi]);
 
 		}
