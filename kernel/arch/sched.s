@@ -1,6 +1,6 @@
 ;sched.s
 
-extern scheduler
+;extern scheduler
 global sched
 sched:
 
@@ -19,7 +19,7 @@ sched:
 	mov eax, esp
 	push eax
 	
-	call scheduler
+	;call scheduler
 	mov esp, eax
 
 	pop edi

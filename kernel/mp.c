@@ -67,14 +67,16 @@ void acpi_parse_madt(madt_header* madt) {
 void acpi_init() {
 	/* Read through the extended bios data area (EBDA) and look at every 16-byte aligned
 	structure for the signature */
-    uint8_t *ptr = (uint8_t *)0x000E0000;
-	while (ptr < 0x000FFFFF) {
+    uint8_t *ptr = (uint8_t *) P2V(0x000E0000);
+
+	while (ptr < P2V(0x000FFFFF)) {
 		uint64_t signature = *(uint64_t *)ptr;
 		if (signature == 0x2052545020445352) { // 'RSD PTR '
 			break;
 		}
 		ptr += 16;
 	}
+
 
 	rsdp_header* h = (rsdp_header*) ptr;
 	printf("ACPI OEM: %s\n", h->oemid);
@@ -87,6 +89,7 @@ void acpi_init() {
 
 	rsdt_header* r = (rsdt_header*) h->rsdt_ptr; // + 0xC0000000;
 
+	return;
 	k_paging_map(h->rsdt_ptr, P2V(h->rsdt_ptr), 0x7);
 	r = P2V(r);
 

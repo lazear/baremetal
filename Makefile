@@ -11,7 +11,7 @@ LD		= /home/lazear/opt/cross/bin/i686-elf-ld
 AS		= nasm
 AR		= /home/lazear/opt/cross/bin/i686-elf-as
 CP		= cp
-LIBGCC	= /home/lazear/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
+LIBGCC	= #/home/lazear/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I ./kernel/include -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
@@ -21,12 +21,13 @@ IMAGE	= ext2
 all: compile link clean
 build: compile link 
 emu: compile link clean run
-user: userland
+user: userland clean
 
 userland:
 	$(CC) $(CCFLAGS) user/user.c 
 	$(LD) -e main -Ttext 0x80400000 -o user.elf user.o
 	$(EXTUTIL) -x $(IMAGE) -wf user.elf -i 12
+
 
 boot:
 	nasm -f bin kernel/bootstrap.asm -o kernel/bootstrap

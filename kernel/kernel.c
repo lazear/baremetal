@@ -39,13 +39,6 @@ SOFTWARE.
 #include <ext2.h>
 #include <elf.h>
 
-static mutex key_mutex = { .lock = 0 };
-
-
-
-extern void scheduler();
-void scheduler() {}
-extern void switch_to_user(void* (fn)(), uint32_t esp);
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
 
 extern uint32_t* KERNEL_PAGE_DIRECTORY;
@@ -56,8 +49,8 @@ extern uint32_t _init_pd[];
 extern uint32_t _binary_ap_entry_start[];
 extern uint32_t _binary_ap_entry_end[];
 
-extern uint32_t stack_top;
-extern uint32_t stack_bottom;
+extern uint32_t stack_top[];
+extern uint32_t stack_bottom[];
 
 
 #define dprint(e) (printf("%s: %x\n", #e, e) )
@@ -94,12 +87,29 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
+	uint32_t* newpd = k_create_pagedir(0, 0, 0x7);
+	dprint(newpd);
+	k_map_kernel(newpd);
+	//k_swap_pd(newpd);
+
+	dprint(newpd);
+	dprint(stack_bottom);
+	dprint(stack_top);
+
+	dprint(heap_brk());
+	malloc(10);
+	traverse_blockchain();
+	acpi_init();
 
 
-	//acpi_init();
-	//ioapicinit();
-	//ioapicenable(0, 0);
-	//ioapicenable(0, 1);
+
+	k_paging_map(0xB8000, 0xDEAD0000, 3);
+	dprint(k_current_pd());
+
+
+	// ioapicinit();
+	// ioapicenable(0, 0);
+	// ioapicenable(0, 1);
 
 	//lapic_init();
 
@@ -107,7 +117,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	//ap_entry_init();
 	//lapic_start_AP(1);
 
-	elf_load();
+	//elf_load();
 
 	for(;;);
 }

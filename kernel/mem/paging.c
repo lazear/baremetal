@@ -93,7 +93,7 @@ void paging_info(uint32_t* pd) {
 
 		}
 	}
-	printf("aPge directory: 0x%x\tTotal pages: %d\tD:%d\tA:%d\n", \
+	printf("Page directory: 0x%x\tTotal pages: %d\tD:%d\tA:%d\n", \
 		pd, total, dirty, accessed);
 }
 /* We are going to try and fix PF's by increasing heap if that's the issue */
@@ -109,18 +109,18 @@ void k_page_fault(regs_t * r) {
 	if (r->err_code & PF_RW) 		printf("\tPage Not Writeable\n");
 	if (r->err_code & PF_USER) 		printf("\tPage Supervisor Mode\n");
 
-	uint32_t phys = k_virt_to_phys(cr2);
-	if (!(phys & PF_PRESENT)) {		
-		printf("Mapped but not present: 0x%x\n", phys);
-		k_paging_map(k_page_alloc(), cr2, (phys & 0xF) | PF_RW | PF_PRESENT);
-		k_swap_pd(CURRENT_PAGE_DIRECTORY);
-		printf("New map: %x\n", k_virt_to_phys(cr2));
-		asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
-		//popcli();
-		asm volatile("hlt");
-		return;
+	// uint32_t phys = k_virt_to_phys(cr2);
+	// if (!(phys & PF_PRESENT)) {		
+	// 	printf("Mapped but not present: 0x%x\n", phys);
+	// 	k_paging_map(k_page_alloc(), cr2, (phys & 0xF) | PF_RW | PF_PRESENT);
+	// 	k_swap_pd(CURRENT_PAGE_DIRECTORY);
+	// 	printf("New map: %x\n", k_virt_to_phys(cr2));
+	// 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
+	// 	//popcli();
+	// 	asm volatile("hlt");
+	// 	return;
 	
-	}
+	// }
 
 	if (cr2 >= heap_brk() && cr2 < heap_brk() + 0x1000){
 		printf("Heap is out of memory\n");
@@ -208,11 +208,11 @@ void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, int flags) {
 	if ( dir[_pdi] & ~0x3FF ) {
 		pt = dir[_pdi] & ~0x3FF;
 	} else {
-		pt = V2P(mm_alloc(0x1000));
+		pt = mm_alloc(0x1000);
 	}
 
 	pt[_pti] = ((phys) | flags);
-	dir[_pdi] = ((uint32_t) pt | flags);
+	dir[_pdi] = ((uint32_t) V2P(pt) | flags);
 }
 
 uint32_t* k_virt_to_phys(uint32_t virt) {
