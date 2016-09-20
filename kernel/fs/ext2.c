@@ -111,10 +111,10 @@ inode* ext2_inode(int dev, int i) {
 	bgd += block_group;
 
 	// Not using the inode table was the issue...
-	printf("Acquring for inode: %d\n", i);
+
 	buffer* b = buffer_read(dev, bgd->inode_table+block);
 	inode* in = (inode*)((uint32_t) b->data + (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE);
-	printf("inode good %x\n", in);
+
 	return in;
 }
 

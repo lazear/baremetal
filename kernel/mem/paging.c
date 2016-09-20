@@ -71,7 +71,7 @@ void paging_info(uint32_t* pd) {
 	int total = 0;
 	for(int i = 0; i < 1024; i++) {
 		if (pd[i] & ~0x3FF) {
-			uint32_t* pt = pd[i] & ~0x3FF;
+			uint32_t* pt = P2V(pd[i] & ~0x3FF);
 			
 			for (int q = 0; q < 1024; q++) {
 
@@ -84,7 +84,7 @@ void paging_info(uint32_t* pd) {
 				if (pt[q] & PF_ACCESSED)
 					accessed++;
 				if (pt[q]) {
-					printf("pd[%d][%d]\t%x -> %x\n", i, q, pt[q], ( (i << 22) + (q << 12)));
+					//printf("pd[%d][%d]\t%x -> %x\n", i, q, pt[q], ( (i << 22) + (q << 12)));
 					total++;
 				}
 
@@ -93,7 +93,7 @@ void paging_info(uint32_t* pd) {
 
 		}
 	}
-	printf("Page directory: 0x%x\tTotal pages: %d\tD:%d\tA:%d\n", \
+	printf("Page directory 0x%x\tTotal pages: %d\tD:%d\tA:%d\n", \
 		pd, total, dirty, accessed);
 }
 /* We are going to try and fix PF's by increasing heap if that's the issue */
@@ -210,15 +210,10 @@ void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, int flags) {
 	} else {
 		pt = mm_alloc(0x1000);
 	}
-	//vga_puts("one");
-	//char b[32];
-	//itoa(_pti, b, 16);
-	//vga_puts(b);
+
 	pt[_pti] = (phys| flags);
-	//vga_puts("two");
-	/* Make sure we use the physical address of the page table */
 	dir[_pdi] = ((uint32_t) V2P(pt) | flags);
-	//vga_puts("mapped");
+
 }
 
 uint32_t* k_virt_to_phys(uint32_t virt) {
@@ -321,7 +316,7 @@ void free_pagedir(uint32_t* pd) {
 		if (pd[i] & ~0x3FF) {
 			uint32_t* pt = pd[i]  & ~0x3FF;
 			for (int q = 0; q < 1024; q++) {
-				if (pt[q] & ~0x3FF) {
+				if ((pt[q] & ~0x3FF) > 0x00400000) {
 					k_page_free(pt[q] & ~0x3FF);
 					//_paging_unmap(pd, ( (i << 22) + (q << 12)));
 				}

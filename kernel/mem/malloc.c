@@ -142,9 +142,8 @@ void* sbrk(size_t n) {
 		and increase the top of the heap by 4KB.
 		*/
 		uint32_t* phys = k_page_alloc();
-		vga_puts("Calling map");
 		k_paging_map(phys, K_HEAP_TOP, 0x3);
-		vga_puts("Mapped");
+
 		//printf("Mapping phys %x to virt %x\n", phys, K_HEAP_TOP);
 		K_HEAP_TOP += 0x1000;
 	}
@@ -345,13 +344,6 @@ void* malloc(size_t n) {
 	return ptr;
 }
 
-void* mallock(size_t n, char* func) {
-	printf("%s requesting %d bytes. Global ncli %d\n", func, n, nocli());
-	void* ptr = malloc(n);
-	printf("memlock status: %d\n", memlock.lock);
-	return ptr;
-}
-
 /*
 We will first allocate a block of free memory to buffer until page alignment.
 */
@@ -427,7 +419,7 @@ void k_heap_init() {
 	K_HEAP_TOP = K_HEAP_BOTTOM;
 	K_LAST_ALLOC = K_HEAP_BOTTOM;
 
-	sbrk(0xA000);
+	sbrk(0x10000);
 }
 
 

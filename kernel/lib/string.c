@@ -72,13 +72,16 @@ char* strcpy(char *dest, const char *src) {
 }
 
 
-int strncmp(char* s1, char* s2, size_t n) {
-	for (size_t i = 0; i < n && s1[i] == s2[i]; i++)//s1++, s2++, i++)
-		//if (*s1 == '\0')
-		if (s1[i] == '\0')
+int strncmp(const char *s1, const char *s2, size_t n)
+{
+    for ( ; n > 0; s1++, s2++, --n)
+		if (*s1 != *s2)
+			return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
+		else if (*s1 == '\0')
 			return 0;
-	return ( *(unsigned char*)s1 - *(unsigned char*)s2 );
+    return 0;
 }
+
 
 int strcmp(char *s1, char* s2) {
 	return strncmp(s1, s2, strlen(s1));

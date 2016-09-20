@@ -34,7 +34,7 @@ extern char* strcat( char* destination, const char* source );
 extern char* strncat( char * destination, const char* source, size_t n);
 extern char* strncpy(char *dest, const char *src, uint16_t n);
 extern char* strcpy(char *dest, const char *src);
-extern int strncmp(char* s1, char* s2, size_t n); 
+//extern int strncmp(char* s1, char* s2, size_t n); 
 extern int strcmp(char *s1, char* s2);
 extern char* strchr(const char* s, int c);
 extern char* strdup(const char* s);

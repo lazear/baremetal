@@ -20,6 +20,8 @@ typedef int bool;
 #define panic(a)	(printf("PANIC: %s (%s:%d:%s)\n", a, __FILE__, __LINE__, __func__))
 #define nelem(x) (sizeof(x)/sizeof((x)[0]))
 
+#define dprint(e) (printf("%s: %x\n", #e, e) )
+
 
 #ifndef KERNEL_VIRT
 #define KERNEL_VIRT		0xC0000000

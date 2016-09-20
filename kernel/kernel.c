@@ -53,8 +53,6 @@ extern uint32_t stack_top[];
 extern uint32_t stack_bottom[];
 
 
-#define dprint(e) (printf("%s: %x\n", #e, e) )
-
 
 mutex km = {.lock=0};
 
