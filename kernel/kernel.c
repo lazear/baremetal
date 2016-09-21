@@ -81,7 +81,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	KERNEL_END = kernel_end;
 	k_mm_init(kernel_end);
 	k_heap_init();
-	k_paging_init(V2P(_init_pd));
+	k_paging_init(_init_pd);
 
 	keyboard_install();
 	timer_init();
@@ -94,20 +94,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	//traverse_blockchain();
-	//cpuid_detect();
-	
-	uint32_t p = k_page_alloc();
 
-	//k_map_on_demand(0xD0000000, 0x202);
-	malloc_a(10);
-	k_paging_map(k_page_alloc(), 0xD0000000, 2);
-	int* ptr = 0xD0000000;
-	dprint(ptr);
-	//*ptr = 10;
-	//dprint(*ptr);
-	traverse_blockchain();
-	//asm volatile("hlt");
 
 	//acpi_init();
 	//ioapicinit();
@@ -120,7 +107,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	//ap_entry_init();
 	//lapic_start_AP(1);
 
-	//elf_load();
+	elf_load();
 
 	for(;;);
 }

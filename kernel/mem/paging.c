@@ -56,7 +56,7 @@ static uint32_t* CURRENT_PAGE_DIRECTORY = 0;
 
 void k_swap_pd(uint32_t* pd) {
 	CURRENT_PAGE_DIRECTORY = pd;
-	asm volatile("movl %0, %%cr3" : : "r"(pd));
+	asm volatile("movl %0, %%cr3" : : "r"(V2P(CURRENT_PAGE_DIRECTORY)));
 }
 
 uint32_t* k_current_pd() {
@@ -228,6 +228,7 @@ void k_paging_init(uint32_t* dir_addr) {
 	/* Moved initial paging functions to starts.s */
 	KERNEL_PAGE_DIRECTORY = dir_addr;
 	CURRENT_PAGE_DIRECTORY = dir_addr;
+	k_swap_pd(CURRENT_PAGE_DIRECTORY);
 }
 
 /* 
@@ -427,7 +428,7 @@ void k_map_kernel(uint32_t* pd) {
 /* Returns the physical address (in first 4 mb, currently) of a new pagedir */
 uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 	/* Change to malloc_a */
-	uint32_t* pd = V2P(mm_alloc(0x1000));	// 0xFFFF0000 virtual address
+	uint32_t* pd = mm_alloc(0x1000);	// 0xFFFF0000 virtual address
 	//uint32_t* table = k_page_alloc();	// 0xFFC00000 virtual address
 
 	memset(pd, 0, 0x1000);
@@ -465,7 +466,7 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 	}
 
 	pd[1022] = V2P(KERNEL_PAGE_DIRECTORY) | PF_PRESENT | PF_RW;
-	pd[1023] = (uint32_t) pd | PF_PRESENT | PF_RW;
+	pd[1023] = (uint32_t) V2P(pd) | PF_PRESENT | PF_RW;
 
 	return pd;
 }

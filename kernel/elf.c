@@ -121,8 +121,7 @@ void elf_load() {
 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
 
-	//elf_objdump(data);
-
+	elf_objdump(data);
 	elf32_phdr* phdr 		= (uint32_t) data + ehdr->e_phoff;
 	elf32_phdr* last_phdr 	= (uint32_t) phdr + (ehdr->e_phentsize * ehdr->e_phnum);
 	
@@ -133,8 +132,12 @@ void elf_load() {
 	uint32_t* elf_pd = k_create_pagedir(0, 0, 0x7);	
 	k_map_kernel(elf_pd);
 	k_swap_pd(elf_pd);
-	k_paging_map(elf_pd, P2V(elf_pd), 0x3);
-	
+
+	printf("%x\n", elf_pd);
+
+//	k_paging_map(elf_pd, P2V(elf_pd), 0x3);
+
+
 	printf("%x\n", data);
 	while(phdr < last_phdr) {
 	//	printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
@@ -150,15 +153,16 @@ void elf_load() {
 		// Unmap in kernel?
 	//	k_paging_unmap(phdr->p_vaddr);
 		phdr++;
-	} 
-
+	}
 	int (*entry)(int, char**);
 	entry = (void(*)(void))(ehdr->e_entry);
 
 	//printf("func2 result: %d\n", func(2));
 	char* d[] = { "user.elf", "HELLO WORLD" };
-	//entry(2, d);
+	entry(2, d);
 	//free(data);
 
+	extern uint32_t* KERNEL_PAGE_DIRECTORY;
 	//k_swap_pd(KERNEL_PAGE_DIRECTORY);
+	printf("HELLO?\n");
 }
