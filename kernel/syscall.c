@@ -29,7 +29,7 @@ SOFTWARE.
 
 extern void syscall_handler();
 
-
+extern uint32_t* KERNEL_PAGE_DIRECTORY();
 
 void syscall(regs_t *r)
 {
@@ -42,10 +42,14 @@ void syscall(regs_t *r)
 	char* s;
 	switch(r->eax)
 	{
-
+	case 0:
+		printf("exit()\n");
+		k_swap_pd(KERNEL_PAGE_DIRECTORY);
+		pushcli();
+		for(;;);
+		break;
 	case 1:	// syscall write()
-		printf("Syscall write() %x", r->edx);
-		printf("%s\n", (char*) r->edx);
+		printf("write(%s)\n", (char*) r->edx);
 		break;
 	case 2:
 		vga_putc(r->edx);

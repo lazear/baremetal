@@ -130,25 +130,30 @@ void elf_load() {
 
 
 	/* Make a new page-directory and swap into it */
-	uint32_t* elf_pd = k_create_pagedir(0, 0, 0x7);	
+	uint32_t* elf_pd = k_create_pagedir(0x0, 0, 0x7);	
 	k_map_kernel(elf_pd);
 	k_swap_pd(elf_pd);
 
 	printf("%x\n", data);
 	while(phdr < last_phdr) {
-		// printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
-		//  	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
+		printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
+		 	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
 		
-		uint32_t phys = k_page_alloc();					// Allocate a physical page
-		k_paging_map(phys, phdr->p_vaddr, 0x7);			// Map that page in KPD
+		for (int i = 0; i <= (phdr->p_memsz/0x1000); i++) {
+			uint32_t phys = k_page_alloc();					// Allocate a physical page
+			k_paging_map(phys, phdr->p_vaddr + (i*0x1000), 0x7);			// Map that page in KPD
+			//printf("Mapped %x->%x\n", phys, phdr->p_vaddr+ (i*0x1000));
+		}
 		memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
-
+		
 		phdr++;
 	}
 	int (*entry)(int, char**);
 	entry = (void(*)(void))(ehdr->e_entry);
 
+
 	char* d[] = { "user.elf", "HELLO WORLD" };
+		printf("Prep to run %s %s @ 0x%x\n", d[0], d[1], entry);
 	entry(2, d);
 	free(data);
 
