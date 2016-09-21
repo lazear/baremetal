@@ -60,7 +60,7 @@ extern uint32_t stack_top;
 extern uint32_t stack_bottom;
 
 
-#define dprint(e, a) (printf("%s:" a, #e, e) )
+#define dprint(e) (printf("%s: %x\n", #e, e) )
 
 void kernel_initialize(uint32_t kernel_end) {
 
@@ -89,31 +89,39 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	sti();
 	vga_init();
-	//vga_pretty(logo, VGA_LIGHTGREEN);
 	vga_pretty("crunchy 0.1 locked and loaded!\n", VGA_LIGHTGREEN);
 
 	ide_init();
 	buffer_init();
 
-	//elf_load();
-
 	//traverse_blockchain();
 	//cpuid_detect();
-	acpi_init();
-	ioapicinit();
-	ioapicenable(0, 0);
-	ioapicenable(0, 1);
-	lapic_init();
+	
+	uint32_t p = k_page_alloc();
 
-	printf("ap_entry: 0x%x-0x%x\n", _binary_ap_entry_start, _binary_ap_entry_end);
+	//k_map_on_demand(0xD0000000, 0x202);
+	malloc_a(10);
+	k_paging_map(k_page_alloc(), 0xD0000000, 2);
+	int* ptr = 0xD0000000;
+	dprint(ptr);
+	//*ptr = 10;
+	//dprint(*ptr);
+	traverse_blockchain();
+	//asm volatile("hlt");
+
+	//acpi_init();
+	//ioapicinit();
+	//ioapicenable(0, 0);
+	//ioapicenable(0, 1);
+
+	//lapic_init();
 
 
-	ap_entry_init();
-	lapic_start_AP(1);
+	//ap_entry_init();
+	//lapic_start_AP(1);
 
 	//elf_load();
-	//dprint(KERNEL_PAGE_DIRECTORY, " %x");
-//	asm volatile ("int $0x80");
+
 	for(;;);
 }
 

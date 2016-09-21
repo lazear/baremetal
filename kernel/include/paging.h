@@ -32,8 +32,8 @@ SOFTWARE.
 #define PF_PRESENT		0x1
 #define PF_RW			0x2
 #define PF_USER			0x4
-#define PF_ACCESSED		0x10	// Bit 5 - PDE/PTE was used for translation
-#define PF_DIRTY		0x20	// Bit 6 - PTE only
+#define PF_ACCESSED		0x20	// Bit 5 - PDE/PTE was used for translation
+#define PF_DIRTY		0x40	// Bit 6 - PTE only
 
 /* 
 assembly functions
@@ -42,7 +42,7 @@ extern void k_paging_enable();
 extern void k_paging_load_directory(uint32_t* dir);
 
 extern int k_paging_unmap(uint32_t virt);
-extern void k_paging_map(uint32_t phys, uint32_t virt, uint8_t flags);
+extern void k_paging_map(uint32_t phys, uint32_t virt, int flags);
 
 extern void k_paging_init(uint32_t* dir_addr);
 extern uint32_t* k_virt_to_phys(uint32_t virt);

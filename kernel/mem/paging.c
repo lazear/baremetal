@@ -43,15 +43,59 @@ Page directory -> Page table -> Page
 = 4GB per page directory
 */
 
+
+/*
+TO-DO:
+	* Implement on-demand paging/non-accessed page de-allocation
+	Bits 9:11 are ignored on PTE's, so stored some info there?
+*/
+
+// Global variables to store important PDE's.	
 uint32_t* KERNEL_PAGE_DIRECTORY = 0;
-uint32_t* CURRENT_PAGE_DIRECTORY = 0;
+static uint32_t* CURRENT_PAGE_DIRECTORY = 0;
 
 void k_swap_pd(uint32_t* pd) {
 	CURRENT_PAGE_DIRECTORY = pd;
 	asm volatile("movl %0, %%cr3" : : "r"(pd));
 }
 
+uint32_t* k_current_pd() {
+	return CURRENT_PAGE_DIRECTORY;
+}
 
+void paging_info(uint32_t* pd) {
+	
+	uint32_t last = 0;
+	int dirty = 0;
+	int accessed = 0;
+	int total = 0;
+	for(int i = 0; i < 1024; i++) {
+		if (pd[i] & ~0x3FF) {
+			uint32_t* pt = pd[i] & ~0x3FF;
+			
+			for (int q = 0; q < 1024; q++) {
+
+				//if ((last & ~0x3FF)  != (pt[q]& ~0x3FF) - 0x1000)
+				//	printf("%x -> %x\n", pt[q], ( (i << 22) + (q << 12)));
+				if (pt[q] & PF_DIRTY) {
+					
+					dirty++;
+				}
+				if (pt[q] & PF_ACCESSED)
+					accessed++;
+				if (pt[q]) {
+					printf("pd[%d][%d]\t%x -> %x\n", i, q, pt[q], ( (i << 22) + (q << 12)));
+					total++;
+				}
+
+				last =(pt[q]);
+			}
+
+		}
+	}
+	printf("aPge directory: 0x%x\tTotal pages: %d\tD:%d\tA:%d\n", \
+		pd, total, dirty, accessed);
+}
 /* We are going to try and fix PF's by increasing heap if that's the issue */
 void k_page_fault(regs_t * r) {
 	pushcli();
@@ -59,11 +103,24 @@ void k_page_fault(regs_t * r) {
 
 	asm volatile("mov %%cr2, %%eax" : "=a"(cr2));
 
-	printf("Page fault @ 0x%X\n", cr2);
-	printf("Phys: %x\n", k_virt_to_phys(cr2));
-	if (cr2 & 1) printf("\tPage Not Present\n");
-	if (cr2 & 2) printf("\tPage Not Writeable\n");
-	if (cr2 & 4) printf("\tPage Supervisor Mode\n");
+	printf("Page fault @ 0x%X [Error: %x]\n", cr2, r->err_code);
+
+	if (r->err_code & PF_PRESENT)	printf("\tPage Not Present\n");
+	if (r->err_code & PF_RW) 		printf("\tPage Not Writeable\n");
+	if (r->err_code & PF_USER) 		printf("\tPage Supervisor Mode\n");
+
+	uint32_t phys = k_virt_to_phys(cr2);
+	if (!(phys & PF_PRESENT)) {		
+		printf("Mapped but not present: 0x%x\n", phys);
+		k_paging_map(k_page_alloc(), cr2, (phys & 0xF) | PF_RW | PF_PRESENT);
+		k_swap_pd(CURRENT_PAGE_DIRECTORY);
+		printf("New map: %x\n", k_virt_to_phys(cr2));
+		asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
+		//popcli();
+		asm volatile("hlt");
+		return;
+	
+	}
 
 	if (cr2 >= heap_brk() && cr2 < heap_brk() + 0x1000){
 		printf("Heap is out of memory\n");
@@ -72,11 +129,12 @@ void k_page_fault(regs_t * r) {
 		return;
 	}
 
-	printf("Calling func: %x\n", r->eip);
+	//printf("Calling func: %x\n", r->eip);
 	//print_regs(r);
 	//traverse_blockchain();
+	k_paging_map(k_page_alloc(), cr2 & ~0x3FF, 0x3);
 	mm_debug();
-
+//	popcli();
 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
 	asm volatile("hlt");
 }
@@ -90,7 +148,7 @@ uint32_t* _virt_to_phys(uint32_t* dir, uint32_t virt) {
 
 	uint32_t* pt = dir[_pdi] & ~0x3FF;
 
-	return ((uint32_t*) pt[_pti]);
+	return (pt[_pti]);
 }
 
 /* 
@@ -100,7 +158,7 @@ Returns the virtual address if mapped, 0 if not
 int _phys_to_virt(uint32_t* pd, uint32_t phys) {
 	for (int i = 0; i < 1024; i++) {
 		if (pd[i] & ~0x3FF) {
-			uint32_t* pt = pd[i]  & ~0x3FF;
+			uint32_t* pt = pd[i];//  & ~0x3FF;
 			for (int q = 0; q < 1024; q++) {
 				if (pt[q] & ~0x3FF)
 					if ((pt[q] & ~0x3FF) == (phys & ~0x3FF)) 
@@ -130,7 +188,18 @@ int _paging_unmap(uint32_t* dir, uint32_t virt) {
 	return 1;
 }
 
-void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, uint8_t flags) {
+void _map_on_demand(uint32_t* dir, uint32_t virt, int flags) {
+	flags &= ~PF_PRESENT;
+	flags |= 0x200;
+
+	_paging_map(dir, 0xDEAD0000, virt, flags);
+}
+
+void k_map_on_demand(uint32_t virt, int flags) {
+	_map_on_demand(CURRENT_PAGE_DIRECTORY, virt, flags);
+}
+
+void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, int flags) {
 	uint32_t _pdi = virt >> 22;
 	uint32_t _pti = (virt >> 12) & 0x3FF;
 
@@ -139,16 +208,11 @@ void _paging_map(uint32_t* dir, uint32_t phys, uint32_t virt, uint8_t flags) {
 	if ( dir[_pdi] & ~0x3FF ) {
 		pt = dir[_pdi] & ~0x3FF;
 	} else {
-
-		/*
-		I have discovered through thorough testing that it is critical
-		to convert back to the base address.
-		*/
-		pt = mm_alloc(0x1000) - KERNEL_VIRT;
+		pt = V2P(mm_alloc(0x1000));
 	}
 
-	pt[_pti] = ((phys) | flags | PF_PRESENT );
-	dir[_pdi] = ((uint32_t) pt | flags | PF_PRESENT);
+	pt[_pti] = ((phys) | flags);
+	dir[_pdi] = ((uint32_t) pt | flags);
 }
 
 uint32_t* k_virt_to_phys(uint32_t virt) {
@@ -171,7 +235,7 @@ For some reason, k_paging_map seems to work
 without reloading the PD into CR3, however,
 unmapping a page requires remapping
 */
-void k_paging_map(uint32_t phys, uint32_t virt, uint8_t flags) {
+void k_paging_map(uint32_t phys, uint32_t virt, int flags) {
 	_paging_map(CURRENT_PAGE_DIRECTORY, phys, virt, flags);
 }
 
@@ -255,8 +319,10 @@ void free_pagedir(uint32_t* pd) {
 					//_paging_unmap(pd, ( (i << 22) + (q << 12)));
 				}
 			}
+			k_page_free(pt);
 		}
 	}
+	k_page_free(pd);
 }
 
 /*
@@ -360,14 +426,11 @@ void k_map_kernel(uint32_t* pd) {
 
 /* Returns the physical address (in first 4 mb, currently) of a new pagedir */
 uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
+	/* Change to malloc_a */
 	uint32_t* pd = V2P(mm_alloc(0x1000));	// 0xFFFF0000 virtual address
-	//k_paging_map(pd, )
 	//uint32_t* table = k_page_alloc();	// 0xFFC00000 virtual address
+
 	memset(pd, 0, 0x1000);
-	//memset(table, 0, 0x1000);
-
-	//pd[1023] = (uint32_t) pd | flags;
-
 	uint32_t phys = 0;
 
 	/*
@@ -388,22 +451,21 @@ uint32_t* k_create_pagedir(uint32_t virt, uint32_t numpages, int flags) {
 			printf("%d pdi\n", _pdi);
 			uint32_t* pt = V2P(mm_alloc(0x1000));//k_page_alloc();
 			
-			pd[_pdi] = ((uint32_t) pt | flags );
+			pd[_pdi] = ((uint32_t) pt | flags);
 			printf("%x\n", pd[_pdi]);
 
 		}
 	}
 
 	for (int i = 0; i < numpages; i++) {
-		phys = k_page_alloc();
+		phys = k_page_alloc() ;
 		if (!phys) 
 			panic("MM error");
-		_paging_map(pd, phys, virt + (i* 0x1000), flags);
+		_paging_map(pd, phys, virt + (i* 0x1000), flags );
 	}
 
-	pd[1022] = (( (uint32_t) KERNEL_PAGE_DIRECTORY > 0xC0000000) ? \
-		V2P(KERNEL_PAGE_DIRECTORY) : ((uint32_t) KERNEL_PAGE_DIRECTORY)) | 3;
-	pd[1023] = (uint32_t) pd | 3;
+	pd[1022] = V2P(KERNEL_PAGE_DIRECTORY) | PF_PRESENT | PF_RW;
+	pd[1023] = (uint32_t) pd | PF_PRESENT | PF_RW;
 
 	return pd;
 }

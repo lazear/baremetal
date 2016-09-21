@@ -103,11 +103,13 @@ void* elf_objdump(void* data) {
 	void* strtab_d 		= (uint32_t) data + strtab->sh_offset;
 	void* func;
 	/* Output symbol information*/
+	/*
 	while(sym < last_sym) {
 		if (sym->st_name) 
 			printf("%s\t0x%x\n", sym->st_name + strtab_d, sym->st_value);
 		sym++;
 	}
+	*/
 }
 
 
@@ -131,6 +133,7 @@ void elf_load() {
 	uint32_t* elf_pd = k_create_pagedir(0, 0, 0x7);	
 	k_map_kernel(elf_pd);
 	k_swap_pd(elf_pd);
+	k_paging_map(elf_pd, P2V(elf_pd), 0x3);
 	
 	printf("%x\n", data);
 	while(phdr < last_phdr) {
@@ -154,7 +157,7 @@ void elf_load() {
 
 	//printf("func2 result: %d\n", func(2));
 	char* d[] = { "user.elf", "HELLO WORLD" };
-	entry(2, d);
+	//entry(2, d);
 	//free(data);
 
 	//k_swap_pd(KERNEL_PAGE_DIRECTORY);
