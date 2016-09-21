@@ -75,30 +75,24 @@ Implementation of stdlib for crunchy
 char*  ftoa(double num, char* str)
 {
    int whole_part = num;
-   int digit = 0, reminder =0;
+   int digit;
    int log_value = dlog10(num), index = log_value;
    long wt =0;
-
-   //Initilise stirng to zero
-   memset(str, 0 ,20);
-
-   //Extract the whole part from float num
-   for(int i = 1 ; i < log_value + 2 ; i++)
-   {
-       wt  =  pow(10,i);
-       reminder = whole_part  %  wt;
-       digit = (reminder - digit) / (wt/10);
-
-       //Store digit in string
-       str[index--] = digit + 48;              // ASCII value of digit  = digit + 48
-       if (index == -1)
-          break;    
-   }
-
-    index = log_value + 1;
-    str[index] = '.';
-
    double fraction_part  = num - whole_part;
+
+	// go in reverse order
+   	int i = 0;
+	while (whole_part != 0) {
+		int remainder = whole_part % 10;
+		str[i++] = remainder + '0';
+		whole_part = whole_part / 10;
+	}
+	strrev(str);
+
+   index = log_value + 1;
+   str[index] = '.';
+
+
    double tmp1 = fraction_part,  tmp =0;
 
    //Extract the fraction part from  num
@@ -148,6 +142,7 @@ int pow(int n, int x) {
 	return n;
 }
 
+
 // string to integer
 int atoi(char* s) {
 	int num = 0;
@@ -179,11 +174,6 @@ char* itoa(uint32_t num, char* buffer, int base) {
 		buffer[i] = '\0';
 		return buffer;
 	}
-/*	if (num == 0 && base == 0) {
-		buffer[0] = '0';
-		buffer[1] = '\0';
-		return buffer;
-	}*/
 
 	// go in reverse order
 	while (num != 0 && len--) {
@@ -200,6 +190,7 @@ char* itoa(uint32_t num, char* buffer, int base) {
 
 	return strrev(buffer);
 }
+
 // signed integer to string
 char* sitoa(int num, char* buffer, int base) {
 	int i = 0;

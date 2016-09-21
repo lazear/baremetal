@@ -11,12 +11,14 @@ _start:
 	push ebp
 	mov ebp, esp
 
-	; mov esi, [ebp+8]	; argc
-	; mov edi, [ebp+12]	; argv
+	mov esi, [ebp+8]	; argc
+	mov edi, [ebp+12]	; argv
+	
+	push esi
+	push edi
 
-	; push edi			; argv
-	; push esi			; argc
 	call crt_initialize
+
 
 	call main
 

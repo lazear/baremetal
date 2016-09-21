@@ -129,7 +129,7 @@ void elf_load() {
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
 
-	elf_objdump(data);
+	//elf_objdump(data);
 	elf32_phdr* phdr 		= (uint32_t) data + ehdr->e_phoff;
 	elf32_phdr* last_phdr 	= (uint32_t) phdr + (ehdr->e_phentsize * ehdr->e_phnum);
 	uint32_t off = (phdr->p_vaddr - phdr->p_paddr);

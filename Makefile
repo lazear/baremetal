@@ -19,13 +19,14 @@ EXTUTIL = ../ext2util/ext2util
 IMAGE	= ext2
 
 all: compile link clean
+user: userland emu
 build: compile link 
 emu: compile link clean run
-user: userland emu
+
 
 userland:
 	make -C libc
-	$(CC) -w -fno-builtin -ffreestanding user/user.c -o user.elf
+	$(CC) -w user/user.c -o user.elf
 	$(EXTUTIL) -x $(IMAGE) -wf user.elf -i 12
 	objdump -d user.elf > user.S
 
