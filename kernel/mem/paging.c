@@ -128,11 +128,11 @@ void k_page_fault(regs_t * r) {
 		popcli();
 		return;
 	}
-
+	paging_info(CURRENT_PAGE_DIRECTORY);
 	//printf("Calling func: %x\n", r->eip);
 	//print_regs(r);
 	//traverse_blockchain();
-	k_paging_map(k_page_alloc(), cr2 & ~0x3FF, 0x3);
+	//k_paging_map(k_page_alloc(), cr2 & ~0x3FF, 0x3);
 	mm_debug();
 	//popcli();
 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));

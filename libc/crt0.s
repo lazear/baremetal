@@ -2,17 +2,28 @@
 section .text
 global _start
 extern main
-extern _init
+extern crt_initialize
 
+; Until we get multi-threading and exit() working, this will have to do
 _start:
 	mov ebp, 0
 	push ebp
 	push ebp
 	mov ebp, esp
 
+	; mov esi, [ebp+8]	; argc
+	; mov edi, [ebp+12]	; argv
+
+	; push edi			; argv
+	; push esi			; argc
+	call crt_initialize
+
 	call main
 
-	mov eax, 0
-	int 0x80
+	add esp, 8			; cleanup the stack
 
-size equ $-$$
+	mov esp, ebp
+	pop ebp
+
+
+	ret 

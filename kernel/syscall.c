@@ -31,6 +31,7 @@ extern void syscall_handler();
 
 extern uint32_t* KERNEL_PAGE_DIRECTORY();
 
+
 void syscall(regs_t *r)
 {
 /*	uint32_t eax, ebx, ecx, edx;
@@ -44,8 +45,10 @@ void syscall(regs_t *r)
 	{
 	case 0:
 		printf("exit()\n");
-		k_swap_pd(KERNEL_PAGE_DIRECTORY);
+		printf("kernel pd %x\n", KERNEL_PAGE_DIRECTORY);
+
 		pushcli();
+		k_swap_pd(KERNEL_PAGE_DIRECTORY);
 		for(;;);
 		break;
 	case 1:	// syscall write()
@@ -53,6 +56,10 @@ void syscall(regs_t *r)
 		break;
 	case 2:
 		vga_putc(r->edx);
+		break;
+	case 8:
+		sys_sbrk(&cp_mmap, r->ebx);
+		r->eax = cp_mmap.brk;
 		break;
 	default:
 		printf("syscall 0x80, eax 0x%x\n", r->eax);

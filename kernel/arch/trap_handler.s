@@ -20,7 +20,7 @@ trap_handler:
 
 	push eax
 	call trap
-
+	;mov esp, eax
 	pop eax
 
 	pop gs

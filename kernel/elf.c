@@ -117,6 +117,13 @@ void* elf_objdump(void* data) {
 }
 
 
+void sys_sbrk(struct _proc_mmap* m, size_t n) {
+	for (int i = n; i > 0; i -= 0x1000) {
+		_paging_map(m->pd, k_page_alloc(), m->brk, 0x7);
+		m->brk += 0x1000;
+	}
+}
+
 void elf_load() {
 	uint32_t* data = ext2_open(ext2_inode(1,12));
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
@@ -125,7 +132,6 @@ void elf_load() {
 	elf_objdump(data);
 	elf32_phdr* phdr 		= (uint32_t) data + ehdr->e_phoff;
 	elf32_phdr* last_phdr 	= (uint32_t) phdr + (ehdr->e_phentsize * ehdr->e_phnum);
-	
 	uint32_t off = (phdr->p_vaddr - phdr->p_paddr);
 
 
@@ -133,6 +139,8 @@ void elf_load() {
 	uint32_t* elf_pd = k_create_pagedir(0x0, 0, 0x7);	
 	k_map_kernel(elf_pd);
 	k_swap_pd(elf_pd);
+
+	
 
 	printf("%x\n", data);
 	while(phdr < last_phdr) {
@@ -148,17 +156,30 @@ void elf_load() {
 		
 		phdr++;
 	}
+	last_phdr--;
+	uint32_t base = (last_phdr->p_vaddr + last_phdr->p_memsz + 0x1000) & ~0xFFF;
+	dprint(base);
+
+	cp_mmap.pd = elf_pd;
+	cp_mmap.base = base;
+	cp_mmap.brk = base;
+
+	k_paging_map(k_page_alloc(), base, 0x7);
+
 	int (*entry)(int, char**);
 	entry = (void(*)(void))(ehdr->e_entry);
 
 
 	char* d[] = { "user.elf", "HELLO WORLD" };
-		printf("Prep to run %s %s @ 0x%x\n", d[0], d[1], entry);
+
 	entry(2, d);
 	free(data);
 
+
+	printf("Returned from program\n");
 	extern uint32_t* KERNEL_PAGE_DIRECTORY;
-	k_swap_pd(KERNEL_PAGE_DIRECTORY);
+	//k_swap_pd(KERNEL_PAGE_DIRECTORY);
 
 	free_pagedir(elf_pd);
+
 }

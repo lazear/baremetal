@@ -16,12 +16,11 @@ ASFLAGS = -f elf
 
 compile:
 	#Compile C source
-	rm *.a
 	$(CC) $(CCFLAGS) usr/*.c		# Compile top level
 	$(NASM) $(ASFLAGS) crt0.s
 	$(AS) crti.s -o crti.o
 	$(AS) crtn.s -o crtn.s
-	$(AR) -cvq libx.a heap.o string.o stdlib.o stdio.o
+	$(AR) -cvru libx.a heap.o string.o stdlib.o stdio.o
 
 	cp libx.a usr/lib
 	cp crt*.o usr/lib

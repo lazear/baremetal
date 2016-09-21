@@ -27,6 +27,14 @@ typedef int bool;
 #define KERNEL_VIRT		0xC0000000
 #endif
 
+struct _proc_mmap {
+	uint32_t* pd;
+	uint32_t base;
+	uint32_t brk;
+} cp_mmap;
+
+
+
 
 // Convert physical to higher half.
 #define P2V(x)	( ((uint32_t) (x) <= KERNEL_VIRT) ? ((uint32_t) (x) + KERNEL_VIRT) : (uint32_t) (x))
