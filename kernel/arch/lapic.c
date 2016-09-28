@@ -34,6 +34,7 @@ AP: Application processor(s). Currently halted.
 #include <lapic.h>
 #include <traps.h>
 #include <x86.h>
+#include <mutex.h>
 
 #define INIT       0x00000500   // INIT/RESET
 #define STARTUP    0x00000600   // Startup IPI
@@ -79,7 +80,7 @@ void lapic_init() {
 	printf("LAPIC id: %d\n", lapic_read(LAPIC_ID) >> 24);
 
 	return;
-	pic_disable();
+	//pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
 	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
 	// Calibrate timer
@@ -105,36 +106,48 @@ void lapic_init() {
 	lapic_write(LAPIC_TPR, 0);
 }
 
+
+mutex proc_m = {.lock = 0};
+
 int udelay(int i) {
-	int t = get_ticks();
-	while(t + i > get_ticks());
+	
 }
 
 /* Sends a start up IPI to the AP processor designated <apic_id>,
-telling it to start executing code at <address> */
+telling it to start executing code at <address> 
+Address must be page-aligned, and in the first megabyte of system mem*/
 void lapic_start_AP(int apic_id) {
 
-	// CMOS port, shutdown code
+	/* Following Intel SMP startup procedure:
+	Write 0Ah to CMOS RAM location 0Fh (shutdown code). 
+	This initializes a warm reset
+	*/
 	outb(0x70, 0xF);
 	outb(0x71, 0xA);
 
-
+	/*
+	The STARTUP IPI causes the target processor to start executing in Real Mode from address
+	000VV000h, where VV is an 8-bit vector that is part of the IPI message. Startup vectors are
+	limited to a 4-kilobyte page boundary in the first megabyte of the address space. Vectors A0-BF
+	are reserved; do not use vectors in this range. 
+	*/
 	uint16_t* warm_reset_vector = (uint16_t) P2V(0x40 << 4 | 0x67);
 	warm_reset_vector[0] = 0;
 	warm_reset_vector[1] = 0x8000 >> 4;
+	//*warm_reset_vector = 0x8000;
 
 	lapic_write(LAPIC_ICRHI, apic_id << 24);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL | ASSERT);
 	//udelay(2);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL);
-	//udelay(1);
-
+	udelay(1);
+	printf("Attemping LAPIC startup: %d: %x\n", apic_id, 0x8000);
 	for (int i = 0; i < 2; i++) {
 		lapic_write(LAPIC_ICRHI, apic_id << 24);
 		lapic_write(LAPIC_ICRLO, STARTUP |  0x8000 >> 12);
-	//	udelay(2);
+		udelay(1);
 	}
-	printf("Attemping LAPIC startup: %d: %x\n", apic_id, 0x8000);
+
 }
 
 
@@ -142,21 +155,56 @@ extern uint32_t _binary_ap_entry_start[];
 extern uint32_t _binary_ap_entry_end[];
 extern uint32_t KERNEL_PAGE_DIRECTORY;
 
+struct cpu {
+	uint8_t id;
+	uint32_t stack;
+	uint32_t blah;
+	struct segdesc gdt[8];
+} cpus[8];
+
+static int ncpu = 0;
+extern struct cpu *cpu asm("%gs:0");
+
+
 void mp_enter() {
-	printf("HBAHAH\n");
+//	asm volatile("cli");
+//	lapic_init();
+	acquire(&proc_m);
+	ncpu++;
+	printf("cpu %d initializing\n", ncpu);
+	printf("eflags: %x\n", get_eflags());
+	printf("%x\n", mp_processor_id());
+
+	printf("eflags: %x\n", get_eflags());
+	release(&proc_m);
+	for(;;);
+}
+
+int mp_processor_id() {
+	//if interrupts enabled, panic
+	if (get_eflags() & 0x200) {
+		panic("INTERRUPTS ENABLED");
+		return -1;
+	}
+	return lapic_read(LAPIC_ID) >> 24;
+}
+
+
+int mp_number_of_processors() {
+	return ncpu;	
 }
 
 void ap_entry_init() {
 
-	int ap_entry_size = _binary_ap_entry_end - _binary_ap_entry_start;
+	int ap_entry_size = (uint32_t) _binary_ap_entry_end - (uint32_t) _binary_ap_entry_start;
 	
 	uint8_t* code = 0x8000;
-	uint8_t* stack = V2P(mm_alloc(0x10000));
+	uint8_t* stack = mm_alloc(0x10000);
+	// Pass several arguments to the ap-start up code
 	*(void**)(code - 4) = stack + 0x10000;
 	*(void**)(code - 8) = mp_enter;
-	*(int**)(code - 12) = KERNEL_PAGE_DIRECTORY;
+	*(int**)(code - 12) = V2P(KERNEL_PAGE_DIRECTORY);
 
-	printf("new stack @ 0x%x\n", stack);
 	memmove(code, _binary_ap_entry_start, ap_entry_size);
 
 

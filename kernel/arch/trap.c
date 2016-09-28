@@ -45,6 +45,9 @@ void trap(regs_t* r) {
 		case 0x80:
 			syscall(r);
 			break;
+		default:
+			printf("Interrupt: 0x%x\n", r->int_no);
+			break;
 	}
 
 	if (r->int_no > 40)

@@ -37,9 +37,9 @@ int acpi_checksum(char* ptr) {
 
 }
 
-void acpi_parse_madt(madt_header* madt) {
+int acpi_parse_madt(madt_header* madt) {
 	char* entries = (char*) ((uint32_t) madt + sizeof(madt_header));
-
+	int num_lapics = 0;
 	while( (uint32_t) entries < (madt->h.length - sizeof(madt_header)) + (uint32_t)madt) {		
 		int type = *entries;
 		int len = *(entries+1);
@@ -47,24 +47,26 @@ void acpi_parse_madt(madt_header* madt) {
 			case 0: {
 				acpi_lapic *x = (acpi_lapic*) entries;// + i;
 				printf("LAPIC: processor id %d\tapic id%d\tflags:%d\n", x->acpi_proc_id, x->apic_id, x->flags);
+				num_lapics++;
 				break;
 			}
 			case 1: {
 				acpi_ioapic *x = (acpi_ioapic*) entries;// + i;
-				printf("I/O APIC: id %d\taddress:0x%x\n", x->ioapic_id, x->ioapic_addr);
+				//printf("I/O APIC: id %d\taddress:0x%x\n", x->ioapic_id, x->ioapic_addr);
 				break;
 			}
 			case 2: {
 				acpi_iso *x = (acpi_iso*)  entries;// + i;
-				printf("IRQ src %d BUS src %d GSI %d\n", x->irq_src, x->bus_src, x->gsi);
+				//printf("IRQ src %d BUS src %d GSI %d\n", x->irq_src, x->bus_src, x->gsi);
 				break;
 			}
 		}
 		entries += len;
 	} 
+	return num_lapics;
 } 
 
-void acpi_init() {
+int acpi_init() {
 	/* Read through the extended bios data area (EBDA) and look at every 16-byte aligned
 	structure for the signature */
     uint8_t *ptr = (uint8_t *) P2V(0x000E0000);
@@ -79,7 +81,6 @@ void acpi_init() {
 
 
 	rsdp_header* h = (rsdp_header*) ptr;
-	printf("ACPI OEM: %s\n", h->oemid);
 
 	/* Make sure we have a valid ACPI table. lower byte of the sum of the first 20 bytes
 	(isn't that a mouthful?) need to sum to zero */
@@ -89,18 +90,17 @@ void acpi_init() {
 
 	rsdt_header* r = (rsdt_header*) h->rsdt_ptr; // + 0xC0000000;
 
-	return;
 	k_paging_map(h->rsdt_ptr, P2V(h->rsdt_ptr), 0x7);
 	r = P2V(r);
-
 	for (int i = 0; i < (r->h.length - sizeof(acpi_header)) /4; i++) {
 		acpi_header* entry = (acpi_header*) P2V(r->tableptrs[i]);
 		k_paging_map(r->tableptrs[i], P2V(r->tableptrs[i]), 0x7);
 		if (!strncmp(entry->signature, "APIC", 4)) {
-			acpi_parse_madt(entry);
-			break;
+			printf("Found\n");
+			return acpi_parse_madt(entry);
 		}
 	}
+	vga_pretty("No APIC table found. SYSTEM FAILURE\n", 0x4);
 	k_paging_unmap(r);
 
 }

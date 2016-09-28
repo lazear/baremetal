@@ -9,17 +9,14 @@ start:
 	mov fs, ax
 	mov gs, ax
 
-;	mov ebx, [gdt_desc]
-
 	lgdt [gdt_desc] 	; Load the Global Descriptor Table
 
 	mov eax, cr0
 	or eax, 1               ; Set bit 0 
 	mov cr0, eax
 
-
 	mov ax, start32
-	jmp $
+	;jmp $
 
 	jmp 0x8:start32
 
@@ -42,10 +39,11 @@ start32:
 	mov cr0, eax
 
 	mov esp, [start-4]			; Pass stack
+	;mov eax, [start-8]
 	call [start-8]				; Jump into entry function
 
 	; Should not reach this point
-	mov eax, 0xDEADBEEF
+	;mov eax, 0xDEADBEEF
 	jmp $
 
 align 32

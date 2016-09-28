@@ -1,17 +1,18 @@
 #crunchy makefile
 #2007-2016, Michael Lazear
 
+PRE 	= cross/bin
 FINAL	= bin/kernel.bin	# Output binary
 START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
 AOBJS	= vectors.so trap_handler.so sched.so syscall.so font.so
 INIT 	= initcode
-CC	    = /home/lazear/opt/cross/bin/i686-elf-gcc
-LD		= /home/lazear/opt/cross/bin/i686-elf-ld
+CC	    = cross/bin/i686-elf-gcc
+LD		= cross/bin/i686-elf-ld
 AS		= nasm
-AR		= /home/lazear/opt/cross/bin/i686-elf-as
+AR		= cross/bin/i686-elf-as
 CP		= cp
-LIBGCC	= #/home/lazear/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
+LIBGCC	= cross/lib/gcc/i686-elf/6.2.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I kernel/include/  -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
@@ -25,8 +26,9 @@ emu: compile link clean run
 
 
 userland:
+	$(CC) -print-sysroot
 	make -C libc
-	$(CC) -w user/user.c -o user.elf
+	$(CC) -w --sysroot=libc user/user.c -o user.elf
 	$(EXTUTIL) -x $(IMAGE) -wf user.elf -i 12
 	objdump -d user.elf > user.S
 
@@ -53,8 +55,8 @@ compile:
 	$(AS) $(ASFLAGS) kernel/font.s -o font.so
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
 	$(AS) -f bin kernel/arch/ap_entry.s -o ap_entry
-	#$(LD) -N -e start -Ttext 0x8000 -o ap_entry.o ap_entry.elf
-	#objcopy -S -O binary -j .text ap_entry.o ap_entry
+	# $(LD) -N -e start -Ttext 0x8000 -o ap_entry.o ap_entry.elf
+	# objcopy -S -O binary -j .text ap_entry.o ap_entry
 
 hd:
 	dd if=/dev/zero of=ext2 bs=1k count=16k
@@ -63,7 +65,7 @@ hd:
 #	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
 
 run:
-	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -smp cpus=2
+	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 128 -smp cpus=4
 	
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain

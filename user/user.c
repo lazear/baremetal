@@ -17,8 +17,6 @@ int main(int argc, char* argv[]) {
 	ftoa(pow(10, 2.3)*123, s->data);
 	puts(k_stream_read(s, 10));
 
-
-	for(;;);
 	return 0;
 
 }

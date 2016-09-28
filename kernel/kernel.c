@@ -88,17 +88,28 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	acpi_init();
-	// ioapicinit();
-	// ioapicenable(0, 0);
-	// ioapicenable(0, 1);
+	int nproc = acpi_init();
+	//pic_disable();
 
-	//lapic_init();
+	ioapicinit();
+	ioapicenable(0, 0);
+	ioapicenable(0, 1);
 
-	//ap_entry_init();
-	//lapic_start_AP(1);
+	lapic_init();
 
-	elf_load();
+	// printf("%x\n", 5<<8);
+	ap_entry_init();
+	for (int i = 1; i < nproc; i++) {
+		printf("PROC %d\n", i);
+		//pushcli();
+		lapic_start_AP(i);
+		//popcli();
+	}
+
+	printf("CPU 0? %d\n", mp_processor_id());
+	sti();
+
+	//elf_load();
 
 	for(;;);
 }

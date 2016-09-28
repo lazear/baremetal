@@ -6,8 +6,8 @@ extern crt_initialize
 
 ; Until we get multi-threading and exit() working, this will have to do
 _start:
-	mov ebp, 0
-	push ebp
+	;mov ebp, 0
+	;push ebp
 	push ebp
 	mov ebp, esp
 

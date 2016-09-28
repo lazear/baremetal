@@ -178,7 +178,7 @@ void elf_load() {
 
 	printf("Returned from program\n");
 	extern uint32_t* KERNEL_PAGE_DIRECTORY;
-	//k_swap_pd(KERNEL_PAGE_DIRECTORY);
+	k_swap_pd(KERNEL_PAGE_DIRECTORY);
 
 	free_pagedir(elf_pd);
 

@@ -53,12 +53,7 @@ extern void irq_handler(regs_t *r);
 
 // The following functions are from start.s, ISR and IRQ macros
 
-extern void gdt_flush();
-extern void idt_load();
-
 extern uint32_t vectors[256];
-
-
 
 // Eflags register
 #define FL_CF           0x00000001      // Carry Flag
