@@ -200,6 +200,27 @@ char* itoa(uint32_t num, char* buffer, int base) {
 
 	return strrev(buffer);
 }
+
+char* x_itoa(uint64_t num, char* buffer, int base, size_t width) {
+	int i = 0;
+
+	// go in reverse order
+	while (num != 0 && width--) {
+		int remainder = num % base;
+		// case for hexadecimal
+		buffer[i++] = (remainder > 9)? (remainder - 10) + 'A' : remainder + '0';
+		num = num / base;
+	}
+
+	// while(width-- && base != 10)
+	// 	buffer[i++] = '0';
+
+	buffer[i] = '\0';
+
+	return strrev(buffer);
+}
+
+
 // signed integer to string
 char* sitoa(int num, char* buffer, int base) {
 	int i = 0;
@@ -224,7 +245,7 @@ char* sitoa(int num, char* buffer, int base) {
 		num = num / base;
 	}
 
-	if (sign == 0) buffer[i++] = '-';
+//	if (sign == 0) buffer[i++] = '-';
 
 	buffer[i] = '\0';
 

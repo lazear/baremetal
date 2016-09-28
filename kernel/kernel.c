@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 #include <kernel.h>
-#include <crunch.h>
 #include <vga.h>
 #include <x86.h>
 #include <stdlib.h>
@@ -33,11 +32,12 @@ SOFTWARE.
 #include <string.h>
 #include <types.h>
 #include <mutex.h>
-#include <proc.h>
+
 #include <assert.h>
 #include <ide.h>
 #include <ext2.h>
 #include <elf.h>
+#include <smp.h>
 
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
 
@@ -56,12 +56,22 @@ extern uint32_t stack_bottom[];
 
 mutex km = {.lock=0};
 
+
 void init_message(char* message, char status) {
 	vga_puts("[");
 	vga_setcolor((status)? VGA_LIGHTGREEN : VGA_LIGHTRED);
 	vga_puts( (status) ? " OK " : "FAIL" );
 	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
 	printf("] %s", message);
+}
+
+void scheduler(void) {
+	acquire(&km);
+	printf("my id %d:%d \n", cpu->id, mp_processor_id());
+	printf("%x\n", cpu->stack);
+	release(&km);
+	sti();
+	for(;;);
 }
 
 void kernel_initialize(uint32_t kernel_end) {
@@ -92,10 +102,15 @@ void kernel_initialize(uint32_t kernel_end) {
 	sti();
 	vga_init();
 	init_message("crunchy 0.1 locked and loaded!\n", 1);
-
 	ide_init();
 	buffer_init();
 
+	/* Initialize BSP cpu-local variables */
+	cpus[0].id = 0;
+	cpus[0].stack = &stack_top;
+	cpus[0].cpu = &cpus[0];
+
+	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
 	//pic_disable();
 
@@ -103,22 +118,23 @@ void kernel_initialize(uint32_t kernel_end) {
 	ioapicenable(0, 0);
 	ioapicenable(0, 1);
 
+
 	lapic_init();
 
+	/* Acquire kernel mutex */
 	acquire(&km);
 	printf("Found %d processors\n", nproc);
 	mp_start_ap(nproc);
-	release(&km);
-	sti();
+		
+	/* Wait until all processors have been started */
 	while(mp_number_of_processors() != nproc);
-	
 
 	printf("All processors started!\n");
-	//elf_load();
+	printf("Hello %4s%20s\n",  "Michael", "Lazear");
+	/* Once BSP releases the initial km lock, AP's will enter scheduler */
+	release(&km);
 
-	//printf("%d\n", cpu->id);
-
-	for(;;);
+	scheduler();
 }
 
 

@@ -25,7 +25,6 @@ SOFTWARE.
 */
 #include <types.h>
 #include <x86.h>
-#include <proc.h>
 
 extern void syscall_handler();
 

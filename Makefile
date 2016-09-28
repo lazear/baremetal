@@ -65,7 +65,7 @@ hd:
 #	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
 
 run:
-	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 128 -smp cpus=4
+	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4
 	
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain

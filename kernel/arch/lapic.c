@@ -30,6 +30,7 @@ BSP: Bootstrap processor - the core we are currently running on
 AP: Application processor(s). Currently halted.
 */
 #include <types.h>
+#include <smp.h>
 #include <acpi.h>
 #include <lapic.h>
 #include <traps.h>
@@ -77,8 +78,8 @@ void lapic_init() {
 		vga_pretty("LAPIC_BASE is already mapped\n", 4);
 	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
 
-	//return;
-		pic_disable();
+	return;
+	//pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
 	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
 	// Calibrate timer
@@ -153,18 +154,7 @@ extern uint32_t _binary_ap_entry_start[];
 extern uint32_t _binary_ap_entry_end[];
 extern uint32_t KERNEL_PAGE_DIRECTORY;
 
-struct cpu {
 
-	uint8_t id;
-	uint32_t stack;
-	uint32_t blah;
-		struct segdesc gdt[8] __attribute__((aligned(32)));
-	//struct cpu cpu;
-} cpus[8] ;
-
-volatile int ncpu = 0;
-extern struct cpu *cpu asm("%gs:0");
-extern struct gatedesc idt[256];
 
 static inline void lidt(struct gatedesc *p, int size) {
 	volatile uint16_t pd[3];
@@ -185,33 +175,24 @@ static inline void lgdt(struct segdesc *p, int size) {
 	asm volatile("lgdt (%0)" : : "r" (pd));
 }
 
+
+volatile int ncpu = 0;
+
+
 void mp_enter() {
 	acquire(&proc_m);
 	int id = lapic_read(LAPIC_ID) >> 24;
-	ncpu = (ncpu > id) ? ncpu : id;
+//	ncpu = (ncpu > id) ? ncpu : id;
+	ncpu++;
 
-
-	cpu = &cpus[id];
-	cpu->id = id;
-	
-	cpu[id].gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);			// CS = 0x8
-	cpu[id].gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);					// SS = 0x10
-	cpu[id].gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x18
-	cpu[id].gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x20
-	cpu[id].gdt[SEG_KCPU]  = SEG(STA_W, cpu, 0x00000008, 0);
-
-
-	lgdt(cpu[id].gdt, sizeof(cpu->gdt));
-	asm volatile("mov %0, %%gs" : : "r"(SEG_KCPU<<3));
-
-	printf("cpu %d initializing\n", id);
-	printf("gdt size %x at %x cpu %x\n", sizeof(cpu->gdt), cpu->gdt, cpu);
+	// Initialize CPU-local GDT and global IDT 
+	gdt_init_cpu(id);
 	lidt(idt, sizeof(idt));
+		cpu->id = id;
 	release(&proc_m);
 
-	for(;;) ;
+	scheduler();
 
-	
 }
 
 int mp_processor_id() {
@@ -229,7 +210,7 @@ int mp_number_of_processors() {
 }
 
 
-
+#define STACK_SIZE	0x4000
 void mp_start_ap(int nproc) {
 	int ap_entry_size = (uint32_t) _binary_ap_entry_end - (uint32_t) _binary_ap_entry_start;
 	uint8_t* code = 0x8000;
@@ -238,10 +219,12 @@ void mp_start_ap(int nproc) {
 	for (int i = 1; i < nproc; i++) {
 
 		//pushcli();
-		uint32_t stack = malloc(0x4000);
-
+		uint32_t stack = (malloc(STACK_SIZE) + STACK_SIZE) & ~0xF;
+		cpus[i].stack = stack;
+		cpus[i].id = i;
+		cpus[i].cpu = &cpus[i];
 		// Pass several arguments to the ap-start up code
-		*(void**)(code - 4) = stack + 0x4000;
+		*(void**)(code - 4) = stack;
 		*(void**)(code - 8) = mp_enter;
 		*(int**)(code - 12) = V2P(KERNEL_PAGE_DIRECTORY);
 		

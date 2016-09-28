@@ -29,121 +29,132 @@ Kernel level printf. Should be removed once userspace is up and running
 
 #include <types.h>
 #include <vga.h>
+#include <ctype.h>
 #include <stdarg.h>
+#include <limits.h>
 
-extern int printf(const char* fmt, ...);
 
-char* format( const char *fmt, ... ) {
-	va_list args;
-	va_start(args, fmt);
-	int count = 0;
-	// buffer is for itoa/sitoa conversions
-	char* buffer = malloc(32);
-	char *formatted = malloc(strlen(fmt) + 32);
+#define PREFIX			1
+#define ALWAYS_SIGN		2
+#define PAD 			4
 
-	while ( *fmt != 0 ) {
+int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 
-		switch (*fmt) {
+	char* buf = malloc(size);
+	memset(str, 0, size);
+	memset(buf, 0, size);
+
+	size_t n = 0;
+	size_t pad = 0;
+	int flags = 0;
+
+	while(*format && n < size) {
+		switch(*format) {
 			case '%': {
-				fmt++;
-				switch( *fmt ) {
+				format++;
+
+next_format:
+				switch(*format) {
+					case '%': {
+						buf[0] = '%';
+						buf[1] = '\0';
+						break;
+					}
+					case '#': {
+						flags |= PREFIX;
+						format++;
+						goto next_format;
+					}
+					case '+': {
+						flags |= ALWAYS_SIGN;
+						format++;
+						goto next_format;
+					}
 					case 'x': {
-						itoa(va_arg(args, int), buffer, 16);
-						for (int i = 0; i < strlen(buffer); i++)
-							formatted[count++] = buffer[i];
-						
-						memset(buffer, 0, strlen(buffer));
+						x_itoa((uint64_t)va_arg(ap, int), buf, 16, 8);
+						if ((flags & PREFIX) && (n+2 < size)) {
+							str[n++] = '0';
+							str[n++] = 'x';
+						}
 						break;
 					}
-					case 'd': {
-						itoa(va_arg(args, int), buffer, 10);
-						for (int i = 0; i < strlen(buffer); i++)
-							formatted[count++] = buffer[i];
-						
-						memset(buffer, 0, strlen(buffer));
+					case 'd': case 'i': {
+						int d = va_arg(ap, int);
+						if ((flags & ALWAYS_SIGN) && (n+1 < size)) 
+							str[n++] = (d > 0) ? '+' : '-';
+						sitoa(d, buf, 10);
+				
 						break;
 					}
+					case 'u': {
+						int d = va_arg(ap, int);
+						itoa(d, buf, 10);
+						break;
+					}
+					case 'o': {
+						itoa(va_arg(ap, int), buf, 8);
+						if ((flags & PREFIX) && (n+2 < size)) {
+							str[n++] = '0';
+						}
+						break;
+					}
+					case 'b': {
+						itoa(va_arg(ap, int), buf, 2);
+						break;
+					}
+					case 's': {
+						buf = va_arg(ap, char*);
+						break;
+					}
+					case 'c': {
+						buf[0] = va_arg(ap, char);
+						buf[1] = '\0';
+						break;
+					}
+					default: {
+						/* Parse out padding information */
+						pad = 0;
+						while(isdigit(*format)) {
+							flags |= PAD;
+							pad *= 10;
+							pad += *format - '0';
+							format++;
+						}
+						goto next_format;
+					}
+
 				}
+				if ((flags & PAD) && (pad > strlen(buf))) {
+					for (int i = 0; (i < (pad - strlen(buf))) && ((i+n) < size); i++)
+						str[n++] = (isdigit(buf[0])) ? '0' : ' ';
+				}
+				for (int i = 0; (i < strlen(buf)) && ((i+n) < size); i++) 	
+					str[n++] = buf[i];		
+				memset(buf, 0, strlen(buf));
 				break;
 			}
-			default:
-				formatted[count] = *fmt;
-
+			default: {
+				str[n++] = *format;
+				flags = 0;
+				break;
+			}
 		}
-		fmt++;
-		count++;
+		format++;
 	}
-	va_end(args);
-	return formatted;
+
+	free(buf);
+	return n;
 }
 
-int printf( const char *fmt, ... ) {
-	va_list args;
-	va_start(args, fmt);
-	int count;
-	char *buf = malloc(32 * sizeof(char));
-	//char buf[32];
-	memset(buf, 0, 32);
-	int len = 8;
-	
-	while ( *fmt != 0 )
-	{
-		switch ( *fmt ){
-			case '%':
-				fmt++;
-				switch ( *fmt )
-				{
-				case 'd':
-				case 'i':
-					sitoa(va_arg(args, int), buf, 10);
-					//sitoa(buf, 10, va_arg(args, int));
-					vga_puts(buf);
-					break;
-				case 'u':	// Unsigned
-					sitoa(va_arg(args, int), buf, 16);
-					vga_puts(buf);
-					break;		
-				case 'b':	// Byte in hex
-					itoa(va_arg(args, uint32_t), buf, 2);
-					vga_puts(buf);
-					break;
-				case 'w':	// word
-					itoa(va_arg(args, uint32_t), buf, 16);
-					vga_puts(buf);
-					break;
-				case 'x':	// hex
-					itoa(va_arg(args, uint32_t), buf, 16);
-					//itoa(buf, 16, va_arg(args, uint32_t));
-					vga_puts(buf);
-					break;
-				case 'X':	// HEX
-					itoa(va_arg(args, uint32_t), buf, 16);
-					vga_puts(buf);
-					break;
-				case 'o':	// Octal
-					itoa(va_arg(args, uint32_t), buf, 8);
-					vga_puts(buf);
-					break;
-				case 's':	// string (char*)
-					vga_puts(va_arg(args, char*));
-					break;
-				case 'c':	// char
-					vga_putc(va_arg(args, char));
-					break;
-				case 'e':
-					vga_puts(ftoa(va_arg(args, double), buf));
-							
-				}
-				fmt++;
-				break;
-			default:
-				vga_putc(*fmt);
-				fmt++;
-		}
-		count++;
-	}
-	vga_scroll();
-	va_end(args);
-	free(buf);
-	return count;
+
+
+int printf(const char* fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+	char buf[256];
+	int i = vsnprintf(buf, 256, fmt, ap);
+	va_end(ap);
+
+	vga_puts(buf);
+	return i;
 }

@@ -28,6 +28,7 @@ SOFTWARE.
 #include <types.h>
 #include <x86.h>
 #include <traps.h>
+#include <smp.h>
 
 /****************************************
 *		        ASM Template			*
@@ -116,7 +117,6 @@ void insl(int port, void *addr, int cnt)
 
 
 
-struct segdesc gdt[8];
 struct gatedesc idt[256];
 struct tss_entry system_tss;
 
@@ -155,42 +155,37 @@ void idt_init() {
 }
 
 
-void tss_swap(uint32_t stack, size_t n) {
-	gdt[SEG_TSS] = SEG16(STS_T32A, &system_tss, sizeof(system_tss)-1, 0);
-	gdt[SEG_TSS].s = 0;
+void gdt_init_cpu(char id) {
+
+	struct __cpu* c;
+	c = &cpus[id];
+
+	c->gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);			// CS = 0x8
+	c->gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);					// SS = 0x10
+	c->gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x18
+	c->gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x20
+	c->gdt[SEG_KCPU]  = SEG(STA_W, &c->cpu, sizeof(struct __cpu), 0);
+
+	c->gdt[SEG_TSS] = SEG16(STS_T32A, &system_tss, sizeof(system_tss)-1, 0);
+	c->gdt[SEG_TSS].s = 0;
+
 	system_tss.ss0 = SEG_KDATA << 3;
-	system_tss.esp0 = stack + n; //(uint)proc->kstack + KSTACKSIZE;
+	system_tss.esp0 = cpus[id].stack;
+
+
+	lgdt(c->gdt, sizeof(c->gdt));
+	asm volatile("mov %0, %%gs" : : "r"(SEG_KCPU<<3));
+
+
 	ltr(SEG_TSS<<3);
+
 }
-struct cpu {
-	struct segdesc gdt[8] __attribute__((aligned(32)));
-	uint8_t id;
-	uint32_t stack;
-	uint32_t blah;
-	
-	//struct cpu cpu;
-} cpus[8] ;
-extern struct cpu* cpuone asm("%gs:0");
 
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
 void gdt_init(void)
 {
-
-	// Map "logical" addresses to virtual addresses using identity map.
-	// Cannot share a CODE descriptor for both kernel and user
-	// because it would have to have DPL_USR, but the CPU forbids
-	// an interrupt from CPL=0 to DPL=3.
-	gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);			// CS = 0x8
-	gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);					// SS = 0x10
-	gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x20
-	gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x28
-	gdt[SEG_KCPU]  = SEG(STA_W, 0x1000000, 8, 0);							// GS:0 = cpu, 0x18
-	//gdt[7] = SEG(STA_W, 0x1000, 0xffffffff, 0	);
-	asm volatile("mov %0, %%gs" : : "r"(3<<3));
-
-	lgdt(gdt, sizeof(gdt));
-	tss_swap(0, 0);
+	gdt_init_cpu(0);
 }
 
 
