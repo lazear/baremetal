@@ -36,36 +36,44 @@ extern int printf(const char* fmt, ...);
 char* format( const char *fmt, ... ) {
 	va_list args;
 	va_start(args, fmt);
-	int count;
+	int count = 0;
 	// buffer is for itoa/sitoa conversions
-	char* buffer = malloc(16 * sizeof(char));
-	char *formatted = malloc(strlen(fmt) * sizeof(char) + 16);
+	char* buffer = malloc(32);
+	char *formatted = malloc(strlen(fmt) + 32);
 
 	while ( *fmt != 0 ) {
+
 		switch (*fmt) {
-			case '%':
+			case '%': {
 				fmt++;
 				switch( *fmt ) {
-					case 'd':
-					case 'i':
-						sitoa(va_arg(args, int), buffer, 10);
-						vga_puts(buffer);
-						strcat(formatted, buffer);
-						memset(buffer, 0, strlen(buffer));
-					case 'x':
+					case 'x': {
 						itoa(va_arg(args, int), buffer, 16);
-						strcat(formatted, buffer);
+						for (int i = 0; i < strlen(buffer); i++)
+							formatted[count++] = buffer[i];
+						
 						memset(buffer, 0, strlen(buffer));
-
+						break;
+					}
+					case 'd': {
+						itoa(va_arg(args, int), buffer, 10);
+						for (int i = 0; i < strlen(buffer); i++)
+							formatted[count++] = buffer[i];
+						
+						memset(buffer, 0, strlen(buffer));
+						break;
+					}
 				}
+				break;
+			}
 			default:
-				*formatted = *fmt;
-				formatted++;
-				fmt++;
+				formatted[count] = *fmt;
 
 		}
-		vga_putc(*formatted);
+		fmt++;
+		count++;
 	}
+	va_end(args);
 	return formatted;
 }
 

@@ -77,10 +77,8 @@ void lapic_init() {
 		vga_pretty("LAPIC_BASE is already mapped\n", 4);
 	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
 
-	printf("LAPIC id: %d\n", lapic_read(LAPIC_ID) >> 24);
-
-	return;
-	//pic_disable();
+//	return;
+	pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
 	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
 	// Calibrate timer
@@ -110,13 +108,13 @@ void lapic_init() {
 mutex proc_m = {.lock = 0};
 
 int udelay(int i) {
-	
+	lapic_read(LAPIC_ID);
 }
 
 /* Sends a start up IPI to the AP processor designated <apic_id>,
 telling it to start executing code at <address> 
 Address must be page-aligned, and in the first megabyte of system mem*/
-void lapic_start_AP(int apic_id) {
+void lapic_start_AP(int apic_id, uint32_t address) {
 
 	/* Following Intel SMP startup procedure:
 	Write 0Ah to CMOS RAM location 0Fh (shutdown code). 
@@ -133,18 +131,18 @@ void lapic_start_AP(int apic_id) {
 	*/
 	uint16_t* warm_reset_vector = (uint16_t) P2V(0x40 << 4 | 0x67);
 	warm_reset_vector[0] = 0;
-	warm_reset_vector[1] = 0x8000 >> 4;
-	//*warm_reset_vector = 0x8000;
+	warm_reset_vector[1] = address >> 4;
+	//*warm_reset_vector = address;
 
 	lapic_write(LAPIC_ICRHI, apic_id << 24);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL | ASSERT);
 	//udelay(2);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL);
 	udelay(1);
-	printf("Attemping LAPIC startup: %d: %x\n", apic_id, 0x8000);
+	printf("Attemping to start cpu: %d\n", apic_id);
 	for (int i = 0; i < 2; i++) {
 		lapic_write(LAPIC_ICRHI, apic_id << 24);
-		lapic_write(LAPIC_ICRLO, STARTUP |  0x8000 >> 12);
+		lapic_write(LAPIC_ICRLO, STARTUP |  address >> 12);
 		udelay(1);
 	}
 
@@ -162,22 +160,28 @@ struct cpu {
 	struct segdesc gdt[8];
 } cpus[8];
 
-static int ncpu = 0;
+volatile int ncpu = 0;
 extern struct cpu *cpu asm("%gs:0");
+extern struct gatedesc idt[256];
 
+static inline void lidt(struct gatedesc *p, int size) {
+	volatile uint16_t pd[3];
+	pd[0] = size-1;
+	pd[1] = (uint32_t)p;
+	pd[2] = (uint32_t)p >> 16;
+
+	asm volatile("lidt (%0)" : : "r" (pd));
+}
 
 void mp_enter() {
-//	asm volatile("cli");
-//	lapic_init();
 	acquire(&proc_m);
-	ncpu++;
+	ncpu += 1;
 	printf("cpu %d initializing\n", ncpu);
-	printf("eflags: %x\n", get_eflags());
-	printf("%x\n", mp_processor_id());
-
-	printf("eflags: %x\n", get_eflags());
+	lidt(idt, sizeof(idt));
 	release(&proc_m);
-	for(;;);
+	for(;;) ;
+
+	
 }
 
 int mp_processor_id() {
@@ -191,21 +195,28 @@ int mp_processor_id() {
 
 
 int mp_number_of_processors() {
-	return ncpu;	
+	return ncpu + 1;	
 }
 
-void ap_entry_init() {
 
+
+void mp_start_ap(int nproc) {
 	int ap_entry_size = (uint32_t) _binary_ap_entry_end - (uint32_t) _binary_ap_entry_start;
-	
 	uint8_t* code = 0x8000;
-	uint8_t* stack = mm_alloc(0x10000);
-	// Pass several arguments to the ap-start up code
-	*(void**)(code - 4) = stack + 0x10000;
-	*(void**)(code - 8) = mp_enter;
-	*(int**)(code - 12) = V2P(KERNEL_PAGE_DIRECTORY);
-
 	memmove(code, _binary_ap_entry_start, ap_entry_size);
 
+	for (int i = 1; i < nproc; i++) {
+
+		//pushcli();
+		uint32_t stack = malloc(0x4000);
+
+		// Pass several arguments to the ap-start up code
+		*(void**)(code - 4) = stack + 0x4000;
+		*(void**)(code - 8) = mp_enter;
+		*(int**)(code - 12) = V2P(KERNEL_PAGE_DIRECTORY);
+		
+		lapic_start_AP(i, 0x8000);
+		//popcli();
+	}
 
 }

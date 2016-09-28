@@ -56,6 +56,14 @@ extern uint32_t stack_bottom[];
 
 mutex km = {.lock=0};
 
+void init_message(char* message, char status) {
+	vga_puts("[");
+	vga_setcolor((status)? VGA_LIGHTGREEN : VGA_LIGHTRED);
+	vga_puts( (status) ? " OK " : "FAIL" );
+	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
+	printf("] %s", message);
+}
+
 void kernel_initialize(uint32_t kernel_end) {
 
 	/*
@@ -83,7 +91,7 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	sti();
 	vga_init();
-	vga_pretty("crunchy 0.1 locked and loaded!\n", VGA_LIGHTGREEN);
+	init_message("crunchy 0.1 locked and loaded!\n", 1);
 
 	ide_init();
 	buffer_init();
@@ -97,18 +105,15 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	lapic_init();
 
-	// printf("%x\n", 5<<8);
-	ap_entry_init();
-	for (int i = 1; i < nproc; i++) {
-		printf("PROC %d\n", i);
-		//pushcli();
-		lapic_start_AP(i);
-		//popcli();
-	}
+	acquire(&km);
+	printf("Found %d processors\n", nproc);
+	mp_start_ap(nproc);
+	release(&km);
+	//sti();
+	while(mp_number_of_processors() != nproc);
+	
 
-	printf("CPU 0? %d\n", mp_processor_id());
-	sti();
-
+	printf("All processors started!\n");
 	//elf_load();
 
 	for(;;);

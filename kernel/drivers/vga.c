@@ -100,7 +100,7 @@ void vga_overwrite_color(int color, int start_x, int start_y, int end_x, int end
 void vga_kputc(char c, int x, int y) {
 	char *vga_address = VGA_MEMORY + (x + y * 160);
 	if (isascii(c))
-		*vga_address = c | (CURRENT_ATTRIB << 8);
+		*(uint16_t*)vga_address = c | (CURRENT_ATTRIB << 8);
 }
 
 void vga_kputs(char* s, int x, int y) {

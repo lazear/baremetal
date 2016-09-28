@@ -46,7 +46,7 @@ int acpi_parse_madt(madt_header* madt) {
 		switch(type) {
 			case 0: {
 				acpi_lapic *x = (acpi_lapic*) entries;// + i;
-				printf("LAPIC: processor id %d\tapic id%d\tflags:%d\n", x->acpi_proc_id, x->apic_id, x->flags);
+				//printf("LAPIC: processor id %d\tapic id%d\tflags:%d\n", x->acpi_proc_id, x->apic_id, x->flags);
 				num_lapics++;
 				break;
 			}
@@ -96,7 +96,6 @@ int acpi_init() {
 		acpi_header* entry = (acpi_header*) P2V(r->tableptrs[i]);
 		k_paging_map(r->tableptrs[i], P2V(r->tableptrs[i]), 0x7);
 		if (!strncmp(entry->signature, "APIC", 4)) {
-			printf("Found\n");
 			return acpi_parse_madt(entry);
 		}
 	}
