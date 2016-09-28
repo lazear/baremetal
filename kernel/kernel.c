@@ -109,12 +109,14 @@ void kernel_initialize(uint32_t kernel_end) {
 	printf("Found %d processors\n", nproc);
 	mp_start_ap(nproc);
 	release(&km);
-	//sti();
+	sti();
 	while(mp_number_of_processors() != nproc);
 	
 
 	printf("All processors started!\n");
 	//elf_load();
+
+	//printf("%d\n", cpu->id);
 
 	for(;;);
 }

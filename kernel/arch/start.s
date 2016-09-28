@@ -86,6 +86,7 @@ jne .loop
 start:
 	mov eax, stack_top 		; Establish the 16K kernel stack
 	mov esp, eax
+
 	call gdt_init			; C function, initialize GDT
 	call idt_init			; C function, initialize IDT
 

@@ -77,8 +77,8 @@ void lapic_init() {
 		vga_pretty("LAPIC_BASE is already mapped\n", 4);
 	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
 
-//	return;
-	pic_disable();
+	//return;
+		pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
 	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
 	// Calibrate timer
@@ -136,7 +136,7 @@ void lapic_start_AP(int apic_id, uint32_t address) {
 
 	lapic_write(LAPIC_ICRHI, apic_id << 24);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL | ASSERT);
-	//udelay(2);
+	udelay(2);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL);
 	udelay(1);
 	printf("Attemping to start cpu: %d\n", apic_id);
@@ -154,11 +154,13 @@ extern uint32_t _binary_ap_entry_end[];
 extern uint32_t KERNEL_PAGE_DIRECTORY;
 
 struct cpu {
+
 	uint8_t id;
 	uint32_t stack;
 	uint32_t blah;
-	struct segdesc gdt[8];
-} cpus[8];
+		struct segdesc gdt[8] __attribute__((aligned(32)));
+	//struct cpu cpu;
+} cpus[8] ;
 
 volatile int ncpu = 0;
 extern struct cpu *cpu asm("%gs:0");
@@ -173,12 +175,40 @@ static inline void lidt(struct gatedesc *p, int size) {
 	asm volatile("lidt (%0)" : : "r" (pd));
 }
 
+static inline void lgdt(struct segdesc *p, int size) {
+
+	// 16:32 bit pointer is required for lgdt/lidt
+	volatile uint16_t pd[3];
+	pd[0] = size-1;
+	pd[1] = (uint32_t)p;
+	pd[2] = (uint32_t)p >> 16;
+	asm volatile("lgdt (%0)" : : "r" (pd));
+}
+
 void mp_enter() {
 	acquire(&proc_m);
-	ncpu += 1;
-	printf("cpu %d initializing\n", ncpu);
+	int id = lapic_read(LAPIC_ID) >> 24;
+	ncpu = (ncpu > id) ? ncpu : id;
+
+
+	cpu = &cpus[id];
+	cpu->id = id;
+	
+	cpu[id].gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);			// CS = 0x8
+	cpu[id].gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);					// SS = 0x10
+	cpu[id].gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x18
+	cpu[id].gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x20
+	cpu[id].gdt[SEG_KCPU]  = SEG(STA_W, cpu, 0x00000008, 0);
+
+
+	lgdt(cpu[id].gdt, sizeof(cpu->gdt));
+	asm volatile("mov %0, %%gs" : : "r"(SEG_KCPU<<3));
+
+	printf("cpu %d initializing\n", id);
+	printf("gdt size %x at %x cpu %x\n", sizeof(cpu->gdt), cpu->gdt, cpu);
 	lidt(idt, sizeof(idt));
 	release(&proc_m);
+
 	for(;;) ;
 
 	

@@ -162,14 +162,15 @@ void tss_swap(uint32_t stack, size_t n) {
 	system_tss.esp0 = stack + n; //(uint)proc->kstack + KSTACKSIZE;
 	ltr(SEG_TSS<<3);
 }
-
 struct cpu {
-	uint32_t id;
+	struct segdesc gdt[8] __attribute__((aligned(32)));
+	uint8_t id;
 	uint32_t stack;
-	uint32_t blah
-};
-
-extern struct cpu* cpu asm("%gs:0");
+	uint32_t blah;
+	
+	//struct cpu cpu;
+} cpus[8] ;
+extern struct cpu* cpuone asm("%gs:0");
 
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
@@ -182,11 +183,11 @@ void gdt_init(void)
 	// an interrupt from CPL=0 to DPL=3.
 	gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);			// CS = 0x8
 	gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);					// SS = 0x10
-	gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x18
-	gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x20
-	gdt[SEG_KCPU]  = SEG(STA_W, cpu, 8, 0);
-
-	asm volatile("mov %0, %%gs" : : "r"(SEG_KCPU<<3));
+	gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x20
+	gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x28
+	gdt[SEG_KCPU]  = SEG(STA_W, 0x1000000, 8, 0);							// GS:0 = cpu, 0x18
+	//gdt[7] = SEG(STA_W, 0x1000, 0xffffffff, 0	);
+	asm volatile("mov %0, %%gs" : : "r"(3<<3));
 
 	lgdt(gdt, sizeof(gdt));
 	tss_swap(0, 0);
