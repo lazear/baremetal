@@ -26,7 +26,7 @@ SOFTWARE.
 
 #include <types.h>
 #include <mutex.h>
-
+#include <smp.h>
 int ncli = 0;
 
 void pushcli() {
@@ -39,17 +39,30 @@ void popcli() {
 
 	if(--ncli < 0)
 		panic("popcli without push");
-	if(ncli == 0) {
+	if(ncli == 0) 
 		asm volatile("sti");
-	}
-	// else {
-	// 	char buf[32];
-	// 	itoa(ncli, buf, 10);
-	// 	vga_puts("NOCLI ");
-	// 	vga_puts(buf);
-	// }
+
 
 }	
+
+
+// extern void __acquire(mutex *);
+// extern void __release(mutex *);
+
+// void acquire(mutex* m) {
+// 	pushcli();
+// 	__acquire(m);
+// 	//m->holder =  __builtin_return_address(0) ;
+// 	//m->cpu = cpu->id;
+
+// 	//asm volatile("mov (%%ebp+4), %0" : "=r"(eip));
+// }
+
+// void release(mutex* m) {
+// 	m->cpu = -1;
+// 	popcli();
+// 	__release(m);
+// }
 
 mutex ml = {.lock = 0};
 
@@ -61,9 +74,9 @@ void mutex_test() {
 
 	printf("Begin mutex test\n");
 	acquire(&ml);
-
-	printf("acquire: %d\n", ml.lock);
+//	ml.cpu = cpu->id;
 
 	release(&ml);
 	printf("release: %d\n", ml.lock);
 }
+

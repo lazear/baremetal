@@ -8,7 +8,7 @@ mutex.h
 #define __crunchy_mutex__
 
 typedef struct mutex_struct {
-	unsigned char lock : 1;
+	uint32_t lock : 1;
 } __attribute__((packed)) mutex;
 
 

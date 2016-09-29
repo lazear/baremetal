@@ -71,7 +71,7 @@ next_format:
 						goto next_format;
 					}
 					case 'x': {
-						x_itoa((uint64_t)va_arg(ap, int), buf, 16, 8);
+						itoa(va_arg(ap, int), buf, 16);
 						if ((flags & PREFIX) && (n+2 < size)) {
 							str[n++] = '0';
 							str[n++] = 'x';
@@ -109,6 +109,11 @@ next_format:
 					case 'c': {
 						buf[0] = va_arg(ap, char);
 						buf[1] = '\0';
+						break;
+					}
+					case 'w': {
+						flags |= PAD;
+						buf[0] = ' ';
 						break;
 					}
 					default: {

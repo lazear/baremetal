@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
 	fflush(s);
 	ftoa(pow(10, 2.3)*123, s->data);
 	puts(k_stream_read(s, 10));
+	printf("Hello %4s%20s\n",  "Michael", "Lazear");
+	
 
 	return 0;
 

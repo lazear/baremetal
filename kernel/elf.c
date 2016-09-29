@@ -81,12 +81,12 @@ void* elf_objdump(void* data) {
 	shdr++;					// Skip null entry
 	int q = 0;
 
-	printf("Sections:\nIdx   Name\tSize\t\tAddress \tOffset\tAlign\n");
+	printf("Sections:\n %8wIdx Name%8wSize\t\tAddress \tOffset\tAlign\n");
 	while (shdr < last_shdr) {	
-		printf("%d:   %s\t%x\t%x\t%d\t%x\n", 
+		printf("%d:%10s %#8x %#8x %5d %#8x\n", 
 			q++, (string_table + shdr->sh_name), shdr->sh_size,
 			shdr->sh_addr, shdr->sh_offset, shdr->sh_addralign);
-		if (strcmp(string_table + shdr->sh_name, ".symtab") == 0) {
+		if (strcmp(".symtab", string_table + shdr->sh_name) == 0) {
 			printf("found symtab: %s\n", string_table + shdr->sh_name);
 			symtab = shdr;
 		}
@@ -124,8 +124,8 @@ void sys_sbrk(struct _proc_mmap* m, size_t n) {
 	}
 }
 
-void elf_load() {
-	uint32_t* data = ext2_open(ext2_inode(1,12));
+void elf_load(int i_no) {
+	uint32_t* data = ext2_open(ext2_inode(1,i_no));
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
 

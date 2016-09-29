@@ -36,8 +36,9 @@ SOFTWARE.
 #include <assert.h>
 #include <ide.h>
 #include <ext2.h>
-#include <elf.h>
+
 #include <smp.h>
+
 
 //We enter into kernel initialize with the GDT and IDT already loaded, and interrupts disabled
 
@@ -46,12 +47,9 @@ uint32_t KERNEL_END = 0;
 
 extern uint32_t _init_pt[];
 extern uint32_t _init_pd[];
-extern uint32_t _binary_ap_entry_start[];
-extern uint32_t _binary_ap_entry_end[];
 
 extern uint32_t stack_top[];
 extern uint32_t stack_bottom[];
-
 
 
 mutex km = {.lock=0};
@@ -90,6 +88,13 @@ void kernel_initialize(uint32_t kernel_end) {
 			* multitasking.
 	*/
 
+	cpus[0].id = 0;
+	cpus[0].stack = &stack_top;
+	cpus[0].cpu = &cpus[0];
+	cpus[0].ncli = 0;
+	cpu = &cpu[0];
+
+
 	KERNEL_END = kernel_end;
 	k_mm_init(kernel_end);
 	k_heap_init();
@@ -105,34 +110,45 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
+
 	/* Initialize BSP cpu-local variables */
-	cpus[0].id = 0;
-	cpus[0].stack = &stack_top;
-	cpus[0].cpu = &cpus[0];
+
+	//elf_objdump(ext2_open(ext2_inode(1, 12)));
 
 	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
 	//pic_disable();
 
-	ioapicinit();
-	ioapicenable(0, 0);
-	ioapicenable(0, 1);
+	// ioapicinit();
+	// ioapicenable(0, 0);
+	// ioapicenable(0, 1);
 
 
-	lapic_init();
+	// lapic_init();
 
-	/* Acquire kernel mutex */
-	acquire(&km);
-	printf("Found %d processors\n", nproc);
-	mp_start_ap(nproc);
+	// /* Acquire kernel mutex */
+	// acquire(&km);
+	// printf("Found %d processors\n", nproc);
+	// mp_start_ap(nproc);
 		
-	/* Wait until all processors have been started */
-	while(mp_number_of_processors() != nproc);
+	// /* Wait until all processors have been started */
+	// while(mp_number_of_processors() != nproc);
 
-	printf("All processors started!\n");
-	printf("Hello %4s%20s\n",  "Michael", "Lazear");
-	/* Once BSP releases the initial km lock, AP's will enter scheduler */
-	release(&km);
+	// printf("All processors started!\n");
+
+	// /* Once BSP releases the initial km lock, AP's will enter scheduler */
+	// release(&km);
+
+	// mutex_test();
+
+	// uint32_t eip =  __builtin_return_address(0) ;
+
+	// printf("%x eip\n", eip);
+
+
+
+
+	sti();
 
 	scheduler();
 }
