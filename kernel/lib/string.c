@@ -30,10 +30,12 @@ Implementation of string library for crunchy project
 #include <types.h>
 
 // Returns length of a null-terminated string
-size_t strlen( char* s ) {
-	char* p = s;
-	uint32_t i = 0;
-	while (*p++ != 0 ) i++;
+size_t strlen( const char* s ) {
+	int i = 0;
+	while(*s) {
+		i++;
+		s++;
+	}
 	return i;
 }
 
@@ -74,11 +76,16 @@ char* strcpy(char *dest, const char *src) {
 
 int strncmp(const char *s1, const char *s2, size_t n)
 {
-    for ( ; n > 0; s1++, s2++, --n)
-		if (*s1 != *s2)
-			return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
-		else if (*s1 == '\0')
-			return 0;
+  //   for ( ; n > 0; s1++, s2++, --n)
+		// if (*s1 != *s2)
+		// 	return ( (int) *s1 - (int) *s2);
+		// else if (*s1 == '\0')
+		// 	return 0;
+
+
+	for (int i = 0; i < n; i++)
+		if (s1[i] != s2[i])
+			return ((unsigned char) s1[i] - (unsigned char) s2[i]);
     return 0;
 }
 

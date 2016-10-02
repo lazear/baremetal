@@ -46,7 +46,10 @@ void trap(regs_t* r) {
 			syscall(r);
 			break;
 		default:
-			printf("Interrupt: 0x%x\n", r->int_no);
+			printf("Interrupt: %#x: EIP %#x\n", r->int_no, r->eip);
+			print_regs(r);
+
+			asm volatile("cli; hlt");
 			break;
 	}
 

@@ -80,6 +80,7 @@ void vga_scroll()
 		uint8_t temp = CURRENT_Y - 24;
 		memcpy(vga_addr, vga_addr + temp * 160, (25 - temp) * 160 * 2);
 		memsetw(vga_addr + (24*160), 0 | (CURRENT_ATTRIB)<<8, 160);
+		//CURRENT_X = 0;
 		CURRENT_Y = 24;
 	}
 	vga_update_cursor();
@@ -126,6 +127,7 @@ void vga_putc(char c) {
 	if (c == '\n') {
 		CURRENT_Y += 1;
 		CURRENT_X = 0;
+			vga_scroll();
 		return;
 	}
 	if (c == '\b') {

@@ -128,7 +128,7 @@ align 0x1000
 global _init_pt
 global _init_pd
 _init_pt:				; 4 MB page table
-	times 1024 dd 0
+	times 1024 dd 3
 _init_pd:
 	times 1024 dd 0
 

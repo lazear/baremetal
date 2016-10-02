@@ -37,6 +37,7 @@ SOFTWARE.
 #include <ide.h>
 #include <ext2.h>
 
+#include <traps.h>
 #include <smp.h>
 
 
@@ -48,9 +49,8 @@ uint32_t KERNEL_END = 0;
 extern uint32_t _init_pt[];
 extern uint32_t _init_pd[];
 
-extern uint32_t stack_top[];
-extern uint32_t stack_bottom[];
 
+extern void enter_usermode(uint32_t);
 
 mutex km = {.lock=0};
 
@@ -66,11 +66,12 @@ void init_message(char* message, char status) {
 void scheduler(void) {
 	acquire(&km);
 	printf("my id %d:%d \n", cpu->id, mp_processor_id());
-	printf("%x\n", cpu->stack);
+	//printf("%x\n", cpu->stack);
 	release(&km);
 	sti();
 	for(;;);
 }
+
 
 void kernel_initialize(uint32_t kernel_end) {
 
@@ -88,11 +89,6 @@ void kernel_initialize(uint32_t kernel_end) {
 			* multitasking.
 	*/
 
-	cpus[0].id = 0;
-	cpus[0].stack = &stack_top;
-	cpus[0].cpu = &cpus[0];
-	cpus[0].ncli = 0;
-	cpu = &cpu[0];
 
 
 	KERNEL_END = kernel_end;
@@ -107,9 +103,13 @@ void kernel_initialize(uint32_t kernel_end) {
 	sti();
 	vga_init();
 	init_message("crunchy 0.1 locked and loaded!\n", 1);
+	dprint(strlen("MICHAEL Lazear"));
+	dprint(strcmp("Michael Lazear", "michael"));
+	dprint(strcmp("ACPI dddd", "ACPI "));
+
 	ide_init();
 	buffer_init();
-
+	lsroot();
 
 	/* Initialize BSP cpu-local variables */
 
@@ -117,39 +117,46 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
-	//pic_disable();
-
-	// ioapicinit();
-	// ioapicenable(0, 0);
-	// ioapicenable(0, 1);
 
 
-	// lapic_init();
 
-	// /* Acquire kernel mutex */
-	// acquire(&km);
-	// printf("Found %d processors\n", nproc);
-	// mp_start_ap(nproc);
+
+	for(;;);
+	pic_disable();
+
+	ioapicinit();
+	ioapicenable(0, 0);
+	ioapicenable(0, 1);
+	ioapicenable(IRQ_IDE, 0);
+	ioapicenable(IRQ_IDE, 1);
+
+
+	lapic_init();
+
+	/* Acquire kernel mutex */
+	acquire(&km);
+	printf("Found %d processors\n", nproc);
+	mp_start_ap(nproc);
 		
-	// /* Wait until all processors have been started */
-	// while(mp_number_of_processors() != nproc);
+	// Wait until all processors have been started 
+	while(mp_number_of_processors() != nproc);
 
-	// printf("All processors started!\n");
-
-	// /* Once BSP releases the initial km lock, AP's will enter scheduler */
-	// release(&km);
-
-	// mutex_test();
-
-	// uint32_t eip =  __builtin_return_address(0) ;
-
-	// printf("%x eip\n", eip);
+	printf("All processors started!\n");
+	
 
 
+	/* Once BSP releases the initial km lock, AP's will enter scheduler */
+	release(&km);
 
+	//mutex_test();
+
+
+	dprint(SEG_UCODE << 3);
+	dprint(SEG_UDATA << 3);
 
 	sti();
 
+//	enter_usermode(0);
 	scheduler();
 }
 

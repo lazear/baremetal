@@ -5,14 +5,14 @@ PRE 	= cross/bin
 FINAL	= bin/kernel.bin	# Output binary
 START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
-AOBJS	= vectors.so trap_handler.so sched.so syscall.so font.so
+AOBJS	= vectors.so trap_handler.so sched.so syscall.so font.so umode.so
 INIT 	= initcode
-CC	    = cross/bin/i686-elf-gcc
-LD		= cross/bin/i686-elf-ld
+CC	    = ~/opt/cross/bin/i686-elf-gcc
+LD		= ~/opt/cross/bin/i686-elf-ld
 AS		= nasm
-AR		= cross/bin/i686-elf-as
+AR		= ~/opt/cross/bin/i686-elf-as
 CP		= cp
-LIBGCC	= #cross/lib/gcc/i686-elf/6.2.0/libgcc.a
+LIBGCC	= #~/opt/cross/lib/gcc/i686-elf/6.2.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I kernel/include/  -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
@@ -53,6 +53,7 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/trap_handler.s -o trap_handler.so
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
 	$(AS) $(ASFLAGS) kernel/font.s -o font.so
+	$(AS) $(ASFLAGS) kernel/arch/umode.s -o umode.so
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
 	$(AS) -f bin kernel/arch/ap_entry.s -o ap_entry
 	# $(LD) -N -e start -Ttext 0x8000 -o ap_entry.o ap_entry.elf
@@ -65,7 +66,7 @@ hd:
 #	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
 
 run:
-	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4
+	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4 #-d cpu_reset -d int -no-reboot
 	
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain

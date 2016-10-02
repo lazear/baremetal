@@ -63,6 +63,7 @@ void syscall(regs_t *r)
 	default:
 		printf("syscall 0x80, eax 0x%x\n", r->eax);
 		//ret = fork();
+
 		break;
 	}
 	//print_regs(cp);

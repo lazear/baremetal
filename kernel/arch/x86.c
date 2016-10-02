@@ -117,8 +117,6 @@ void insl(int port, void *addr, int cnt)
 
 
 
-struct gatedesc idt[256];
-struct tss_entry system_tss;
 
 static inline void lidt(struct gatedesc *p, int size) {
 	volatile uint16_t pd[3];
@@ -146,7 +144,6 @@ static inline void ltr(uint16_t sel) {
 
 void idt_init() {
 	pic_init();
-	//irq_remap();
 	for (int i = 0; i < 256; i ++)
 		SETGATE(idt[i], 0, 0x8, vectors[i], 0);
 	// Make syscall accessible from userland
@@ -155,37 +152,58 @@ void idt_init() {
 }
 
 
+extern uint32_t stack_top[];
+extern uint32_t stack_bottom[];
+
 void gdt_init_cpu(char id) {
 
-	struct __cpu* c;
+	struct cpu* c;
 	c = &cpus[id];
 
 	c->gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);			// CS = 0x8
 	c->gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);					// SS = 0x10
-	c->gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x18
-	c->gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x20
-	c->gdt[SEG_KCPU]  = SEG(STA_W, &c->cpu, sizeof(struct __cpu), 0);
+	c->gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);		// CS = 0x20
+	c->gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);			// SS = 0x28
+	c->gdt[SEG_KCPU]  = SEG(STA_W, &c->cpu, sizeof(struct cpu), 0);
 
-	c->gdt[SEG_TSS] = SEG16(STS_T32A, &system_tss, sizeof(system_tss)-1, 0);
+	c->gdt[SEG_TSS] = SEG(STS_T32A, &system_tss, sizeof(system_tss)-1, 0);
 	c->gdt[SEG_TSS].s = 0;
-
-	system_tss.ss0 = SEG_KDATA << 3;
-	system_tss.esp0 = cpus[id].stack;
 
 
 	lgdt(c->gdt, sizeof(c->gdt));
 	asm volatile("mov %0, %%gs" : : "r"(SEG_KCPU<<3));
 
-
+	//system_tss.esp0 = cpus[id].stack;
 	ltr(SEG_TSS<<3);
 
+	
+
 }
+
 
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
 void gdt_init(void)
 {
+
+	cpus[0].id = 0;
+	cpus[0].stack = &stack_top;
+	cpus[0].cpu = &cpus[0];
+	cpus[0].ncli = 0;
+	cpu = &cpu[0];
+
+
 	gdt_init_cpu(0);
+
+
+	system_tss.cs = SEG_KCODE << 3;
+	system_tss.ss0 = SEG_KDATA << 3;
+
+	int esp = 0;
+	asm volatile("mov %%esp, %0" : "=r"(esp));
+	system_tss.esp0 = esp;
+	//ltr(SEG_TSS<<3);
+
 }
 
 
@@ -202,6 +220,7 @@ void sti() {
 
 void print_regs(regs_t* r) {
     //vga_clear();
+   // r = (uint32_t)r + 4;
     printf("Register dump\n");
     printf("gs: 0x%x\n", r->gs);
     printf("fs: 0x%x\n", r->fs);

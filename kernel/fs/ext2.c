@@ -27,6 +27,7 @@ SOFTWARE.
 #include <ext2.h>
 #include <types.h>
 #include <assert.h>
+#include <mutex.h>
 
 /* 	Read superblock from device dev, and check the magic flag.
 	Return NULL if not a valid EXT2 partition */
@@ -188,6 +189,8 @@ void ls(dirent* d) {
 	} while(d->inode);
 }
 
+
+mutex llm = { .lock = 0};
 void lsroot() {
 	inode* i = ext2_inode(1, 2);			// Root directory
 
@@ -209,22 +212,16 @@ void lsroot() {
 		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
 		sum += d->rec_len;
 
-		if (d->rec_len != calc && sum == 1024) {
-			/* if the calculated value doesn't match the given value,
-			then we've reached the final entry on the block */
-			sum -= d->rec_len;
+		d->name[d->name_len] = '\0';
 	
-			d->rec_len = calc; 		// Resize this entry to it's real size
-			d = (dirent*)((uint32_t) d + d->rec_len);
-			break;
-
-		}
-		printf("%d\t/%s\n", d->inode, d->name);
-
+		printf("%2d  %10s\t%2d %3d\t", (int)d->inode, d->name, d->name_len, d->rec_len);
+		char* n =  d->name;
+		vga_puts(n);
 		d = (dirent*)((uint32_t) d + d->rec_len);
+		
 
 
-	} while(sum < 1024);
+	} while(sum < (1024 * i->blocks/2));
 
 	free(buf);
 	return NULL;

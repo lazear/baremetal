@@ -7,6 +7,7 @@
 
 
 
+
 struct gdt_entry
 {
     unsigned short limit_low;
@@ -248,5 +249,9 @@ struct gatedesc {
 }
 
 #define T_SYSCALL 0x80
+
+
+struct gatedesc idt[256];
+struct tss_entry system_tss;
 
 #endif
