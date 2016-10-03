@@ -185,13 +185,20 @@ void elf_load(int i_no) {
 	entry = (void(*)(void))(ehdr->e_entry);
 	printf("Program entry @ %#x\n", entry);
 
-	char* d[] = { "user.elf", "HELLO WORLD" };
+
 
 	k_paging_map(0, 0, 0x7);
 	k_paging_map(0x1000, 0x1000, 0x7);
-	enter_usermode(entry, 0x1000);
 
-	entry(2, d);
+	uint32_t* stack = 0x1000;
+
+
+	*--stack = 0;
+
+	*--stack = 1;
+
+	enter_usermode(entry, stack);
+
 	free(data);
 
 

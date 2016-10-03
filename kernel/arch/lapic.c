@@ -78,7 +78,7 @@ void lapic_init() {
 		vga_pretty("LAPIC_BASE is already mapped\n", 4);
 	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
 
-	return;
+
 	//pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
 	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
@@ -103,6 +103,7 @@ void lapic_init() {
 		;
 
 	lapic_write(LAPIC_TPR, 0);
+
 }
 
 

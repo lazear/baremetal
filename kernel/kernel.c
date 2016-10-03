@@ -109,7 +109,7 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	/* Initialize BSP cpu-local variables */
 
-	elf_load(12);
+	
 	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
 
@@ -126,7 +126,7 @@ void kernel_initialize(uint32_t kernel_end) {
 
 
 	lapic_init();
-
+	elf_load(12);
 	/* Acquire kernel mutex */
 	acquire(&km);
 	printf("Found %d processors\n", nproc);
@@ -136,19 +136,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	while(mp_number_of_processors() != nproc);
 
 	printf("All processors started!\n");
-	
-	k_paging_map(0, 0, 0x7);
-	k_paging_map(0x1000, 0x1000, 0x7);
-
-//	k_map_kernel(&_init_pd);
-	extern void test();
-	memcpy(0, test, 0x100);
-
 
 	/* Once BSP releases the initial km lock, AP's will enter scheduler */
 	release(&km);
-
-	//mutex_test();
 
 
 	dprint(SEG_UCODE << 3);
@@ -156,8 +146,6 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	sti();
 
-	enter_usermode(0, 0x1000);
-//	enter_usermode(0);
 	scheduler();
 }
 

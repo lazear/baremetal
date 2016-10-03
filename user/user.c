@@ -3,7 +3,17 @@
 
 int main(int argc, char* argv[]) {
 
-	printf("Hello %4s%20s\n",  "Michael", "Lazear");
+	// printf("USERLAND ELF EXECUTABLE!\n");
+	// int esp;
+	// asm("mov %esp, %eax");
+	// asm("mov %%eax, %0" : "=r"(esp));
+
+	// printf("stack %#x",  esp);
+	printf("argc %d ", argc);
+	printf("argv %s", argv[0]);
+
+	printf("commencing malloc() test");
+
 	return 0;
 }
 

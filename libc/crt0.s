@@ -11,22 +11,22 @@ _start:
 	push ebp
 	mov ebp, esp
 
-	mov esi, [ebp+8]	; argc
-	mov edi, [ebp+12]	; argv
-	
-	push esi
-	push edi
+	mov edi, [ebp+4]	; argc
+	mov esi, [ebp+8]	; argv
+
 
 	call crt_initialize
-
+	
+	push esi			; argv
+	push edi			; argc	
 
 	call main
 
+	jmp $
 	add esp, 8			; cleanup the stack
 
 	mov esp, ebp
 	pop ebp
 
-	jmp $
 
 	ret 
