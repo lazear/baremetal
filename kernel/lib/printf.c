@@ -37,6 +37,25 @@ Kernel level printf. Should be removed once userspace is up and running
 #define PREFIX			1
 #define ALWAYS_SIGN		2
 #define PAD 			4
+#define LONG			8
+#define NOTNUM			0x10
+
+char* ltoa(uint64_t num, char* buffer, int base) {
+	int i = 0;
+	// go in reverse order
+	while (num != 0) {
+		int remainder = num % base;
+		// case for hexadecimal
+		buffer[i++] = (remainder > 9)? (remainder - 10) + 'A' : remainder + '0';
+		num = num / base;
+	}
+
+//	if (sign == 0) buffer[i++] = '-';
+
+	buffer[i] = '\0';
+	strrev(buffer);
+	return buffer;
+}
 
 int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 
@@ -91,6 +110,12 @@ next_format:
 						itoa(d, buf, 10);
 						break;
 					}
+					case 'l': {
+						uint64_t d = va_arg(ap, uint64_t);
+						flags |= LONG;
+						ltoa(d, buf, 16);
+						break;
+					}
 					case 'o': {
 						itoa(va_arg(ap, int), buf, 8);
 						if ((flags & PREFIX) && (n+2 < size)) {
@@ -104,11 +129,13 @@ next_format:
 					}
 					case 's': {
 						buf = va_arg(ap, char*);
+						flags |= NOTNUM;
 						break;
 					}
 					case 'c': {
 						buf[0] = va_arg(ap, char);
 						buf[1] = '\0';
+						flags |= NOTNUM;
 						break;
 					}
 					case 'w': {
@@ -131,7 +158,7 @@ next_format:
 				}
 				if ((flags & PAD) && (pad > strlen(buf))) {
 					for (int i = 0; (i < (pad - strlen(buf))) && ((i+n) < size); i++)
-						str[n++] = (isdigit(buf[0])) ? '0' : ' ';
+						str[n++] = (flags & NOTNUM) ? ' ' : '0';
 				}
 				for (int i = 0; (i < strlen(buf)) && ((i+n) < size); i++) 	
 					str[n++] = buf[i];		

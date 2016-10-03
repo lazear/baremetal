@@ -103,13 +103,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	sti();
 	vga_init();
 	init_message("crunchy 0.1 locked and loaded!\n", 1);
-	dprint(strlen("MICHAEL Lazear"));
-	dprint(strcmp("Michael Lazear", "michael"));
-	dprint(strcmp("ACPI dddd", "ACPI "));
-
+	//enter_usermode(0);
 	ide_init();
 	buffer_init();
-	lsroot();
 
 	/* Initialize BSP cpu-local variables */
 
@@ -118,10 +114,9 @@ void kernel_initialize(uint32_t kernel_end) {
 	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
 
+	//asm volatile("mov %0, %%gs": :"r"(0x28) );
 
 
-
-	for(;;);
 	pic_disable();
 
 	ioapicinit();
@@ -143,7 +138,10 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	printf("All processors started!\n");
 	
-
+	k_paging_map(0, 0, 0x7);
+	k_paging_map(0x1000, 0x1000, 0x7);
+	k_map_kernel(&_init_pd);
+	enter_usermode(0x1000);
 
 	/* Once BSP releases the initial km lock, AP's will enter scheduler */
 	release(&km);

@@ -12,7 +12,7 @@ LD		= ~/opt/cross/bin/i686-elf-ld
 AS		= nasm
 AR		= ~/opt/cross/bin/i686-elf-as
 CP		= cp
-LIBGCC	= #~/opt/cross/lib/gcc/i686-elf/6.2.0/libgcc.a
+LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/6.2.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I kernel/include/  -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
@@ -54,6 +54,7 @@ compile:
 	$(AS) $(ASFLAGS) kernel/arch/vectors.s -o vectors.so
 	$(AS) $(ASFLAGS) kernel/font.s -o font.so
 	$(AS) $(ASFLAGS) kernel/arch/umode.s -o umode.so
+	#$(CC) -c kernel/arch/umode.s -o umode.so
 	$(AS) -f bin kernel/arch/initcode.s -o initcode
 	$(AS) -f bin kernel/arch/ap_entry.s -o ap_entry
 	# $(LD) -N -e start -Ttext 0x8000 -o ap_entry.o ap_entry.elf

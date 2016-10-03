@@ -127,6 +127,7 @@ static inline void lidt(struct gatedesc *p, int size) {
 	asm volatile("lidt (%0)" : : "r" (pd));
 }
 
+extern void gdt_flush();
 
 static inline void lgdt(struct segdesc *p, int size) {
 
@@ -136,6 +137,7 @@ static inline void lgdt(struct segdesc *p, int size) {
 	pd[1] = (uint32_t)p;
 	pd[2] = (uint32_t)p >> 16;
 	asm volatile("lgdt (%0)" : : "r" (pd));
+	gdt_flush();
 }
 
 static inline void ltr(uint16_t sel) {
@@ -171,6 +173,7 @@ void gdt_init_cpu(char id) {
 
 
 	lgdt(c->gdt, sizeof(c->gdt));
+
 	asm volatile("mov %0, %%gs" : : "r"(SEG_KCPU<<3));
 
 	//system_tss.esp0 = cpus[id].stack;
