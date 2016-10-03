@@ -423,7 +423,7 @@ stored directly after the kernel (bitmaps, stack, etc)
 */
 void k_map_kernel(uint32_t* pd) {
 	for (int i = 0; i < 0x00400000; i+=0x1000)
-		_paging_map(pd, i, i + KERNEL_VIRT, 0x7);
+		_paging_map(pd, i, i + KERNEL_VIRT, 0x3);
 }
 
 /* Returns the physical address (in first 4 mb, currently) of a new pagedir */

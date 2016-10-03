@@ -138,19 +138,18 @@ void* ext2_open(inode* in) {
 
 	int indirect = 0;
 
-	/* Singly-indirect block pointer */
-	if (num_blocks > 12) {
-		indirect = in->block[12];
-	}
+
 
 	int blocknum = 0;
 	for (int i = 0; i < num_blocks; i++) {
 		if (i < 12) 
 			blocknum = in->block[i];
+		else if (i == 12)
+			indirect = in->block[i];
 		else
 			blocknum = ext2_read_indirect(indirect, i-12);
-		if (!blocknum)
-			break;
+		if (!blocknum || blocknum == 0)
+			return buf;
 		buffer* b = buffer_read(1, blocknum);
 		memcpy((uint32_t) buf + (i * BLOCK_SIZE), b->data, BLOCK_SIZE);
 		//printf("%x\n", b->data[i]);

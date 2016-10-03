@@ -3,10 +3,10 @@
 
 FINAL	= new
 OBJS	= *.o				# Elf object files
-CC	    = ../cross/bin/i686-elf-gcc
-LD		= ../cross/bin/i686-elf-ld
+CC	    = ~/opt/cross/bin/i686-elf-gcc
+LD		= ~/opt/cross/bin/i686-elf-ld
 NASM		= nasm
-AS 		= ../cross/bin/i686-elf-as
+AS 		= ~/opt/cross/bin/i686-elf-as
 AR		= ~/opt/cross/bin/i686-elf-ar
 CP		= cp
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 --sysroot=. -c 

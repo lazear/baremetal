@@ -50,7 +50,7 @@ extern uint32_t _init_pt[];
 extern uint32_t _init_pd[];
 
 
-extern void enter_usermode(uint32_t);
+extern void enter_usermode(uint32_t, uint32_t);
 
 mutex km = {.lock=0};
 
@@ -109,8 +109,7 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	/* Initialize BSP cpu-local variables */
 
-	//elf_objdump(ext2_open(ext2_inode(1, 12)));
-
+	elf_load(12);
 	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
 
@@ -140,8 +139,11 @@ void kernel_initialize(uint32_t kernel_end) {
 	
 	k_paging_map(0, 0, 0x7);
 	k_paging_map(0x1000, 0x1000, 0x7);
-	k_map_kernel(&_init_pd);
-	enter_usermode(0x1000);
+
+//	k_map_kernel(&_init_pd);
+	extern void test();
+	memcpy(0, test, 0x100);
+
 
 	/* Once BSP releases the initial km lock, AP's will enter scheduler */
 	release(&km);
@@ -154,6 +156,7 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	sti();
 
+	enter_usermode(0, 0x1000);
 //	enter_usermode(0);
 	scheduler();
 }

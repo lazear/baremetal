@@ -124,6 +124,21 @@ void sys_sbrk(struct _proc_mmap* m, size_t n) {
 	}
 }
 
+
+struct elf_executable {
+	uint32_t* pd;	/* page directory */
+	struct _proc_mmap* m;
+	elf32_ehdr* ehdr;
+	uint32_t esp;
+	uint32_t eip;
+	void (*execute)(struct elf_executable*);
+};
+
+extern void enter_usermode(uint32_t eip, uint32_t esp);
+
+
+
+
 void elf_load(int i_no) {
 	uint32_t* data = ext2_open(ext2_inode(1,i_no));
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
@@ -158,7 +173,7 @@ void elf_load(int i_no) {
 	}
 	last_phdr--;
 	uint32_t base = (last_phdr->p_vaddr + last_phdr->p_memsz + 0x1000) & ~0xFFF;
-	dprint(base);
+
 
 	cp_mmap.pd = elf_pd;
 	cp_mmap.base = base;
@@ -168,9 +183,13 @@ void elf_load(int i_no) {
 
 	int (*entry)(int, char**);
 	entry = (void(*)(void))(ehdr->e_entry);
-
+	printf("Program entry @ %#x\n", entry);
 
 	char* d[] = { "user.elf", "HELLO WORLD" };
+
+	k_paging_map(0, 0, 0x7);
+	k_paging_map(0x1000, 0x1000, 0x7);
+	enter_usermode(entry, 0x1000);
 
 	entry(2, d);
 	free(data);

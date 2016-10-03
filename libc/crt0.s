@@ -27,5 +27,6 @@ _start:
 	mov esp, ebp
 	pop ebp
 
+	jmp $
 
 	ret 

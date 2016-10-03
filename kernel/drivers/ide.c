@@ -110,10 +110,13 @@ void ide_handler() {
 	//if dirty is not set, and no errors, read data
 	int stat = ide_wait(1);
 	assert(stat >= 0);
+	if (stat < 0) {
+		printf("[ERROR] Reading data to buffer %x dev %d block %d\n", b, b->dev, b->block);
+	}
 
 	if (!(b->flags & B_DIRTY) && stat >= 0) {
 		insl(0x1f0, b->data, BLOCK_SIZE/4);
-		//printf("Reading data to buffer %x dev %d block %d\n", b, b->dev, b->block);
+		
 	}
 
 	b->flags |= B_VALID;	// set valid flag

@@ -16,65 +16,53 @@ gdt_flush:
 	mov ss, ax
 	ret
 
-
-
-asmitoa:
-	mov esi, datastor 	; buffer
-	xor edx, edx	
-	mov ecx, 0x10
-.loop:
-	cmp eax, 0
-	jz .done
-
-	lodsb 
-	div ecx
-	add dl, '0'
-	mov [esi], edx
-
-	jmp .loop
-
-.done:
-	ret
-
-
-datastor resb 32
-
 global test
 test:
-	mov esi, .string
-	mov eax, 0xDEADFEEF
-	;lcall asmitoa
+	push ebp
+	mov ebp, esp
+	sub esp, 12
+	mov esi, esp
+	mov dx, 10
+	mov cl, 'A'
+	mov [esi], cl
 
-.loop:
-	cld
-	lodsw
-
-	cmp al, 'o fr'
-	jnz .loop
 	mov eax, 1
-	mov edx, datastor
+	mov edx, esi
+
 	int 0x80
+
+	mov eax, 2202
+	int 0x80
+
 	jmp $
 
-.string db 'Hello from userland?', 0
-
+extern printf
 global enter_usermode
 enter_usermode:
+	;push ebp
+	mov ebp, esp
 	cli
 
-	mov ax, 0x2B
+	mov ax, SEG_UDATA | 3
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
 
-	push 0x2B		; SS3
+	push SEG_UDATA | 3	; push ss3
 
-	push 0x1000				; ESP3
+	mov ecx, [ebp+8]
+	push ecx			; push esp3
 
-	push 0x202
-	push 0x23		; CS
-	push test
+	pushf 				; push flags onto stack
+	pop eax				; pop into eax
+	or eax, 0x200		; set IF (enable interrupts)
+	push eax			; push eflags
+	push SEG_UCODE | 3	; push CS, requested priv. level = 3
+
+	xor eax, eax
+	mov eax, [ebp+4]
+	push eax
 
 	iret
 
