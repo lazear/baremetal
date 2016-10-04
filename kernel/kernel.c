@@ -102,8 +102,8 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	sti();
 	vga_init();
-	init_message("crunchy 0.1 locked and loaded!\n", 1);
-	//enter_usermode(0);
+	init_message("xiphos kernel locked and loaded!\n", 1);
+
 	ide_init();
 	buffer_init();
 
@@ -112,9 +112,10 @@ void kernel_initialize(uint32_t kernel_end) {
 	
 	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
+	acquire(&km);
+//	lass_main("new.s");
 
-	//asm volatile("mov %0, %%gs": :"r"(0x28) );
-
+	elf_load(find_inode_in_dir("output", 2));
 
 	pic_disable();
 
@@ -126,9 +127,9 @@ void kernel_initialize(uint32_t kernel_end) {
 
 
 	lapic_init();
-	elf_load(12);
+
 	/* Acquire kernel mutex */
-	acquire(&km);
+	
 	printf("Found %d processors\n", nproc);
 	mp_start_ap(nproc);
 		

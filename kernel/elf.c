@@ -124,7 +124,6 @@ void sys_sbrk(struct _proc_mmap* m, size_t n) {
 	}
 }
 
-
 struct elf_executable {
 	uint32_t* pd;	/* page directory */
 	struct _proc_mmap* m;
@@ -135,9 +134,6 @@ struct elf_executable {
 };
 
 extern void enter_usermode(uint32_t eip, uint32_t esp);
-
-
-
 
 void elf_load(int i_no) {
 	uint32_t* data = ext2_open(ext2_inode(1,i_no));
@@ -155,9 +151,6 @@ void elf_load(int i_no) {
 	k_map_kernel(elf_pd);
 	k_swap_pd(elf_pd);
 
-	
-
-	printf("%x\n", data);
 	while(phdr < last_phdr) {
 		printf("LOAD:\toff 0x%x\tvaddr\t0x%x\tpaddr\t0x%x\n\t\tfilesz\t%d\tmemsz\t%d\talign\t%d\t\n",
 		 	phdr->p_offset, phdr->p_vaddr, phdr->p_paddr, phdr->p_filesz, phdr->p_memsz, phdr->p_align);
@@ -167,8 +160,14 @@ void elf_load(int i_no) {
 			k_paging_map(phys, phdr->p_vaddr + (i*0x1000), 0x7);			// Map that page in KPD
 			//printf("Mapped %x->%x\n", phys, phdr->p_vaddr+ (i*0x1000));
 		}
+		memset(phdr->p_vaddr, 0, phdr->p_memsz);
 		memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
-		
+		// uint32_t* sta = 0;
+		// for (int i = 0; i < phdr->p_memsz / 4; i++) {
+			
+		// 	sta[i] = data[i];
+		// 	printf("%#x\t", sta[i]);
+		// }
 		phdr++;
 	}
 	last_phdr--;
@@ -181,27 +180,16 @@ void elf_load(int i_no) {
 
 	k_paging_map(k_page_alloc(), base, 0x7);
 
-	int (*entry)(int, char**);
-	entry = (void(*)(void))(ehdr->e_entry);
-	printf("Program entry @ %#x\n", entry);
+	printf("Program entry @ %#x\n", ehdr->e_entry);
 
+	uint32_t* stack = base;
 
-
-	k_paging_map(0, 0, 0x7);
-	k_paging_map(0x1000, 0x1000, 0x7);
-
-	uint32_t* stack = 0x1000;
-
-
-	*--stack = 0;
-
-	*--stack = 1;
-
-	enter_usermode(entry, stack);
+	*--stack = 0;	// argv
+	*--stack = 1;	// argc
+	
+	enter_usermode(ehdr->e_entry, stack);
 
 	free(data);
-
-
 	printf("Returned from program\n");
 	extern uint32_t* KERNEL_PAGE_DIRECTORY;
 	k_swap_pd(KERNEL_PAGE_DIRECTORY);

@@ -12,7 +12,7 @@ LD		= ~/opt/cross/bin/i686-elf-ld
 AS		= nasm
 AR		= ~/opt/cross/bin/i686-elf-as
 CP		= cp
-LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/6.2.0/libgcc.a
+LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I kernel/include/  -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
@@ -28,7 +28,7 @@ emu: compile link clean run
 userland:
 	$(CC) -print-sysroot
 	make -C libc
-	$(CC) -w --sysroot=libc user/user.c -o user.elf
+	$(CC) -w --sysroot=libc -I libc/usr/include user/user.c -o user.elf
 	$(EXTUTIL) -x $(IMAGE) -wf user.elf -i 12
 	objdump -d user.elf > user.S
 

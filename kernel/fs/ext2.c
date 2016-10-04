@@ -213,17 +213,53 @@ void lsroot() {
 
 		d->name[d->name_len] = '\0';
 	
-		printf("%2d  %10s\t%2d %3d\t", (int)d->inode, d->name, d->name_len, d->rec_len);
+		printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
 		char* n =  d->name;
 		vga_puts(n);
 		d = (dirent*)((uint32_t) d + d->rec_len);
-		
-
 
 	} while(sum < (1024 * i->blocks/2));
 
 	free(buf);
 	return NULL;
+}
+
+
+int find_inode_in_dir(char* name, int dir_inode) {
+	if (!dir_inode)
+		return -1;
+	inode* i = ext2_inode(1, dir_inode);			// Root directory
+
+	char* buf = malloc(BLOCK_SIZE*i->blocks/2);
+	memset(buf, 0, BLOCK_SIZE*i->blocks/2);
+
+	for (int q = 0; q < i->blocks / 2; q++) {
+		buffer* b = buffer_read(1, i->block[q]);
+		memcpy((uint32_t)buf+(q * BLOCK_SIZE), b->data, BLOCK_SIZE);
+	}
+
+	dirent* d = (dirent*) buf;
+	
+	int sum = 0;
+	int calc = 0;
+	do {
+		// Calculate the 4byte aligned size of each entry
+		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
+		sum += d->rec_len;
+
+		d->name[d->name_len] = '\0';
+
+		int i = strncmp(d->name, name, d->name_len);
+		if (i== 0) {
+			free(buf);
+			return d->inode;
+		}
+		d = (dirent*)((uint32_t) d + d->rec_len);
+
+	} while(sum < (1024 * i->blocks/2));
+
+	free(buf);
+	return -1;
 }
 
 int ext_first_free(uint32_t* b, int sz) {
