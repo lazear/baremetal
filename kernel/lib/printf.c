@@ -97,10 +97,18 @@ next_format:
 						}
 						break;
 					}
-					case 'd': case 'i': {
+					case 'd':{
 						int d = va_arg(ap, int);
 						if ((flags & ALWAYS_SIGN) && (n+1 < size)) 
 							str[n++] = (d > 0) ? '+' : '-';
+						sitoa(d, buf, 10);
+				
+						break;
+					}
+				 	case 'i': {
+						int d = va_arg(ap, int);
+						if ((n+1 < size)) 
+							if (d < 0) str[n++] = '-';
 						sitoa(d, buf, 10);
 				
 						break;

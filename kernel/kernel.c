@@ -73,6 +73,17 @@ void scheduler(void) {
 }
 
 
+int pathize(char* path) {
+	char* pch = strtok(path, "/");
+	int parent = 2;
+	while(pch) {
+		parent = find_inode_in_dir(pch, parent);
+		//printf("%s inode: %i\n", pch, parent);
+		pch = strtok(NULL, "/");
+	}
+	return parent;
+}
+
 void kernel_initialize(uint32_t kernel_end) {
 
 	/*
@@ -117,7 +128,7 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	//find_inode_in_dir("lost+found", 2);
 	acquire(&km);
-	lass_main("new.s");
+	lass_main("/test/asm/new.s");
 
 	//elf_load(find_inode_in_dir("output", 2));
 
@@ -142,14 +153,15 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	printf("All processors started!\n");
 
+
 	/* Once BSP releases the initial km lock, AP's will enter scheduler */
 	release(&km);
 
-
-	dprint(SEG_UCODE << 3);
-	dprint(SEG_UDATA << 3);
-
 	sti();
+
+
+
+
 
 	scheduler();
 }
