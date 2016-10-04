@@ -261,7 +261,7 @@ int find_inode_in_dir(const char* name, int dir_inode) {
 		// 	for (int j = 0; j < calc; j++)
 		// 		printf( isalpha(dd[j]) ? "%2c" : "%2d", dd[j]);
 		// vga_putc('\n');
-	printf("%2d: %s\t%d\n", d->inode, d->name, q);
+	printf("%2d: %s\n", d->inode, d->name);
 		if (q== 0) {
 		
 			free(buf);
