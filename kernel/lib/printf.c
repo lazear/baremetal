@@ -128,7 +128,8 @@ next_format:
 						break;
 					}
 					case 's': {
-						buf = va_arg(ap, char*);
+						char* tmp = va_arg(ap, char*);
+						strcpy(buf, tmp);
 						flags |= NOTNUM;
 						break;
 					}

@@ -28,6 +28,7 @@ SOFTWARE.
 #include <types.h>
 #include <assert.h>
 #include <mutex.h>
+#include <ctype.h>
 
 /* 	Read superblock from device dev, and check the magic flag.
 	Return NULL if not a valid EXT2 partition */
@@ -211,12 +212,19 @@ void lsroot() {
 		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
 		sum += d->rec_len;
 
-		d->name[d->name_len] = '\0';
+		//d->name[d->name_len] = '\0';
 	
 		printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
-		char* n =  d->name;
-		vga_puts(n);
-		d = (dirent*)((uint32_t) d + d->rec_len);
+		
+		// if (d->inode < 14) {
+
+		// 	char* dd = (char*)d;
+		// 	for (int j = 0; j < calc; j++)
+		// 		if (j < 40) printf( isalpha(dd[j]) ? "%2c" : "%2d", dd[j]);
+
+		// vga_putc('\n');
+		// }
+		d = (dirent*)((char*)d + d->rec_len);
 
 	} while(sum < (1024 * i->blocks/2));
 
@@ -225,7 +233,7 @@ void lsroot() {
 }
 
 
-int find_inode_in_dir(char* name, int dir_inode) {
+int find_inode_in_dir(const char* name, int dir_inode) {
 	if (!dir_inode)
 		return -1;
 	inode* i = ext2_inode(1, dir_inode);			// Root directory
@@ -247,10 +255,15 @@ int find_inode_in_dir(char* name, int dir_inode) {
 		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
 		sum += d->rec_len;
 
-		d->name[d->name_len] = '\0';
-
-		int i = strncmp(d->name, name, d->name_len);
-		if (i== 0) {
+		int q = strncmp(d->name, name, d->name_len);
+	
+		// 	char* dd = (char*)d;
+		// 	for (int j = 0; j < calc; j++)
+		// 		printf( isalpha(dd[j]) ? "%2c" : "%2d", dd[j]);
+		// vga_putc('\n');
+	printf("%2d: %s\t%d\n", d->inode, d->name, q);
+		if (q== 0) {
+		
 			free(buf);
 			return d->inode;
 		}

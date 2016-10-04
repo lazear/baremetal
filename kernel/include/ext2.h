@@ -132,7 +132,7 @@ typedef struct dirent_s {
 	uint16_t rec_len;		// Total size of entry, including all fields
 	uint8_t name_len;		// Name length, least significant 8 bits
 	uint8_t file_type;		// Type indicator
-	uint8_t name[];
+	uint8_t name[255];
 } __attribute__((packed)) dirent;
 
 /* IMPORTANT: Inode addresses start at 1 */

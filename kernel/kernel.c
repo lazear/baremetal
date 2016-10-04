@@ -112,10 +112,14 @@ void kernel_initialize(uint32_t kernel_end) {
 	
 	/* Parse ACPI tables for number of processors */
 	int nproc = acpi_init();
-	acquire(&km);
-//	lass_main("new.s");
+	
+	//lsroot();
 
-	elf_load(find_inode_in_dir("output", 2));
+	//find_inode_in_dir("lost+found", 2);
+	acquire(&km);
+	lass_main("new.s");
+
+	//elf_load(find_inode_in_dir("output", 2));
 
 	pic_disable();
 
