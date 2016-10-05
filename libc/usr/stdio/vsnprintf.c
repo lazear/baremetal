@@ -1,5 +1,5 @@
 /*
-printf.c
+vsnprintf.c
 ===============================================================================
 MIT License
 Copyright (c) 2007-2016 Michael Lazear
@@ -28,11 +28,9 @@ Kernel level printf. Should be removed once userspace is up and running
 
 
 #include <types.h>
-#include <vga.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <limits.h>
-
 
 #define PREFIX			1
 #define ALWAYS_SIGN		2
@@ -56,24 +54,6 @@ char* ltoa(uint64_t num, char* buffer, int base) {
 	strrev(buffer);
 	return buffer;
 }
-
-char* ctoa(uint8_t num, char* buffer, int base) {
-	int i = 0;
-	// go in reverse order
-	while (num != 0) {
-		int remainder = num % base;
-		// case for hexadecimal
-		buffer[i++] = (remainder > 9)? (remainder - 10) + 'A' : remainder + '0';
-		num = num / base;
-	}
-
-//	if (sign == 0) buffer[i++] = '-';
-
-	buffer[i] = '\0';
-	strrev(buffer);
-	return buffer;
-}
-
 int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 
 	char* buf = malloc(size);
@@ -108,14 +88,6 @@ next_format:
 					}
 					case 'x': {
 						itoa(va_arg(ap, int), buf, 16);
-						if ((flags & PREFIX) && (n+2 < size)) {
-							str[n++] = '0';
-							str[n++] = 'x';
-						}
-						break;
-					}
-					case 'X': {
-						ctoa(va_arg(ap, int), buf, 16);
 						if ((flags & PREFIX) && (n+2 < size)) {
 							str[n++] = '0';
 							str[n++] = 'x';
@@ -212,6 +184,8 @@ next_format:
 	return n;
 }
 
+
+#ifndef _LIBK_
 int printf(const char* fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
@@ -219,41 +193,7 @@ int printf(const char* fmt, ...) {
 	int i = vsnprintf(buf, 256, fmt, ap);
 	va_end(ap);
 
-	vga_puts(buf);
+	syscall_one(1, buf);
 	return i;
 }
-
-
-void init_message(int status, const char* fmt, ...) {
-	va_list ap;
-	va_start(ap, fmt);
-	vga_puts("[");
-	int color;
-	char* message;
-	switch(status) {
-		case 0:
-			color =VGA_LIGHTRED;
-			message = "FAIL";
-			break;
-		case 1:
-			color = VGA_LIGHTGREEN;
-			message = " OK ";
-			break;
-		case 2:
-			color = VGA_LIGHTBROWN;
-			message = "WAIT";
-			break;
-		default:
-			color = VGA_LIGHTCYAN;
-			message = "????";
-			break;
-	}
-	vga_setcolor(color);
-	vga_puts( message);
-	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
-	vga_puts("] ");
-	char buf[256];
-	vsnprintf(buf, 256, fmt, ap);
-	vga_puts(buf);
-	va_end(ap);
-}
+#endif

@@ -29,14 +29,7 @@ SOFTWARE.
 
 extern void syscall_handler();
 
-extern uint32_t* KERNEL_PAGE_DIRECTORY();
-
-
-struct file {
-	void* data;
-	int size;
-};
-
+extern uint32_t* KERNEL_PAGE_DIRECTORY;
 
 void sys_sbrk(struct _proc_mmap* m, size_t n) {
 	for (int i = n; i > 0; i -= 0x1000) {
@@ -46,21 +39,24 @@ void sys_sbrk(struct _proc_mmap* m, size_t n) {
 }
 
 char* sys_open(char* filename) {
-	printf("SYS OPEN!\n");
+	printf("SYS OPEN!: %s\n",  filename);
 	int fp = find_inode_in_dir(filename, 2);
 	if (!fp)
 		return NULL;
-	inode* in = ext2_inode(1, fp);
-	
-	char* buf = ext2_open(in);
-	sys_sbrk(&cp_mmap, in->size);
 
-	struct file* f = cp_mmap.brk;
-	f->size = in->size;
-	f->data = cp_mmap.brk + sizeof(struct file);
-	memcpy(f->data, buf, f->size);
+	inode* in = ext2_inode(1, fp);
+	char* buf = ext2_open(in);
+	buf = ext2_open(in);
+	inode_dump(in);
+	uint32_t dest = cp_mmap.brk;
 	
-	return f->data;
+	//_paging_map(cp_mmap.pd, k_virt_to_phys(dest), dest, 0x3 );
+	//sys_sbrk(&cp_mmap, in->size);
+	//ext2_open_alt(in, (void*)dest);
+	for (int i = 0; i < in->size; i++)
+		printf("%X", buf[i]);
+	printf("contents; %s\n", buf);
+	return (char*) dest;
 
 }
 

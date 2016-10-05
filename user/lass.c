@@ -558,27 +558,26 @@ void pass(char* buffer, int sz, int pass_no) {
 int main(int argc, const char* fname) {
 
 	int sz = 129;
+	printf("Filename: %s", fname);
 	char* buffer 	= open(fname);
 	char* buff2 	= malloc(sz);
 
 	memcpy(buff2, buffer, sz);
 	output = malloc(sz);
 	//pread(fp, buffer, sz, 0);
-
+	printf("Output buffer: %x", output);
+	printf("Input buffer: %x", buffer);
+	printf("Buff2: %x", buff2);
 	// // First pass
 	printf("lass: read %d bytes from %s\n", sz, fname);
 	printf("First pass, finding labels:\n");
 	pass(buffer, sz, 1);
-	free(buffer);
+	//free(buffer);
 	//Second pass
 	program_length = current_position;
 	current_position = 0;
 	//make_elf();
 	pass(buff2, sz, 2);
-
-
-	// for (int q = 0; q < (program_length / 0x1000) + 1; q++)
-	// 	k_paging_map(0, ORG + (q*0x1000), 0x7);
 
 	memset(ORG, 0, 0x1000);
 	memcpy(ORG, elf_output, elf_offset);

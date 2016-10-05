@@ -225,13 +225,15 @@ void elf_load(int i_no) {
 	elf32_phdr* last_phdr 	= (uint32_t) phdr + (ehdr->e_phentsize * ehdr->e_phnum);
 	uint32_t off = (phdr->p_vaddr - phdr->p_paddr);
 
+	extern uint32_t* KERNEL_PAGE_DIRECTORY;
 	/* Make a new page-directory and swap into it */
 	uint32_t* elf_pd = k_create_pagedir(0x0, 0, 0x7);	
+	//k_copy_pagedir(elf_pd, KERNEL_PAGE_DIRECTORY);
 	k_map_kernel(elf_pd);
 	/* Map the elf data into the new page directory */
-	for (int i = 0; i <= ein->size; i += 0x1000) {
-		_paging_map(elf_pd, k_virt_to_phys((uint32_t)data + i), (uint32_t)data + i, 0x3 );
-	}
+	// for (int i = 0; i <= ein->size; i += 0x1000) {
+	// 	_paging_map(elf_pd, k_virt_to_phys((uint32_t)data + i), (uint32_t)data + i, 0x3 );
+	// }
 	
 	k_swap_pd(elf_pd);
 
@@ -243,7 +245,7 @@ void elf_load(int i_no) {
 		for (int i = 0; i <= phdr->p_memsz; i += 0x1000) {
 			uint32_t phys = k_page_alloc();					// Allocate a physical page
 			k_paging_map(phys, phdr->p_vaddr + i, 0x7);			// Map that page in KPD
-			printf("Mapped %x->%x\n", phys, phdr->p_vaddr + i);
+			//printf("Mapped %x->%x\n", phys, phdr->p_vaddr + i);
 		}
 		memset(phdr->p_vaddr, 0, phdr->p_memsz);
 		memcpy(phdr->p_vaddr, (uint32_t)data + phdr->p_offset, phdr->p_memsz);
@@ -268,7 +270,7 @@ void elf_load(int i_no) {
 	*v = var1;
 	strcpy(var1, "new.s");
 
-	*--stack = v;	// argv
+	*--stack = var1;	// argv
 	*--stack = 0;	// argc
 
 	enter_usermode(ehdr->e_entry, stack);

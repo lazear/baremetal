@@ -103,8 +103,8 @@ void k_page_fault(regs_t * r) {
 	asm volatile("mov %%cr2, %%eax" : "=a"(cr2));
 	r = (uint32_t) r + 4;
 	printf("Page Fault(%d): cr2 %#x\n", r->err_code, cr2);
-	printf("Faulting EIP %#x (%s)\n", r->eip, ksym_find(r->eip));
-
+	printf("Faulting instruction:  %#x (%s)\n", r->eip, (r->cs == 0x23) ? "User process" : ksym_find(r->eip));
+	printf("Current stack pointer: %#x\n", r->esp);
 	if (r->err_code & PF_PRESENT)	vga_puts(" \tPage Not Present\n");
 	if (r->err_code & PF_RW) 		vga_puts(" \tPage Not Writeable\n");
 	if (r->err_code & PF_USER) 		vga_puts(" \tPage Supervisor Mode\n");
@@ -134,7 +134,7 @@ uint32_t* _virt_to_phys(uint32_t* dir, uint32_t virt) {
 	if (!dir[_pdi] & ~0x3FF)
 		return NULL;
 
-	uint32_t* pt = dir[_pdi] & ~0x3FF;
+	uint32_t* pt = P2V(dir[_pdi] & ~0x3FF);
 
 	return (pt[_pti]);
 }
@@ -253,6 +253,13 @@ uint32_t* k_copy_pagedir(uint32_t* dest, uint32_t* src) {
 		}
 	}
 	return src;
+}
+
+uint32_t* k_pd_cp(uint32_t* src) {
+	uint32_t* pd = k_create_pagedir(0,0,0x7);
+	for (int i = 0; i < 1024; i++) {
+		pd[i] = src[i];
+	}
 }
 
 void walk_pagedir(uint32_t* pd) {

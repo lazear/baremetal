@@ -29,9 +29,13 @@ userland:
 	$(CC) -print-sysroot
 	make -C libc
 	$(CC) -w --sysroot=libc -I libc/usr/include user/user.c -o user.elf
-	$(CC) -w --sysroot libc -I libc/usr/include user/lass.c -o lass.elf
-	$(EXTUTIL) -x $(IMAGE) -wf user.elf -i 12
+	$(CC) -w --sysroot=libc -I libc/usr/include user/lass.c -o lass.elf
+	$(EXTUTIL) -x $(IMAGE) -wf user.elf
+	$(EXTUTIL) -x $(IMAGE) -wf lass.elf
 	objdump -d user.elf > user.S
+
+lass:
+	$(CC) -w --sysroot=libc user/lass.c -o lass.elf
 
 boot:
 	nasm -f bin kernel/bootstrap.asm -o kernel/bootstrap

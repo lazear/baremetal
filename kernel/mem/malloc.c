@@ -141,8 +141,12 @@ void* sbrk(size_t n) {
 		Map that page to the top of the heap,
 		and increase the top of the heap by 4KB.
 		*/
-		uint32_t* phys = k_page_alloc();
-		k_paging_map(phys, K_HEAP_TOP, 0x3);
+		/* if the address is already allocated, use that same page */
+		if (!k_virt_to_phys(K_HEAP_TOP)) {
+			uint32_t* phys = k_page_alloc();
+			k_paging_map(phys, K_HEAP_TOP, 0x3);
+		}
+	
 
 		//printf("Mapping phys %x to virt %x\n", phys, K_HEAP_TOP);
 		K_HEAP_TOP += 0x1000;
