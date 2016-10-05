@@ -25,11 +25,44 @@ SOFTWARE.
 */
 #include <types.h>
 #include <x86.h>
+#include <ext2.h>
 
 extern void syscall_handler();
 
 extern uint32_t* KERNEL_PAGE_DIRECTORY();
 
+
+struct file {
+	void* data;
+	int size;
+};
+
+
+void sys_sbrk(struct _proc_mmap* m, size_t n) {
+	for (int i = n; i > 0; i -= 0x1000) {
+		_paging_map(m->pd, k_page_alloc(), m->brk, 0x7);
+		m->brk += 0x1000;
+	}
+}
+
+char* sys_open(char* filename) {
+	printf("SYS OPEN!\n");
+	int fp = find_inode_in_dir(filename, 2);
+	if (!fp)
+		return NULL;
+	inode* in = ext2_inode(1, fp);
+	
+	char* buf = ext2_open(in);
+	sys_sbrk(&cp_mmap, in->size);
+
+	struct file* f = cp_mmap.brk;
+	f->size = in->size;
+	f->data = cp_mmap.brk + sizeof(struct file);
+	memcpy(f->data, buf, f->size);
+	
+	return f->data;
+
+}
 
 void syscall(regs_t *r)
 {
@@ -60,6 +93,10 @@ void syscall(regs_t *r)
 		sys_sbrk(&cp_mmap, r->ebx);
 		r->eax = cp_mmap.brk;
 		break;
+	case 0x10:
+		
+		r->eax =sys_open(r->ebx);
+		break;
 	default:
 		printf("syscall 0x80, eax 0x%x\n", r->eax);
 		//ret = fork();
@@ -70,9 +107,4 @@ void syscall(regs_t *r)
 	//r->eax = 0xDEAD;
 	//r->eax = 0xDEADBEEF;
 
-}
-
-void syscall_init(void)
-{
-	//idt_set_gate(0x80, (uint32_t)syscall_handler, 0x08, 0x8e);
 }

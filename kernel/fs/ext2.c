@@ -243,7 +243,7 @@ int find_inode_in_dir(const char* name, int dir_inode) {
 		// Calculate the 4byte aligned size of each entry
 		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
 		sum += d->rec_len;
-		printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
+		//printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
 		if (strncmp(d->name, name, d->name_len)== 0) {
 			
 			free(buf);

@@ -7,7 +7,7 @@ START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
 AOBJS	= vectors.so trap_handler.so sched.so syscall.so font.so umode.so
 INIT 	= initcode
-CC	    = ~/opt/cross/bin/i686-elf-gcc
+CC	    = cross/bin/i686-elf-gcc
 LD		= ~/opt/cross/bin/i686-elf-ld
 AS		= nasm
 AR		= ~/opt/cross/bin/i686-elf-as
@@ -29,6 +29,7 @@ userland:
 	$(CC) -print-sysroot
 	make -C libc
 	$(CC) -w --sysroot=libc -I libc/usr/include user/user.c -o user.elf
+	$(CC) -w --sysroot libc -I libc/usr/include user/lass.c -o lass.elf
 	$(EXTUTIL) -x $(IMAGE) -wf user.elf -i 12
 	objdump -d user.elf > user.S
 
