@@ -141,7 +141,9 @@ void lapic_start_AP(int apic_id, uint32_t address) {
 	udelay(2);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL);
 	udelay(1);
-	printf("Attemping to start cpu: %d\n", apic_id);
+
+	/* Keep this printf here, it acts as a delay... lol */
+	init_message(2, "Attemping to start cpu: %d\n", apic_id);
 	for (int i = 0; i < 2; i++) {
 		lapic_write(LAPIC_ICRHI, apic_id << 24);
 		lapic_write(LAPIC_ICRLO, STARTUP |  address >> 12);

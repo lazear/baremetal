@@ -212,18 +212,7 @@ void lsroot() {
 		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
 		sum += d->rec_len;
 
-		//d->name[d->name_len] = '\0';
-	
 		printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
-		
-		// if (d->inode < 14) {
-
-		// 	char* dd = (char*)d;
-		// 	for (int j = 0; j < calc; j++)
-		// 		if (j < 40) printf( isalpha(dd[j]) ? "%2c" : "%2d", dd[j]);
-
-		// vga_putc('\n');
-		// }
 		d = (dirent*)((char*)d + d->rec_len);
 
 	} while(sum < (1024 * i->blocks/2));
@@ -254,22 +243,15 @@ int find_inode_in_dir(const char* name, int dir_inode) {
 		// Calculate the 4byte aligned size of each entry
 		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
 		sum += d->rec_len;
-
-		int q = strncmp(d->name, name, d->name_len);
-	
-		// 	char* dd = (char*)d;
-		// 	for (int j = 0; j < calc; j++)
-		// 		printf( isalpha(dd[j]) ? "%2c" : "%2d", dd[j]);
-		// vga_putc('\n');
-		if (q== 0) {
-		
+		printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
+		if (strncmp(d->name, name, d->name_len)== 0) {
+			
 			free(buf);
 			return d->inode;
 		}
 		d = (dirent*)((uint32_t) d + d->rec_len);
 
 	} while(sum < (1024 * i->blocks/2));
-
 	free(buf);
 	return -1;
 }

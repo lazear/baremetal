@@ -65,9 +65,24 @@ char* k_stream_read(STREAM* stream, size_t n) {
 	memcpy(buffer, ((uint32_t) stream->data + stream->offset), n);
 }
 
+char* k_stream_read_until(STREAM* stream, char c) {
+
+	int count = 0;
+	while ((*(char*)((uint32_t) stream->data + stream->offset) != c) && stream->offset < stream->size) {
+		count++;
+		stream->offset++;
+	}
+	char* buffer = malloc(count);
+	memcpy(buffer, ((uint32_t) stream->data + stream->offset - count), count);
+	return buffer;
+
+}
+
+/* Returns the last character in the stream */
 char fgetc(STREAM* stream) {
-	char q = *(char*)((uint32_t) stream->data + stream->offset - 1);
-	return q;
+	if (stream->offset > 1)
+		return  *(char*)((uint32_t) stream->data + stream->offset - 1);
+	return 0;
 }
 
 int k_stream_seek(STREAM* stream, int p) {

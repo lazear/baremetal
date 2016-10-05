@@ -100,37 +100,25 @@ void paging_info(uint32_t* pd) {
 void k_page_fault(regs_t * r) {
 	pushcli();
 	uint32_t cr2;
-
 	asm volatile("mov %%cr2, %%eax" : "=a"(cr2));
+	r = (uint32_t) r + 4;
+	printf("Page Fault(%d): cr2 %#x\n", r->err_code, cr2);
+	printf("Faulting EIP %#x (%s)\n", r->eip, ksym_find(r->eip));
 
-	printf("Page fault @ 0x%X [Error: %x]\n", cr2, r->err_code);
+	if (r->err_code & PF_PRESENT)	vga_puts(" \tPage Not Present\n");
+	if (r->err_code & PF_RW) 		vga_puts(" \tPage Not Writeable\n");
+	if (r->err_code & PF_USER) 		vga_puts(" \tPage Supervisor Mode\n");
 
-	if (r->err_code & PF_PRESENT)	printf("\tPage Not Present\n");
-	if (r->err_code & PF_RW) 		printf("\tPage Not Writeable\n");
-	if (r->err_code & PF_USER) 		printf("\tPage Supervisor Mode\n");
-
-	// uint32_t phys = k_virt_to_phys(cr2);
-	// if (!(phys & PF_PRESENT)) {		
-	// 	printf("Mapped but not present: 0x%x\n", phys);
-	// 	k_paging_map(k_page_alloc(), cr2, (phys & 0xF) | PF_RW | PF_PRESENT);
-	// 	k_swap_pd(CURRENT_PAGE_DIRECTORY);
-	// 	printf("New map: %x\n", k_virt_to_phys(cr2));
-	// 	asm volatile("mov %%eax, %%cr2" :: "a"(0x00000000));
-	// 	//popcli();
-	// 	asm volatile("hlt");
-	// 	return;
-	
-	// }
 
 	if (cr2 >= heap_brk() && cr2 < heap_brk() + 0x1000){
-		printf("Heap is out of memory\n");
+		vga_puts("Heap is out of memory\n");
 		sbrk(0x1000);
 		popcli();
 		return;
 	}
 	paging_info(CURRENT_PAGE_DIRECTORY);
 	//printf("Calling func: %x\n", r->eip);
-	//print_regs(r);
+
 	//traverse_blockchain();
 	//k_paging_map(k_page_alloc(), cr2 & ~0x3FF, 0x3);
 	mm_debug();

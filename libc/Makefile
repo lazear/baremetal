@@ -3,7 +3,7 @@
 
 FINAL	= new
 OBJS	= *.o				# Elf object files
-PREFIX  = ~/opt
+PREFIX  = ..# ~/opt
 CC	    = $(PREFIX)/cross/bin/i686-elf-gcc
 LD		= $(PREFIX)/cross/bin/i686-elf-ld
 NASM		= nasm

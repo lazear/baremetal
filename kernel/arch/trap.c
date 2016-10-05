@@ -46,9 +46,8 @@ void trap(regs_t* r) {
 			syscall(r);
 			break;
 		default:
-			printf("Interrupt: %#x: EIP %#x\n", r->int_no, r->eip);
+			printf("Interrupt: %#x: EIP %#x (%s)\n", r->int_no, r->eip, ksym_find(r->eip));
 			print_regs(r);
-
 			asm volatile("cli; hlt");
 			break;
 	}

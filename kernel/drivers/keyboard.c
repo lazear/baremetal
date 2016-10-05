@@ -50,16 +50,14 @@ uint8_t keyboard_shift[] =
 };
 
 
-//char buffer[400];
 char *buffer;	// we want to dynamically alloc this
+char* linebuffer = 0;
+
 uint32_t idx = 0;	// keep track of where we are
 int key_wait = 0;
 int shift = 0;
 
-STREAM *kb;
 
-extern mutex test;
-extern void sched_asm();
 void keyboard_handler(regs_t *r)
 {
 	uint8_t scancode;
@@ -67,9 +65,9 @@ void keyboard_handler(regs_t *r)
 	if (idx >= 0x400)
 		idx = 0;
 
-
     scancode = inb(0x60);
   	uint8_t  data = inb(0x60);
+
     if (scancode & 0x80)
 	{
 		scancode &= ~0x80;		/* Get rid of key-release code */
@@ -98,12 +96,9 @@ void keyboard_handler(regs_t *r)
 			key = keyboard[scancode];
 
 			vga_putc(key);
-		//	fputc(kb, key);
 			if (key == '\n')	// line return
 			{
-			//	sched_asm();
-			//	printf("%d ESP: %x\n", getpid(), r->esp);
-			//sched();
+				strcpy(linebuffer, buffer, (idx < 0x100) ? idx : 0x100);
 				idx = 0;
 				
 			} 
@@ -116,23 +111,20 @@ void keyboard_handler(regs_t *r)
 				buffer[idx++] = key;	// add 'key' to the input buffer
 
 	}
-	
 
-	if (key_wait == 1)
-		key_wait = 0;
-	vga_scroll();
 }
 
-int key_state(void)
-{
-	return key_wait;
+char* gets() {
+	while(!*linebuffer);
+	char* tmp = strdup(linebuffer);
+	memset(linebuffer, 0, 0x100);
+	return tmp;
 }
-
 
 /* Installs the keyboard handler into IRQ1 */
 void keyboard_install()
 {
-	kb = k_new_stream(0x1000);
 	buffer = (char*)malloc(0x400);		// allocate and zero the buffer
+	linebuffer = malloc(0x100);
 	pic_enable(IRQ_KBD);
 }

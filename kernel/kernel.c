@@ -55,20 +55,11 @@ extern void enter_usermode(uint32_t, uint32_t);
 mutex km = {.lock=0};
 
 
-void init_message(char* message, char status) {
-	vga_puts("[");
-	vga_setcolor((status)? VGA_LIGHTGREEN : VGA_LIGHTRED);
-	vga_puts( (status) ? " OK " : "FAIL" );
-	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
-	printf("] %s", message);
-}
 
 void scheduler(void) {
 	acquire(&km);
-	printf("my id %d:%d \n", cpu->id, mp_processor_id());
-	//printf("%x\n", cpu->stack);
+	init_message(1,"CPU %d initialized\n", cpu->id);
 	release(&km);
-	sti();
 	for(;;);
 }
 
@@ -99,9 +90,6 @@ void kernel_initialize(uint32_t kernel_end) {
 			* APIC/ACPI/Multiple processors
 			* multitasking.
 	*/
-
-
-
 	KERNEL_END = kernel_end;
 	k_mm_init(kernel_end);
 	k_heap_init();
@@ -113,56 +101,48 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	sti();
 	vga_init();
-	init_message("xiphos kernel locked and loaded!\n", 1);
+	init_message(1, "xiphos kernel locked and loaded!\n");
 
 	ide_init();
 	buffer_init();
 
-	/* Initialize BSP cpu-local variables */
+	build_ksyms();
 
-	
-	/* Parse ACPI tables for number of processors */
-	int nproc = acpi_init();
-	
-	//lsroot();
+	//printf("ksym_find() %s\n", ksym_find(0xC0102F00));
 
-	//find_inode_in_dir("lost+found", 2);
-	acquire(&km);
-	lass_main("/test/asm/new.s");
-
-	//elf_load(find_inode_in_dir("output", 2));
-
-	pic_disable();
-
-	ioapicinit();
-	ioapicenable(0, 0);
-	ioapicenable(0, 1);
-	ioapicenable(IRQ_IDE, 0);
-	ioapicenable(IRQ_IDE, 1);
+	lass_main("new.s");
 
 
-	lapic_init();
+// #define SMP 0
 
-	/* Acquire kernel mutex */
-	
-	printf("Found %d processors\n", nproc);
-	mp_start_ap(nproc);
-		
-	// Wait until all processors have been started 
-	while(mp_number_of_processors() != nproc);
+// 	if(SMP) {
+// 		/* Parse ACPI tables for number of processors */
+// 		int nproc = acpi_init();
+// 		/* Acquire kernel mutex, otherwise things will get out of hand quickly */
+// 		acquire(&km);
 
-	printf("All processors started!\n");
+// 		init_message(1, "Found %d processors\n", nproc);
+// 		pic_disable();
+// 		lapic_init();
+// 		ioapicinit();
+// 		ioapicenable(0, 0);
+// 		ioapicenable(0, 1);
+// 		ioapicenable(IRQ_IDE, 0);
+// 		ioapicenable(IRQ_IDE, 1);
+
+// 		/* Start all AP's */
+// 		mp_start_ap(nproc);
+			
+// 		/* Wait until all processors have been started  */
+// 		while(mp_number_of_processors() != nproc);
+
+// 		init_message(1, "All processors started!\n");
 
 
-	/* Once BSP releases the initial km lock, AP's will enter scheduler */
-	release(&km);
-
-	sti();
-
-
-
-
-
+// 		/* Once BSP releases the initial km lock, AP's will enter scheduler */
+// 		pushcli();
+// 		release(&km);
+// 	}
 	scheduler();
 }
 

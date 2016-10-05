@@ -148,7 +148,7 @@ void ide_init() {
 	}
 
 
-	printf("IDE status: %d\n", IDE_STATUS);
+	init_message(IDE_STATUS, "IDE driver ready, and disk found\n");
 	//outb(IDE_IO | IDE_HEAD, 0xE0 | (0<<4));
 	release(&idelock);
 }

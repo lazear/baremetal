@@ -187,8 +187,6 @@ next_format:
 	return n;
 }
 
-
-
 int printf(const char* fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
@@ -198,4 +196,39 @@ int printf(const char* fmt, ...) {
 
 	vga_puts(buf);
 	return i;
+}
+
+
+void init_message(int status, const char* fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+	vga_puts("[");
+	int color;
+	char* message;
+	switch(status) {
+		case 0:
+			color =VGA_LIGHTRED;
+			message = "FAIL";
+			break;
+		case 1:
+			color = VGA_LIGHTGREEN;
+			message = " OK ";
+			break;
+		case 2:
+			color = VGA_LIGHTBROWN;
+			message = "WAIT";
+			break;
+		default:
+			color = VGA_LIGHTCYAN;
+			message = "????";
+			break;
+	}
+	vga_setcolor(color);
+	vga_puts( message);
+	vga_setcolor(VGA_COLOR(VGA_WHITE, VGA_BLACK));
+	vga_puts("] ");
+	char buf[256];
+	vsnprintf(buf, 256, fmt, ap);
+	vga_puts(buf);
+	va_end(ap);
 }

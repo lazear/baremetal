@@ -30,14 +30,98 @@ SOFTWARE.
 #include <ide.h>
 #include <elf.h>
 
+static struct ksym {
+	uint32_t address;
+	char name[32];
+	int size;
+} *kernel_symbols;
 
-char* elf_findsymbol_by_address(void* addr) {
+static int no_ksym = 0;
 
+void build_ksyms(void) {
+
+	int ki = find_inode_in_dir("kernel.bin", 2);
+
+	char* data = ext2_open(ext2_inode(1, ki));
+
+	elf32_ehdr *ehdr = (elf32_ehdr*) data;
+
+	/* Make sure the file ain't fucked */
+	assert(ehdr->e_ident[0] == ELF_MAGIC);
+	assert(ehdr->e_machine 	== EM_386);
+	assert(ehdr->e_type		== ET_EXEC);
+
+	/* Parse the section headers */
+	elf32_shdr* shdr 		= ((uint32_t) data) + ehdr->e_shoff;
+	elf32_shdr* sh_str		= (uint32_t) shdr + (ehdr->e_shentsize * ehdr->e_shstrndx);
+	elf32_shdr* last_shdr 	= (uint32_t) shdr + (ehdr->e_shentsize * ehdr->e_shnum);
+
+	elf32_shdr* strtab 		= NULL;
+	elf32_shdr* symtab		= NULL;
+
+	char* string_table 		= (uint32_t) data + sh_str->sh_offset;
+
+	shdr++;					// Skip null entry
+
+	while (shdr < last_shdr) {	
+		if (strcmp(".symtab", string_table + shdr->sh_name) == 0) {
+			symtab = shdr;
+		}
+		if (strcmp(".strtab", string_table + shdr->sh_name) == 0) {
+			strtab = shdr;
+		}
+		shdr++;
+	}
+
+	if (!strtab || !symtab) {
+		vga_pretty("ERROR: Could not load symbol table", 0x4);
+		return;
+	}
+
+	elf32_sym* sym 		= ((uint32_t) data) + symtab->sh_offset;
+	elf32_sym* last_sym = (uint32_t) sym + symtab->sh_size;
+	void* strtab_d 		= ((uint32_t) data) + strtab->sh_offset;
+
+	size_t sym_tab_sz = ((uint32_t) last_sym - (uint32_t) sym)/ sizeof(elf32_sym);
+	kernel_symbols = malloc(sizeof(struct ksym) * sym_tab_sz);
+	/* Output symbol information*/
+	int q = 0;
+	while(sym < last_sym) {
+		if (sym->st_name && sym->st_value > KERNEL_VIRT) {
+			
+			if ( q > sym_tab_sz)
+				printf("ERROR\n");
+			char* tmp = (char*) (sym->st_name + (uint32_t)strtab_d);
+			//printf("%s, %d\n", tmp, sym->st_size);
+			kernel_symbols[q].address = sym->st_value;
+			kernel_symbols[q].size = sym->st_size;
+			for (int i = 0; i < 32, i < strlen(tmp); i++)
+				kernel_symbols[q].name[i] = tmp[i];
+			q++;
+		}
+		sym++;
+	}
+	no_ksym  = q;
+	free(data);
 }
 
-void* elf_findsymbol_by_name(char* symbol) {
+char* ksym_find(uint32_t addr) {
 
+	if (!kernel_symbols)
+		return NULL;
+	int closest_diff = 0x1000;
+	int match = 0;
+
+	for (int i = 0; i < no_ksym; i++) {
+		int diff = addr - kernel_symbols[i].address;
+		if (diff < closest_diff && diff > 0) {
+			match = i;
+			closest_diff = diff;
+		}
+	}
+	return kernel_symbols[match].name;
 }
+
 
 void* elf_objdump(void* data) {
 	elf32_ehdr *ehdr = (elf32_ehdr*) data;
