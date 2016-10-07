@@ -30,8 +30,11 @@ userland:
 	make -C libc
 	$(CC) -w --sysroot=libc -I libc/usr/include user/user.c -o user.elf
 	$(CC) -w --sysroot=libc -I libc/usr/include user/lass.c -o lass.elf
+	$(CC) -w --sysroot=libc lquad.c -o lquad.elf
+
 	$(EXTUTIL) -x $(IMAGE) -wf user.elf
 	$(EXTUTIL) -x $(IMAGE) -wf lass.elf
+	$(EXTUTIL) -x $(IMAGE) -wf lquad.elf
 	objdump -d user.elf > user.S
 
 lass:
@@ -70,7 +73,9 @@ hd:
 	sudo mke2fs ext2
 #	dd if=kernel/bootstrap of=ext2 conv=notrunc
 #	dd if=kernel/stage2 of=ext2 seek=1 conv=notrunc
-
+	cp bin/kernel.bin .
+	$(EXTUTIL) -x $(IMAGE) -wf kernel.bin
+	rm kernel.bin
 run:
 	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4 #-d cpu_reset -d int -no-reboot
 	
