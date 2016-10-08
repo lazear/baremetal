@@ -65,12 +65,10 @@ void scheduler(void) {
 
 
 int pathize(char* path) {
-	printf("PATHIZE\n");
 	char* pch = strtok(path, "/");
 	int parent = 2;
 	while(pch) {
 		parent = find_inode_in_dir(pch, parent);
-		printf("%s inode: %i\n", pch, parent);
 		pch = strtok(NULL, "/");
 	}
 	return parent;
@@ -106,16 +104,10 @@ void kernel_initialize(uint32_t kernel_end) {
 	ide_init();
 	buffer_init();
 
-	build_ksyms();
-
-
-
-//	elf_execute("lass.elf");
-	elf_execute("lquad.elf");
-	//printf("ksym_find() %s\n", ksym_find(0xC0102F00));
-
-
-
+	if (pathize("kernel.bin"))
+		build_ksyms();
+	
+	elf_objdump(open("lquad.o"));
 
 // #define SMP 0
 

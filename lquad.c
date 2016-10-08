@@ -43,6 +43,7 @@ struct node* pop(struct node** head) {
 	return (*head)->last;
 }
 
+
 void traverse_list(struct node** head) {
 	struct node** h;
 	for (h = head; *h; h = &(*h)->next) {
@@ -58,6 +59,7 @@ int list_size(struct node** head) {
 		i++;
 	return i;
 }
+
 
 int main(int argc, char* argv[]) {
 
@@ -75,3 +77,4 @@ int main(int argc, char* argv[]) {
 	printf("num nodes %d\n", list_size(&head));
 	return 0;
 }
+
