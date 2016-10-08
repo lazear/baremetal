@@ -108,6 +108,8 @@ void kernel_initialize(uint32_t kernel_end) {
 
 	build_ksyms();
 
+
+
 //	elf_execute("lass.elf");
 	elf_execute("lquad.elf");
 	//printf("ksym_find() %s\n", ksym_find(0xC0102F00));

@@ -7,12 +7,12 @@ START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
 AOBJS	= vectors.so trap_handler.so sched.so syscall.so font.so umode.so
 INIT 	= initcode
-CC	    = cross/bin/i686-elf-gcc
+CC	    = ~/opt/cross/bin/i686-elf-gcc
 LD		= ~/opt/cross/bin/i686-elf-ld
 AS		= nasm
 AR		= ~/opt/cross/bin/i686-elf-as
 CP		= cp
-LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
+LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/6.2.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I kernel/include/  -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
