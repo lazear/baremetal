@@ -7,7 +7,8 @@ with open("kernel/arch/vectors.s", "w") as f:
 	for i in range(0, 256):
 		f.write("global vector{0}\n".format(i))
 		f.write("vector{0}:\n".format(i))
-		f.write("\tpush 0\n")
+		if (i not in [8, 10, 11, 12, 13, 14, 16]):
+			f.write("\tpush 0\n")
 		f.write("\tpush {0}\n".format(i))
 		f.write("\tjmp trap_handler\n")
 

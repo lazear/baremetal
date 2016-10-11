@@ -101,7 +101,7 @@ void k_page_fault(regs_t * r) {
 	pushcli();
 	uint32_t cr2;
 	asm volatile("mov %%cr2, %%eax" : "=a"(cr2));
-	r = (uint32_t) r + 4;
+	//r = (uint32_t) r + 4;
 	printf("Page Fault(%d): cr2 %#x\n", r->err_code, cr2);
 	printf("Faulting instruction:  %#x (%s)\n", r->eip, (r->cs == 0x23) ? "User process" : ksym_find(r->eip));
 	printf("Current stack pointer: %#x\n", r->esp);

@@ -44,7 +44,6 @@ vector7:
 	jmp trap_handler
 global vector8
 vector8:
-	push 0
 	push 8
 	jmp trap_handler
 global vector9
@@ -54,27 +53,22 @@ vector9:
 	jmp trap_handler
 global vector10
 vector10:
-	push 0
 	push 10
 	jmp trap_handler
 global vector11
 vector11:
-	push 0
 	push 11
 	jmp trap_handler
 global vector12
 vector12:
-	push 0
 	push 12
 	jmp trap_handler
 global vector13
 vector13:
-	push 0
 	push 13
 	jmp trap_handler
 global vector14
 vector14:
-	push 0
 	push 14
 	jmp trap_handler
 global vector15
@@ -84,7 +78,6 @@ vector15:
 	jmp trap_handler
 global vector16
 vector16:
-	push 0
 	push 16
 	jmp trap_handler
 global vector17

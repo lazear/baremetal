@@ -129,12 +129,13 @@ void* elf_objdump(void* data) {
 	/* Make sure the file ain't fucked */
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
 	assert(ehdr->e_machine 	== EM_386);
-	assert(ehdr->e_type		== ET_EXEC);
+
+	char *types[] = { "NONE", "RELOCATABLE", "EXECUTABLE", "SHARED", "CORE"};
 
 	printf("OBJDUMP\n");
 	printf("ELF ident\t%x\t",ehdr->e_ident[0]);     
-	printf("Type\t%x\t", ehdr->e_type);                
-	printf("Machine\t%x\n", ehdr->e_machine);              
+	printf("Type %s\t", types[ehdr->e_type]);                
+	printf("Machine %s\n", "i386");              
 	printf("Version \t%x\t",ehdr->e_version);              
 	printf("Entry\t%x\t",ehdr->e_entry);                
          
@@ -159,25 +160,24 @@ void* elf_objdump(void* data) {
 
 	elf32_shdr* strtab 		= NULL;
 	elf32_shdr* symtab		= NULL;
+	elf32_shdr* reltab		= NULL;
 
 	char* string_table 		= (uint32_t) data + sh_str->sh_offset;
 
 	shdr++;					// Skip null entry
-	int q = 0;
+	int q = 1;
 
-	printf("Sections:\n %8wIdx Name%8wSize\t\tAddress \tOffset\tAlign\n");
+	printf("Idx %19s Size\t Address    Offset    Align Type\n", "Name");
 	while (shdr < last_shdr) {	
-		printf("%d:%10s %#8x %#8x %5d %#8x\n", 
+		printf("%2d:%20s %#8x %#8x %5d %#5x %d\n", 
 			q++, (string_table + shdr->sh_name), shdr->sh_size,
-			shdr->sh_addr, shdr->sh_offset, shdr->sh_addralign);
-		if (strcmp(".symtab", string_table + shdr->sh_name) == 0) {
-			printf("found symtab: %s\n", string_table + shdr->sh_name);
+			shdr->sh_addr, shdr->sh_offset, shdr->sh_addralign, shdr->sh_type);
+		if (strcmp(".symtab", string_table + shdr->sh_name) == 0 && shdr->sh_type == SHT_SYMTAB)
 			symtab = shdr;
-		}
-		if (strcmp(".strtab", string_table + shdr->sh_name) == 0) {
-			printf("found strtab: %s\n", string_table + shdr->sh_name);
+		if (strcmp(".strtab", string_table + shdr->sh_name) == 0 && shdr->sh_type == SHT_STRTAB)
 			strtab = shdr;
-		}
+		if (strcmp(".rel.text", string_table + shdr->sh_name) == 0 && shdr->sh_type == SHT_REL)
+			reltab = shdr;
 		shdr++;
 	}
 
@@ -192,11 +192,42 @@ void* elf_objdump(void* data) {
 
 	/* Output symbol information*/
 	
+
+/* BEGIN RELOCATION CODE */	
 	while(sym < last_sym) {
 		if (sym->st_name) 
-			printf("%s\t0x%x\n", (char*) (sym->st_name + (uint32_t)strtab_d), sym->st_value);
+			printf("%x %s\t0x%x\n", sym->st_info, (char*) (sym->st_name + (uint32_t)strtab_d), sym->st_value);
 		sym++;
 	}
+
+	if (reltab) {
+		printf("Found relocation table\n");
+		printf("Link: %x\tInfo %x\n", reltab->sh_link, reltab->sh_info);
+
+		elf32_rel* r 	= ((uint32_t) data) + reltab->sh_offset;
+		elf32_rel* last = ((uint32_t) r) + reltab->sh_size;
+		
+		elf32_shdr* target = ((uint32_t) data + ehdr->e_shoff) + (reltab->sh_info * ehdr->e_shentsize);
+
+
+		while(r < last) {
+
+			uint8_t t 	= (unsigned char) (r->r_info);
+			uint8_t s 	= (r->r_info) >> 8;
+			sym 		= (((uint32_t) data) + symtab->sh_offset);
+			sym += s;
+			
+			char* sym_name = (char*) (sym->st_name + (uint32_t)strtab_d);
+	
+
+			uint32_t addend = *(uint32_t*) ((uint32_t) data + target->sh_offset + r->r_offset);
+			addend -= r->r_offset;
+			addend += 0;
+			printf("addr %x addend %x type %X %s\n", r->r_offset, addend, t, sym_name);
+			//printf("value @ offset: %x %x\n", addend, addend - r->r_offset);
+			r++;
+		}
+	}	
 	
 }
 
@@ -283,6 +314,7 @@ void elf_load(int i_no) {
 	free_pagedir(elf_pd);
 
 }
+
 
 void elf_execute(const char* path) {
 	elf_load(pathize(path));

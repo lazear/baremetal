@@ -298,3 +298,12 @@ int ext_first_free(uint32_t* b, int sz) {
 	}
 }
 
+
+char* open(char* path) {
+	int ino = pathize(path);
+	if (ino == -1)
+		return NULL;
+	printf("%+d \n", ino);
+	inode* i = ext2_inode(1, ino);
+	return ext2_open(i);
+}
