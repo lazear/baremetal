@@ -46,18 +46,18 @@ int acpi_parse_madt(madt_header* madt) {
 		switch(type) {
 			case 0: {
 				acpi_lapic *x = (acpi_lapic*) entries;// + i;
-				dprintf("[ACPI] LAPIC: processor id %d\tapic id%d\tflags:%d\n", x->acpi_proc_id, x->apic_id, x->flags);
+				dprintf("[acpi] lapic: processor id %d\tapic id%d\tflags:%d\n", x->acpi_proc_id, x->apic_id, x->flags);
 				num_lapics++;
 				break;
 			}
 			case 1: {
 				acpi_ioapic *x = (acpi_ioapic*) entries;// + i;
-				dprintf("[ACPI] I/O APIC: id %d\taddress:0x%x\n", x->ioapic_id, x->ioapic_addr);
+				dprintf("[acpi] ioapic: id %d\taddress:0x%x\n", x->ioapic_id, x->ioapic_addr);
 				break;
 			}
 			case 2: {
 				acpi_iso *x = (acpi_iso*)  entries;// + i;
-				dprintf("[ACPI] IRQ src %d BUS src %d GSI %d\n", x->irq_src, x->bus_src, x->gsi);
+				dprintf("[acpi] irq src %d bus src %d gsi %d\n", x->irq_src, x->bus_src, x->gsi);
 				break;
 			}
 		}
@@ -99,7 +99,7 @@ int acpi_init() {
 			return acpi_parse_madt(entry);
 		}
 	}
-	vga_pretty("No APIC table found. SYSTEM FAILURE\n", 0x4);
+	panic("No APIC table found. SYSTEM FAILURE\n");
 	k_paging_unmap(r);
 
 }

@@ -53,7 +53,7 @@ static void ioapic_write(int reg, uint32_t data) {
 }
 
 void ioapic_enable(uint8_t irq, uint16_t cpu) {
-	dprintf("[IOAPIC] Enabling irg %d on cpu %d\n", irq, cpu);
+	
 	/* Write the low 32 bits :
 	31:17 reserved
 	16: Interrupt mask:		1 = masked. 0 = enabled
@@ -73,9 +73,16 @@ void ioapic_enable(uint8_t irq, uint16_t cpu) {
 		111 ExtINT
 	7:0 Interrupt Vector: 8 bit field containing the interrupt vector, from 0x10 to 0xFE
 	*/
-	ioapic_write(IOREDTBL + (irq * 2), 0);
+	uint32_t low = (IRQ0 + irq);
+	dprintf("[ioapic] Enabling irg %d on cpu %d (low dword: %#x)\n", irq, cpu, low);
+	ioapic_write(IOREDTBL + (irq * 2), low );
 	/* Write the high 32 bites. 63:56 contains destination field */
 	ioapic_write(IOREDTBL + (irq * 2) + 1, cpu << 24);
+}
+
+void ioapic_disable(uint8_t irq) {
+	ioapic_write(IOREDTBL + (irq*2), (1<<16) | (0x20 + irq));
+	ioapic_write(IOREDTBL + (irq*2) +1, 0);
 }
 
 void ioapic_init(){
@@ -85,10 +92,15 @@ void ioapic_init(){
 		k_paging_map(IOAPIC, IOAPIC, 0x3);
 
 	uint32_t ver = ioapic_read(0x01);
-	int max = (ver >> 16) & 0xFF;
-
+	uint16_t max = (ver >> 16) & 0xFF;
+	dprintf("[ioapic] version %#x max reg table entries: %d\n", ver, max);
 	if (ver != 0x00170011) 
 		panic("Faulty IOAPIC version!\n");
+	for (int i = 0; i < max; i++)
+		ioapic_disable(i);
+
+
+
 
 }
 

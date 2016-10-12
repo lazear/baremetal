@@ -26,6 +26,7 @@ SOFTWARE.
 #include <types.h>
 #include <x86.h>
 #include <traps.h>
+#include <smp.h>
 
 /* Should switch back to using an array of handlers */
 void trap(regs_t* r) {
@@ -46,9 +47,10 @@ void trap(regs_t* r) {
 			syscall(r);
 			break;
 		default:
-			printf("Interrupt: %#x: EIP %#x (%s)\n", r->int_no, r->eip, ksym_find(r->eip));
-			print_regs(r);
-			asm volatile("cli; hlt");
+			printf("Unknown Interrupt: %#x: EIP %#x (%s)\n", r->int_no, r->eip, ksym_find(r->eip));
+			dprintf("Unknown Interrupt: %#x: EIP %#x (%s)\n", r->int_no, r->eip, ksym_find(r->eip));
+			//print_regs(r);
+		//	asm volatile("cli; hlt");
 			break;
 	}
 
@@ -56,7 +58,6 @@ void trap(regs_t* r) {
 		outb(0xA0, 0x20);
 	
 	outb(0x20, 0x20);
-
+	lapic_eoi();
 	return r;
-	//lapic_eoi();
 }

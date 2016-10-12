@@ -62,6 +62,7 @@ void scheduler(void) {
 	release(&km);
 
 	sti();
+	lapic_test();
 
 	for(;;);
 }
@@ -93,21 +94,22 @@ void kernel_initialize(uint32_t kernel_end) {
 			* multitasking.
 	*/
 	KERNEL_END = kernel_end;
+	uart_init();
 	k_mm_init(kernel_end);
 	k_heap_init();
 	k_paging_init(_init_pd);
 
+	dprintf("Early kernel start success\n");
 	keyboard_install();
 	timer_init();
 
 	sti();
 	vga_init();
 	init_message(1, "xiphos kernel locked and loaded!\n");
-	uart_init();
+	
 	ide_init();
 	buffer_init();
-	
-	dprintf("Testing serial out printf %x\n", 0xDEADBEEF);
+
 
 	if (pathize("kernel.bin"))
 		build_ksyms();
@@ -123,14 +125,19 @@ void kernel_initialize(uint32_t kernel_end) {
 		acquire(&km);
 
 		init_message(1, "Found %d processors\n", nproc);
+
+		/* Disable the programmable interrupt control */
 		pic_disable();
+
+		/* Initialize IO/APIC's */
 		ioapic_init();
+		ioapic_enable(0, 1);
+	
+		
 		lapic_init();
 		
-		ioapic_enable(0, 0);
-		ioapic_enable(0, 1);
-		ioapic_enable(0, 2);
-		ioapic_enable(0, 3);
+		
+
 		ioapic_enable(IRQ_IDE, 0);
 		ioapic_enable(IRQ_IDE, 1);
 

@@ -55,10 +55,15 @@ volatile uint32_t* LAPIC = NULL;
 static void lapic_write(int index, int value) {
 	LAPIC[index/4] = value;		// div by 4 for sizeof(int)
 	LAPIC[0x8];					// Wait by reading;
+	//dprintf("[lapic] write %x to %x\n", value, index);	
 }
 
 static uint32_t lapic_read(int index) {
 	return LAPIC[index/4];
+}
+
+void lapic_test() {
+	lapic_write(LAPIC_ICRLO, (3<<18) | (1<<11) | (1<<14) | (0<<8) | 0x25);
 }
 
 void lapic_eoi() {
@@ -75,35 +80,42 @@ void lapic_init() {
 
 	/* Paging is enabled, so we need to map in the physical mem */
 	if (k_phys_to_virt(LAPIC_BASE))
-		vga_pretty("LAPIC_BASE is already mapped\n", 4);
+		dprintf("[lapic] non-fatal error: LAPIC_BASE already mapped\n");
 	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
 
 
-	//pic_disable();
+//	pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
-	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
+	dprintf("LAPIC_SIV %x\n", lapic_read(LAPIC_SIV));
+	//lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
+	lapic_write(LAPIC_SIV, 0x1ff);
+	dprintf("LAPIC_SIV %x\n", lapic_read(LAPIC_SIV));
 	// Calibrate timer
-	lapic_write(LAPIC_TDCR, 0x00020000 | 0x20);	// Irq0 + IRQ_timer | Periodic
-	lapic_write(LAPIC_TICR, 10000000);
+	lapic_write(LAPIC_TIMER, (1<<17) | 0x20);
+	//lapic_write(LAPIC_TDCR, 0x00020000 | 0x20);	// Irq0 + IRQ_timer | Periodic
+	lapic_write(0x380, 0xF0000000);
 
+	dprintf("CC: %d\n", lapic_read(0x390));
 	/* Mask interrupts */
-	lapic_write(LAPIC_LINT0, 0x10000);
-	lapic_write(LAPIC_LINT1, 0x10000);
+	//lapic_write(LAPIC_LINT0, 0x10000);
+	//lapic_write(LAPIC_LINT1, 0x10000);
 
 	if ((lapic_read(LAPIC_VER) >> 16) & 0xFF >= 4)
 		lapic_write(0x0340, 0x10000);
 
-	lapic_write(LAPIC_ERR, 0);
+	lapic_write(LAPIC_ERR, IRQ0 + IRQ_ERROR);
 	lapic_write(LAPIC_ERR, 0);
 	lapic_write(LAPIC_EOI, 0);	// Clear any existing interrupts
 
 	lapic_write(LAPIC_ICRHI, 0);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL | BCAST);
+
+
 	while(LAPIC[LAPIC_ICRLO] & DELIVS)
 		;
-
+	dprintf("CC: %x\n", lapic_read(0x390));
 	lapic_write(LAPIC_TPR, 0);
-
+dprintf("CC: %x\n", lapic_read(0x390));
 }
 
 
@@ -143,7 +155,7 @@ void lapic_start_AP(int apic_id, uint32_t address) {
 	udelay(1);
 
 	/* Keep this printf here, it acts as a delay... lol */
-	dprintf("[LAPIC] Attemping to start cpu: %d\n", apic_id);
+	dprintf("[lapic] starting cpu: %d\n", apic_id);
 	for (int i = 0; i < 2; i++) {
 		lapic_write(LAPIC_ICRHI, apic_id << 24);
 		lapic_write(LAPIC_ICRLO, STARTUP |  address >> 12);

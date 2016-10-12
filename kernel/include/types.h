@@ -17,7 +17,7 @@ typedef int bool;
 #define false	0
 
 #define NULL	((void*) 0)
-#define panic(a)	(printf("PANIC: %s (%s:%d:%s)\n", a, __FILE__, __LINE__, __func__))
+#define panic(a)	( printf("PANIC: %s (%s:%d:%s)\n", a, __FILE__, __LINE__, __func__))
 #define nelem(x) (sizeof(x)/sizeof((x)[0]))
 
 #define dprint(e) (printf("%s: %x\n", #e, e) )

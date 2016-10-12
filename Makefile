@@ -78,7 +78,7 @@ hd:
 	rm kernel.bin
 run:
 	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4 -serial file:serial.txt #-d cpu_reset -d int -no-reboot
-	
+	cat serial.txt
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain
 	

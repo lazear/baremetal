@@ -33,7 +33,7 @@ to k_page_alloc() them and then map those pages to the current page directory.
 #include <x86.h>
 #include <paging.h>
 #include <kernel.h>
-
+#include <smp.h>
 /*
 Page directory -> Page table -> Page
 1024 entires in directory (1024 page tables)
