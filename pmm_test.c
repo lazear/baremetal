@@ -72,10 +72,15 @@ uint32_t mm_alloc() {
 	return find_and_allocate(&pp);
 }
 
+uint32_t k_page_alloc() {
+	return mm_alloc();
+}
+
 /* De-allocates a specific physical address */
 uint32_t mm_free(uint32_t address) {
 	return find_and_mark(&pp, address, 0);
 }
+
 
 /* Request allocation of a specific physical address
 Returns 1 on success, -1 on failure */
@@ -84,6 +89,11 @@ int mm_request(uint32_t address) {
 	if (!used)	
 		return find_and_mark(&pp, address, 1);
 	return -1;
+}
+
+/* Mark first 4 MB as used */
+int pmm_init() {
+
 }
 
 int main(int argc, char* argv[]) {

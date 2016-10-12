@@ -60,6 +60,9 @@ void scheduler(void) {
 	acquire(&km);
 	init_message(1,"CPU %d initialized\n", cpu->id);
 	release(&km);
+
+	sti();
+
 	for(;;);
 }
 
@@ -100,45 +103,51 @@ void kernel_initialize(uint32_t kernel_end) {
 	sti();
 	vga_init();
 	init_message(1, "xiphos kernel locked and loaded!\n");
-
+	uart_init();
 	ide_init();
 	buffer_init();
+	
+	dprintf("Testing serial out printf %x\n", 0xDEADBEEF);
 
 	if (pathize("kernel.bin"))
 		build_ksyms();
 	
-	elf_objdump(open("lquad.o"));
+	//elf_objdump(open("lquad.o"));
 
 // #define SMP 0
+	int nproc = acpi_init();
+	if(nproc > 1) {
+		/* Parse ACPI tables for number of processors */
+	
+		/* Acquire kernel mutex, otherwise things will get out of hand quickly */
+		acquire(&km);
 
-// 	if(SMP) {
-// 		/* Parse ACPI tables for number of processors */
-// 		int nproc = acpi_init();
-// 		/* Acquire kernel mutex, otherwise things will get out of hand quickly */
-// 		acquire(&km);
+		init_message(1, "Found %d processors\n", nproc);
+		pic_disable();
+		ioapic_init();
+		lapic_init();
+		
+		ioapic_enable(0, 0);
+		ioapic_enable(0, 1);
+		ioapic_enable(0, 2);
+		ioapic_enable(0, 3);
+		ioapic_enable(IRQ_IDE, 0);
+		ioapic_enable(IRQ_IDE, 1);
 
-// 		init_message(1, "Found %d processors\n", nproc);
-// 		pic_disable();
-// 		lapic_init();
-// 		ioapicinit();
-// 		ioapicenable(0, 0);
-// 		ioapicenable(0, 1);
-// 		ioapicenable(IRQ_IDE, 0);
-// 		ioapicenable(IRQ_IDE, 1);
-
-// 		/* Start all AP's */
-// 		mp_start_ap(nproc);
+		/* Start all AP's */
+		mp_start_ap(nproc);
 			
-// 		/* Wait until all processors have been started  */
-// 		while(mp_number_of_processors() != nproc);
+		/* Wait until all processors have been started  */
+		while(mp_number_of_processors() != nproc);
 
-// 		init_message(1, "All processors started!\n");
+		init_message(1, "All processors started!\n");
 
 
-// 		/* Once BSP releases the initial km lock, AP's will enter scheduler */
-// 		pushcli();
-// 		release(&km);
-// 	}
+		/* Once BSP releases the initial km lock, AP's will enter scheduler */
+		pushcli();
+		release(&km);
+	}
+
 	scheduler();
 }
 

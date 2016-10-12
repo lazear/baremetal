@@ -32,74 +32,65 @@ http://www.intel.com/design/chipsets/datashts/29056601.pdf
 #include <types.h>
 #include <traps.h>
 
-#define IOAPIC  0xFEC00000   // Default physical address of IO APIC
+#define IOAPIC  	0xFEC00000  /* Default physical address of IO APIC */
+#define IOREGSEL	0x00 		/* This register selects the IOAPIC register to be read/written */
+#define IOWIN		0x10 		/* This register is used to read and write from the reg selected by IOREGSEL */
 
-#define REG_ID     0x00  // Register index: ID
-#define REG_VER    0x01  // Register index: version
-#define REG_TABLE  0x10  // Redirection table base
 
-// The redirection table starts at REG_TABLE and uses
-// two registers to configure each interrupt.  
-// The first (low) register in a pair contains configuration bits.
-// The second (high) register contains a bitmask telling which
-// CPUs can serve that interrupt.
-#define INT_DISABLED   0x00010000  // Interrupt disabled
-#define INT_LEVEL      0x00008000  // Level-triggered (vs edge-)
-#define INT_ACTIVELOW  0x00002000  // Active low (vs high)
-#define INT_LOGICAL    0x00000800  // Destination is CPU id (vs APIC ID)
+#define IOAPICID 	0x00 		/* Identification register - 4 bit APIC ID */
+#define IOAPICVER	0x01 
+#define IOREDTBL 	0x10 		/* Base address of IO Redirection tables */
 
-volatile struct ioapic *ioapic;
 
-// IO APIC MMIO structure: write reg, then read or write data.
-struct ioapic {
-uint32_t reg;
-uint32_t pad[3];
-uint32_t data;
-};
-
-static uint32_t
-ioapicread(int reg)
-{
-ioapic->reg = reg;
-return ioapic->data;
+static uint32_t ioapic_read(int reg) {
+	*(uint32_t*)(IOAPIC + IOREGSEL) = reg;
+	return *(uint32_t*)(IOAPIC + IOWIN);
 }
 
-static void
-ioapicwrite(int reg, uint32_t data)
-{
-ioapic->reg = reg;
-ioapic->data = data;
+static void ioapic_write(int reg, uint32_t data) {
+	*(uint32_t*)(IOAPIC + IOREGSEL) = reg;
+	*(uint32_t*)(IOAPIC + IOWIN) = data;
 }
 
-void
-ioapicinit(void) {
-	int i, id, maxintr;
+void ioapic_enable(uint8_t irq, uint16_t cpu) {
+	dprintf("[IOAPIC] Enabling irg %d on cpu %d\n", irq, cpu);
+	/* Write the low 32 bits :
+	31:17 reserved
+	16: Interrupt mask:		1 = masked. 0 = enabled
+	15: Trigger mode:		1 = Level sensitive. 0 = Edge sensitive
+	14: Remote IRR:			1 = LAPIC accept. 0 = LAPIC sent EOI, and IOAPIC received
+	13: INTPOL: 			1 = Low active polarity. 0 = High active polarity
+	12: Delivery Stat:		1 = Send Pending. 0 = IDLE
+	11: Destination Mode:	1 = Logical Mode (Set of processors.. LAPIC id?). 0 = Physical mode, APIC ID
+	10:8 Delivery Mode:
+		000 Fixed
+		001 Lowest priority
+		010 SMI: System Management Interrupt. Requires edge trigger mode
+		011 Reserved
+		100 NMI
+		101 INIT
+		110 Reserved
+		111 ExtINT
+	7:0 Interrupt Vector: 8 bit field containing the interrupt vector, from 0x10 to 0xFE
+	*/
+	ioapic_write(IOREDTBL + (irq * 2), 0);
+	/* Write the high 32 bites. 63:56 contains destination field */
+	ioapic_write(IOREDTBL + (irq * 2) + 1, cpu << 24);
+}
 
+void ioapic_init(){
 	if (k_phys_to_virt(IOAPIC))
-	vga_pretty("LAPIC_BASE is already mapped\n", 4);
+		vga_pretty("IOAPIC_BASE is already mapped\n", 4);
 	else
-	k_paging_map(IOAPIC, IOAPIC, 0x3);
+		k_paging_map(IOAPIC, IOAPIC, 0x3);
 
-	ioapic = (volatile struct ioapic*) IOAPIC;
-	maxintr = (ioapicread(REG_VER) >> 16) & 0xFF;
-	id = ioapicread(REG_ID) >> 24;
-	// if(id != ioapicid)
-	//   cprintf("ioapicinit: id isn't equal to ioapicid; not a MP\n");
+	uint32_t ver = ioapic_read(0x01);
+	int max = (ver >> 16) & 0xFF;
 
-	// Mark all interrupts edge-triggered, active high, disabled,
-	// and not routed to any CPUs.
-	for(i = 0; i <= maxintr; i++){
-		ioapicwrite(REG_TABLE+2*i, INT_DISABLED | (IRQ0 + i));
-		ioapicwrite(REG_TABLE+2*i+1, 0);
-	}
+	if (ver != 0x00170011) 
+		panic("Faulty IOAPIC version!\n");
+
 }
 
-void
-ioapicenable(int irq, int cpunum)
-{
-// Mark interrupt edge-triggered, active high,
-// enabled, and routed to the given cpunum,
-// which happens to be that cpu's APIC ID.
-ioapicwrite(REG_TABLE+2*irq, IRQ0 + irq);
-ioapicwrite(REG_TABLE+2*irq+1, cpunum << 24);
-}
+
+

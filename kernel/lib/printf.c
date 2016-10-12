@@ -223,6 +223,16 @@ int printf(const char* fmt, ...) {
 	return i;
 }
 
+/* Writes output to serial log */
+int dprintf(const char* fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+	char buf[256];
+	int i = vsnprintf(buf, 256, fmt, ap);
+	va_end(ap);
+	uart_write(buf);
+	return i;
+}
 
 void init_message(int status, const char* fmt, ...) {
 	va_list ap;

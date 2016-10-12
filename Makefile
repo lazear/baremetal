@@ -12,7 +12,7 @@ LD		= ~/opt/cross/bin/i686-elf-ld
 AS		= nasm
 AR		= ~/opt/cross/bin/i686-elf-as
 CP		= cp
-LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/6.2.0/libgcc.a
+LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I kernel/include/  -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
@@ -77,7 +77,7 @@ hd:
 	$(EXTUTIL) -x $(IMAGE) -wf kernel.bin
 	rm kernel.bin
 run:
-	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4 #-d cpu_reset -d int -no-reboot
+	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4 -serial file:serial.txt #-d cpu_reset -d int -no-reboot
 	
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain

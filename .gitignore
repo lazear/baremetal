@@ -1,6 +1,8 @@
 *
+*.elf
 !*.c
 !*.h
 !*.s
 !user/
 !libc/*
+!kernel/*
