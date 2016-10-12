@@ -50,4 +50,11 @@ SOFTWARE.
 #define LAPIC_LINT1		0x360 	// Local Int
 #define LAPIC_LINTERR	0x370 	// LVT Errors
 
+
+/* TImer definitions */
+#define ONESHOT		0
+#define PERIODIC	1
+#define TSCDEADLINE	2
+
+
 #endif

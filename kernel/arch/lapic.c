@@ -63,7 +63,8 @@ static uint32_t lapic_read(int index) {
 }
 
 void lapic_test() {
-	lapic_write(LAPIC_ICRLO, (3<<18) | (1<<11) | (1<<14) | (0<<8) | 0x25);
+	lapic_write(LAPIC_ICRHI, 2<<24);
+	lapic_write(LAPIC_ICRLO, LEVEL| 0x25);
 }
 
 void lapic_eoi() {
@@ -78,32 +79,34 @@ void lapic_init() {
 	/* Use default Local APIC location */
 	LAPIC = LAPIC_BASE;
 
+
 	/* Paging is enabled, so we need to map in the physical mem */
 	if (k_phys_to_virt(LAPIC_BASE))
 		dprintf("[lapic] non-fatal error: LAPIC_BASE already mapped\n");
 	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
-
+	int id = lapic_read(LAPIC_ID);
 
 //	pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
-	dprintf("LAPIC_SIV %x\n", lapic_read(LAPIC_SIV));
-	//lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
-	lapic_write(LAPIC_SIV, 0x1ff);
-	dprintf("LAPIC_SIV %x\n", lapic_read(LAPIC_SIV));
-	// Calibrate timer
-	lapic_write(LAPIC_TIMER, (1<<17) | 0x20);
-	//lapic_write(LAPIC_TDCR, 0x00020000 | 0x20);	// Irq0 + IRQ_timer | Periodic
-	lapic_write(0x380, 0xF0000000);
+	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
 
-	dprintf("CC: %d\n", lapic_read(0x390));
+	/* Setup timer on the first CPU only */
+	if (id == 0) {
+		lapic_write(LAPIC_TIMER, (1<<17) | 0x20);
+	//lapic_write(LAPIC_TDCR, 0x00020000 | 0x20);	// Irq0 + IRQ_timer | Periodic
+		lapic_write(0x380, 0x100000);
+	}
+
+
 	/* Mask interrupts */
-	//lapic_write(LAPIC_LINT0, 0x10000);
-	//lapic_write(LAPIC_LINT1, 0x10000);
+	lapic_write(LAPIC_LINT0, 0x10000);
+	lapic_write(LAPIC_LINT1, 0x10000);
 
 	if ((lapic_read(LAPIC_VER) >> 16) & 0xFF >= 4)
 		lapic_write(0x0340, 0x10000);
 
 	lapic_write(LAPIC_ERR, IRQ0 + IRQ_ERROR);
+
 	lapic_write(LAPIC_ERR, 0);
 	lapic_write(LAPIC_EOI, 0);	// Clear any existing interrupts
 
@@ -113,9 +116,8 @@ void lapic_init() {
 
 	while(LAPIC[LAPIC_ICRLO] & DELIVS)
 		;
-	dprintf("CC: %x\n", lapic_read(0x390));
+
 	lapic_write(LAPIC_TPR, 0);
-dprintf("CC: %x\n", lapic_read(0x390));
 }
 
 
@@ -197,6 +199,7 @@ volatile int ncpu = 0;
 void mp_enter() {
 	acquire(&proc_m);
 	int id = lapic_read(LAPIC_ID) >> 24;
+	lapic_init();
 //	ncpu = (ncpu > id) ? ncpu : id;
 	ncpu++;
 

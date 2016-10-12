@@ -49,6 +49,7 @@ void trap(regs_t* r) {
 		default:
 			printf("Unknown Interrupt: %#x: EIP %#x (%s)\n", r->int_no, r->eip, ksym_find(r->eip));
 			dprintf("Unknown Interrupt: %#x: EIP %#x (%s)\n", r->int_no, r->eip, ksym_find(r->eip));
+
 			//print_regs(r);
 		//	asm volatile("cli; hlt");
 			break;

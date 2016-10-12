@@ -65,6 +65,7 @@ void keyboard_handler(regs_t *r)
 	if (idx >= 0x400)
 		idx = 0;
 
+
     scancode = inb(0x60);
   	uint8_t  data = inb(0x60);
 

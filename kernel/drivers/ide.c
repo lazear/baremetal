@@ -106,7 +106,7 @@ void ide_handler() {
 	}
 	idequeue = b->q;
 	//assert(idequeue);
-
+	dprintf("ide: read block %d\n", b->block);
 	//if dirty is not set, and no errors, read data
 	int stat = ide_wait(1);
 	assert(stat >= 0);

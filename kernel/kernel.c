@@ -59,10 +59,10 @@ mutex km = {.lock=0};
 void scheduler(void) {
 	acquire(&km);
 	init_message(1,"CPU %d initialized\n", cpu->id);
+	
 	release(&km);
 
 	sti();
-	lapic_test();
 
 	for(;;);
 }
@@ -114,7 +114,7 @@ void kernel_initialize(uint32_t kernel_end) {
 	if (pathize("kernel.bin"))
 		build_ksyms();
 	
-	//elf_objdump(open("lquad.o"));
+
 
 // #define SMP 0
 	int nproc = acpi_init();
@@ -131,15 +131,11 @@ void kernel_initialize(uint32_t kernel_end) {
 
 		/* Initialize IO/APIC's */
 		ioapic_init();
-		ioapic_enable(0, 1);
-	
-		
-		lapic_init();
-		
-		
+		ioapic_enable(IRQ_KBD, 0);	/* CPU 0 gets the keyboard presses */
+		ioapic_enable(IRQ_IDE, 1);	/* CPU 1 gets the IDE driver interrupts */
 
-		ioapic_enable(IRQ_IDE, 0);
-		ioapic_enable(IRQ_IDE, 1);
+		lapic_init();
+	
 
 		/* Start all AP's */
 		mp_start_ap(nproc);
@@ -149,12 +145,11 @@ void kernel_initialize(uint32_t kernel_end) {
 
 		init_message(1, "All processors started!\n");
 
-
 		/* Once BSP releases the initial km lock, AP's will enter scheduler */
 		pushcli();
 		release(&km);
 	}
-
+	//elf_objdump(open("kernel.bin"));	
 	scheduler();
 }
 
