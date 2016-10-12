@@ -41,14 +41,16 @@ SOFTWARE.
 #define LAPIC_ICRLO		0x300 	// Interrupt Command Register
 #define LAPIC_ICRHI		0x310 	// Interrupt Command Register
 
-#define LAPIC_TIMER 	0x320 	// LVT Timer Register
-#define LAPIC_TICR 		0x380	// Timer Init. Count Register
-#define LAPIC_TCCR 		0x390 	// Timer Current Count Register
-#define LAPIC_TDCR		0x3E0	// Timer Divide Config. Register
+#define TIMER 			0x320 	// LVT Timer Register
+#define INIT_COUNT 		0x380	// Timer Init. Count Register
+#define CURR_COUNT 		0x390 	// Timer Current Count Register
+#define DIVIDE_CONF		0x3E0	// Timer Divide Config. Register
 
 #define LAPIC_LINT0		0x350 	// Local Int 
 #define LAPIC_LINT1		0x360 	// Local Int
 #define LAPIC_LINTERR	0x370 	// LVT Errors
+
+
 
 
 /* TImer definitions */

@@ -87,7 +87,7 @@ void ioapic_disable(uint8_t irq) {
 
 void ioapic_init(){
 	if (k_phys_to_virt(IOAPIC))
-		vga_pretty("IOAPIC_BASE is already mapped\n", 4);
+		dprintf("[ioapic] IOAPIC_BASE is already mapped\n");
 	else
 		k_paging_map(IOAPIC, IOAPIC, 0x3);
 
@@ -98,10 +98,6 @@ void ioapic_init(){
 		panic("Faulty IOAPIC version!\n");
 	for (int i = 0; i < max; i++)
 		ioapic_disable(i);
-
-
-
-
 }
 
 

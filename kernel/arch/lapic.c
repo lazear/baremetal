@@ -47,19 +47,15 @@ AP: Application processor(s). Currently halted.
 #define BUSY       0x00001000
 #define FIXED      0x00000000
 
-volatile uint32_t* LAPIC = NULL;
-
-
-
+static bool lapic_up = false;
 
 static void lapic_write(int index, int value) {
-	LAPIC[index/4] = value;		// div by 4 for sizeof(int)
-	LAPIC[0x8];					// Wait by reading;
-	//dprintf("[lapic] write %x to %x\n", value, index);	
+	*(uint32_t*) (LAPIC_BASE + index) = value;	/* Write to lapic register */
+	*(uint32_t*) (LAPIC_BASE + LAPIC_ID);	/* Wait by reading */
 }
 
 static uint32_t lapic_read(int index) {
-	return LAPIC[index/4];
+	return *(uint32_t*) (LAPIC_BASE + index);
 }
 
 void lapic_test() {
@@ -68,35 +64,51 @@ void lapic_test() {
 }
 
 void lapic_eoi() {
-	if (!LAPIC)
+	if (!lapic_up)
 		return;
 	lapic_write(LAPIC_EOI, 0);
 }
 
-/* Initilize the local advanced programmable interrupt chip */
+void lapic_timer_config(uint8_t mode, uint32_t initial_count, uint8_t divide_by) {
+	/* LVT Timer register:
+		19:17 Timer mode
+		16:15 Mask
+		12:11 Delivery status
+		7:0 Vector 	*/
+	lapic_write(TIMER, (mode << 17) | 0x20 + IRQ_TIMER);
+	/* LVT Divide Configuration Register, bits 0, 1, and 3 
+		0000 Divide by 2
+		0001 Divide by 4
+		0010 Divide by 8
+		0011 Divide by 16
+		1000 Divide by 32
+		1001 Divide by 64
+		1010 Divide by 128
+		1011 Divide by 1 */
+	lapic_write(DIVIDE_CONF, divide_by);
+	lapic_write(INIT_COUNT, initial_count);
+	lapic_write(CURR_COUNT, 0);
+	dprintf("[lapic] timer mode set to %d, initial count: %#x, divide_by: %X\n", \
+		mode, initial_count, divide_by);
+}
+
+
+/* Initilize the local advanced programmable interrupt chip 
+PIC should already be disabled by the time we get here*/
 void lapic_init() {
-
-	/* Use default Local APIC location */
-	LAPIC = LAPIC_BASE;
-
 
 	/* Paging is enabled, so we need to map in the physical mem */
 	if (k_phys_to_virt(LAPIC_BASE))
 		dprintf("[lapic] non-fatal error: LAPIC_BASE already mapped\n");
 	k_paging_map(LAPIC_BASE, LAPIC_BASE, 0x3);
-	int id = lapic_read(LAPIC_ID);
 
-//	pic_disable();
 	/* Enable local APIC and set the spurious interrupt vector */
 	lapic_write(LAPIC_SIV, 0x100 | (IRQ0 + IRQ_SPURIOUS));
 
-	/* Setup timer on the first CPU only */
-	if (id == 0) {
-		lapic_write(LAPIC_TIMER, (1<<17) | 0x20);
-	//lapic_write(LAPIC_TDCR, 0x00020000 | 0x20);	// Irq0 + IRQ_timer | Periodic
-		lapic_write(0x380, 0x100000);
+	/* Setup timer on the first CPU only to avoid race for timer()*/
+	if (lapic_read(LAPIC_ID) == 0) {
+		lapic_timer_config(PERIODIC, 0x10000, 0x0A);
 	}
-
 
 	/* Mask interrupts */
 	lapic_write(LAPIC_LINT0, 0x10000);
@@ -114,10 +126,11 @@ void lapic_init() {
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL | BCAST);
 
 
-	while(LAPIC[LAPIC_ICRLO] & DELIVS)
+	while(lapic_read(LAPIC_ICRLO) & DELIVS)
 		;
 
 	lapic_write(LAPIC_TPR, 0);
+	lapic_up = true;
 }
 
 

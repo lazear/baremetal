@@ -106,7 +106,7 @@ void ide_handler() {
 	}
 	idequeue = b->q;
 	//assert(idequeue);
-	dprintf("ide: read block %d\n", b->block);
+	//dprintf("ide: read block %d\n", b->block);	
 	//if dirty is not set, and no errors, read data
 	int stat = ide_wait(1);
 	assert(stat >= 0);
@@ -146,8 +146,6 @@ void ide_init() {
 			break;
 		}
 	}
-
-
 	init_message(IDE_STATUS, "IDE driver ready, and disk found\n");
 	//outb(IDE_IO | IDE_HEAD, 0xE0 | (0<<4));
 	release(&idelock);

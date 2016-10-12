@@ -31,6 +31,7 @@ SOFTWARE.
 
 uint32_t ticks = 0;
 char* timer_buf = 0;
+static int oneshot = 0;
 
 void timer(regs_t *r) {
 	ticks++;
@@ -47,6 +48,7 @@ void timer_init() {
 	memset(timer_buf, 0, 8);
 	pic_enable(IRQ_TIMER);
 }
+
 
 uint32_t get_ticks(){
 	return ticks;
