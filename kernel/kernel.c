@@ -149,7 +149,8 @@ void kernel_initialize(uint32_t kernel_end) {
 		pushcli();
 		release(&km);
 	}
-	//elf_objdump(open("kernel.bin"));	
+	//elf_objdump(open("kernel.bin"));
+	lapic_test(0, 2, 0x30);	
 	scheduler();
 }
 

@@ -58,15 +58,16 @@ static uint32_t lapic_read(int index) {
 	return *(uint32_t*) (LAPIC_BASE + index);
 }
 
-void lapic_test() {
-	lapic_write(LAPIC_ICRHI, 2<<24);
-	lapic_write(LAPIC_ICRLO, LEVEL| 0x25);
-}
 
 void lapic_eoi() {
 	if (!lapic_up)
 		return;
 	lapic_write(LAPIC_EOI, 0);
+}
+
+void lapic_test(uint16_t dest, uint16_t sh, uint16_t vector) {
+	lapic_write(LAPIC_ICRHI, dest << 24);
+	lapic_write(LAPIC_ICRLO, (sh << 17) | vector);
 }
 
 void lapic_timer_config(uint8_t mode, uint32_t initial_count, uint8_t divide_by) {
@@ -92,7 +93,6 @@ void lapic_timer_config(uint8_t mode, uint32_t initial_count, uint8_t divide_by)
 		mode, initial_count, divide_by);
 }
 
-
 /* Initilize the local advanced programmable interrupt chip 
 PIC should already be disabled by the time we get here*/
 void lapic_init() {
@@ -110,9 +110,9 @@ void lapic_init() {
 		lapic_timer_config(PERIODIC, 0x10000, 0x0A);
 	}
 
-	/* Mask interrupts */
-	lapic_write(LAPIC_LINT0, 0x10000);
-	lapic_write(LAPIC_LINT1, 0x10000);
+	/* Mask local interrupts */
+	//lapic_write(LAPIC_LINT0, 0x10000);
+	//lapic_write(LAPIC_LINT1, 0x10000);
 
 	if ((lapic_read(LAPIC_VER) >> 16) & 0xFF >= 4)
 		lapic_write(0x0340, 0x10000);
@@ -124,7 +124,6 @@ void lapic_init() {
 
 	lapic_write(LAPIC_ICRHI, 0);
 	lapic_write(LAPIC_ICRLO, INIT | LEVEL | BCAST);
-
 
 	while(lapic_read(LAPIC_ICRLO) & DELIVS)
 		;
@@ -211,17 +210,20 @@ volatile int ncpu = 0;
 
 void mp_enter() {
 	acquire(&proc_m);
+	/* What's our APIC id? */
 	int id = lapic_read(LAPIC_ID) >> 24;
-	lapic_init();
-//	ncpu = (ncpu > id) ? ncpu : id;
+
 	ncpu++;
-
-	// Initialize CPU-local GDT and global IDT 
-	gdt_init_cpu(id);
+	/* Initialize GDT/IDT for cpu n */
+	gdt_init_cpu(id);		
 	lidt(idt, sizeof(idt));
-		cpu->id = id;
-	release(&proc_m);
+	/* Store id in cpu-local variable */
+	cpu->id = id;
+	/* Initialize the processors's LAPIC */
+	lapic_init();
 
+	/* Release spinlock, allowing next processor in */
+	release(&proc_m);
 	scheduler();
 
 }
