@@ -1,4 +1,4 @@
-#crunchy makefile
+#xiphos makefile
 #2007-2016, Michael Lazear
 
 PRE 	= cross/bin
@@ -7,12 +7,12 @@ START	= start.so			# Must link this first
 OBJS	= *.o				# Elf object files
 AOBJS	= vectors.so trap_handler.so sched.so syscall.so font.so umode.so
 INIT 	= initcode
-CC	    = ~/opt/cross/bin/i686-elf-gcc
-LD		= ~/opt/cross/bin/i686-elf-ld
-AS		= nasm
-AR		= ~/opt/cross/bin/i686-elf-as
-CP		= cp
-LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/7.0.0/libgcc.a
+CC	= ~/opt/cross/bin/i686-elf-gcc
+LD	= ~/opt/cross/bin/i686-elf-ld
+AS	= nasm
+AR	= ~/opt/cross/bin/i686-elf-as
+CP	= cp
+LIBGCC	= ~/opt/cross/lib/gcc/i686-elf/6.2.0/libgcc.a
 CCFLAGS	= -w -fno-builtin -nostdlib -ffreestanding -std=gnu99 -m32 -I kernel/include/  -c 
 LDFLAGS	= -Map map.txt -T linker.ld -o $(FINAL) $(START) $(AOBJS) $(OBJS) $(LIBGCC) -b binary $(INIT) ap_entry
 ASFLAGS = -f elf 
@@ -77,8 +77,7 @@ hd:
 	$(EXTUTIL) -x $(IMAGE) -wf kernel.bin
 	rm kernel.bin
 run:
-	qemu-system-x86_64 -kernel bin/kernel.bin -hdb ext2 -curses -m 256 -smp cpus=4 -serial file:serial.txt #-d cpu_reset -d int -no-reboot
-	cat serial.txt
+	./qemu.sh
 link:
 	$(LD) $(LDFLAGS)	# Link using the i586-elf toolchain
 	

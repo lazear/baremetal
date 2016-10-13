@@ -311,7 +311,7 @@ void buffer_free(buffer* b) {
 	acquire(&cache.lock);
 	for (bp = cache.list; bp != b; bp = bp->next);
 	bp++;
-	bp->flags = 0;
+	bp->flags = 7;
 	bp->block = -1;
 	memset(bp->data, 0, BLOCK_SIZE);
 	free(b);
