@@ -40,9 +40,9 @@ static int no_ksym = 0;
 
 void build_ksyms(void) {
 
-	int ki = find_inode_in_dir("kernel.bin", 2);
+	int ki = pathize("kernel.bin", 2);
 
-	char* data = ext2_open(ext2_inode(1, ki));
+	char* data = ext2_read_file(ext2_read_inode(1, ki));
 
 	elf32_ehdr *ehdr = (elf32_ehdr*) data;
 
@@ -151,7 +151,7 @@ void* elf_objdump(void* data) {
 		phdr++;
 	} 
 
-	//uint32_t* buf = ext2_file_seek(ext2_inode(1,14), BLOCK_SIZE, ehdr->e_shoff);
+	//uint32_t* buf = ext2_file_seek(ext2_read_inode(1,14), BLOCK_SIZE, ehdr->e_shoff);
 
 	/* Parse the section headers */
 	elf32_shdr* shdr 		= ((uint32_t) data) + ehdr->e_shoff;
@@ -245,9 +245,9 @@ struct elf_executable {
 extern void enter_usermode(uint32_t eip, uint32_t esp);
 
 void elf_load(int i_no) {
-	inode* ein = ext2_inode(1, i_no);
+	inode* ein = ext2_read_inode(1, i_no);
 	
-	uint32_t* data = ext2_open(ein);
+	uint32_t* data = ext2_read_file(ein);
 	elf32_ehdr * ehdr = (elf32_ehdr*) data; 
 	assert(ehdr->e_ident[0] == ELF_MAGIC);
 

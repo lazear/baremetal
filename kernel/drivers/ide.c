@@ -31,6 +31,7 @@ Disk buffer cache/LBA read/write support ala XV6
 #include <traps.h>
 #include <ide.h>
 #include <assert.h>
+#include <ext2.h>
 
 void sleep(void* channel, mutex* m) {}
 void wake(void* channel) {} 
@@ -71,7 +72,7 @@ static void ide_op(buffer* b) {
 	//printf("Begin op on dev %d block %d\n", b->dev, b->block );
 
 	assert(b->dev);
-	int sector_per_block = BLOCK_SIZE / SECTOR_SIZE;	// 1
+	int sector_per_block = b->size / SECTOR_SIZE;	// 1
 	int sector = b->block * sector_per_block;
 
 	ide_wait(0);
@@ -85,7 +86,7 @@ static void ide_op(buffer* b) {
 
 	if (b->flags & B_DIRTY) {						// Need to write
 		outb(IDE_IO | IDE_CMD, IDE_CMD_WRITE);
-		outsl(IDE_IO, b->data, BLOCK_SIZE / 4);		// Write in 4 byte chunks
+		outsl(IDE_IO, b->data, b->size / 4);		// Write in 4 byte chunks
 	} else {										// Read only
 		outb(IDE_IO | IDE_CMD, IDE_CMD_READ);
 	}
@@ -115,7 +116,7 @@ void ide_handler() {
 	}
 
 	if (!(b->flags & B_DIRTY) && stat >= 0) {
-		insl(0x1f0, b->data, BLOCK_SIZE/4);
+		insl(0x1f0, b->data, b->size/4);
 		
 	}
 
@@ -184,17 +185,19 @@ struct {
 	buffer* list;
 } cache;
 
-void buffer_init() {
+void buffer_init(struct ext2_fs* f) {
 	cache.list = malloc(sizeof(buffer) * MAX_OP_BLOCKS);
 	int i = 0;
 	buffer* b;
 	for (b = cache.list; b < (cache.list + MAX_OP_BLOCKS - 1); b++) {
 		b->next = b+1;
-		b->dev = -1;
+		b->dev = f->dev;
+		b->size = f->block_size;
 	}
 	//b++;
 	b->next = NULL;
-	b->dev = -1;
+	b->dev = f->dev;
+	b->size = f->block_size;
 }
 
 // Converts to same endian-ness as sublime for hex viewing
@@ -212,7 +215,7 @@ void buffer_dump(buffer *b) {
 	assert(b);
 	assert(b->flags & B_VALID);
 	//assert(idequeue == b);
-	for (int i = 0; i < BLOCK_SIZE; i += 4) {
+	for (int i = 0; i < b->size; i += 4) {
 		if (i % 32 == 0 && i)
 			vga_putc('\n');
 		int o = byte_order(*(uint32_t*)((uint32_t)b->data + i));
@@ -234,21 +237,23 @@ void buffer_traverse() {
 }
 
 
-buffer* buffer_get(uint32_t dev, uint32_t block) {
+buffer* buffer_get(struct ext2_fs*f,  uint32_t block) {
 	buffer* b;
 	acquire(&cache.lock);
 loop:
 	for (b = cache.list; b; b = b->next) {
-		if (b->dev == dev && b->block == block) {
+		if (b->dev == f->dev && b->block == block) {
 			//printf("Buffer found\n");
 			if (!(b->flags & B_BUSY)) {		// Is buffer free?
 				b->flags |= B_BUSY;			// Mark buffer as in-use
-	
+				b->data = malloc(f->block_size);
+				b->size = f->block_size;
 				release(&cache.lock);
 				return b;
 			}
 			sleep(b, &cache.lock);			// Wait until that block is free
-
+			b->data = malloc(f->block_size);
+			b->size = f->block_size;
 			release(&cache.lock);
 			return b;
 		//	goto loop;					// Without MT, this freezes
@@ -276,17 +281,19 @@ loop:
 
 	*bp = malloc(sizeof(buffer));
 	//printf("Returned from malloc (block %d) %x\n", block, bp);
-	(*bp)->dev = dev;
+	(*bp)->dev = f->dev;
 	(*bp)->block = block;
 	(*bp)->flags = B_BUSY;
+	(*bp)->data = malloc(f->block_size);
+	(*bp)->size = f->block_size;
 	//(*bp)->next = NULL;
 
 	release(&cache.lock);
 	return *bp;
 }
 
-buffer* buffer_read(uint32_t dev, uint32_t block) {
-	buffer* b = buffer_get(dev, block);
+buffer* buffer_read(struct ext2_fs* f, uint32_t block) {
+	buffer* b = buffer_get(f, block);
 	
 	int i = -1;
 	if ( !(b->flags & B_VALID)) 	// Block not read yet
@@ -294,13 +301,13 @@ buffer* buffer_read(uint32_t dev, uint32_t block) {
 
 	if (i == -1 &  !(b->flags & B_VALID) ) {
 		ide_delay();
-		buffer_read(dev, block);
+		buffer_read(f, block);
 	}
 
 	return b;
 }
 
-void buffer_write(buffer* b) {
+void buffer_write(struct ext2_fs* f, buffer* b) {
 	//assert((b->flags & B_BUSY) == 0);
 	b->flags |= B_DIRTY; 		// Set write flag
 	ide_rw(b);
@@ -313,7 +320,7 @@ void buffer_free(buffer* b) {
 	bp++;
 	bp->flags = 7;
 	bp->block = -1;
-	memset(bp->data, 0, BLOCK_SIZE);
+	memset(bp->data, 0, b->size);
 	free(b);
 	release(&cache.lock);
 }

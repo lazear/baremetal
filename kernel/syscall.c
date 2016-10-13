@@ -40,13 +40,13 @@ void sys_sbrk(struct _proc_mmap* m, size_t n) {
 
 char* sys_open(char* filename) {
 	printf("SYS OPEN!: %s\n",  filename);
-	int fp = find_inode_in_dir(filename, 2);
+	int fp = pathize(filename, 2);
 	if (!fp)
 		return NULL;
 
-	inode* in = ext2_inode(1, fp);
-	char* buf = ext2_open(in);
-	buf = ext2_open(in);
+	inode* in = ext2_read_inode(1, fp);
+	char* buf = ext2_read_file(in);
+	//buf = ext2_read_file(in);
 	inode_dump(in);
 	uint32_t dest = cp_mmap.brk;
 	

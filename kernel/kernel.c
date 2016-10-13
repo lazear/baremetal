@@ -68,16 +68,6 @@ void scheduler(void) {
 }
 
 
-int pathize(char* path) {
-	char* pch = strtok(path, "/");
-	int parent = 2;
-	while(pch) {
-		parent = find_inode_in_dir(pch, parent);
-		pch = strtok(NULL, "/");
-	}
-	return parent;
-}
-
 void kernel_initialize(uint32_t kernel_end) {
 
 	/*

@@ -12,7 +12,6 @@ with xv6 inspired queueing
 #define __crunchy_ide__
 
 #define SECTOR_SIZE		512
-#define BLOCK_SIZE		1024	// Default block size
 #define B_BUSY	0x1		// buffer is locked by a process
 #define B_VALID	0x2		// buffer has been read from disk
 #define B_DIRTY	0x4		// buffer has been written to
@@ -38,11 +37,11 @@ with xv6 inspired queueing
 #define LBA_MID(c)		((uint8_t) (c >> 8) & 0xFF)
 #define LBA_HIGH(c)		((uint8_t) (c >> 16) & 0xFF)
 #define LBA_LAST(c)		((uint8_t) (c >> 24) & 0xF)
-
-#define IDE_CMD_READ  (BLOCK_SIZE/SECTOR_SIZE == 1) ? 0x20 : 0xC4
-#define IDE_CMD_WRITE (BLOCK_SIZE/SECTOR_SIZE == 1) ? 0x30 : 0xC5
 #define IDE_CMD_READ_MUL  0xC4
 #define IDE_CMD_WRITE_MUL 0xC5
+#define IDE_CMD_READ  IDE_CMD_READ_MUL //(BLOCK_SIZE/SECTOR_SIZE == 1) ? 0x20 : 0xC4
+#define IDE_CMD_WRITE IDE_CMD_WRITE_MUL//(BLOCK_SIZE/SECTOR_SIZE == 1) ? 0x30 : 0xC5
+
 
 
 
@@ -54,7 +53,8 @@ typedef struct ide_buffer {
 	uint32_t block;				// block number
 	struct ide_buffer* next;	// next block in queue
 	struct ide_buffer* q;
-	uint8_t data[BLOCK_SIZE];	// 1 disk sector of data
+	uint16_t size;
+	uint8_t *data;	// 1 disk sector of data
 } buffer;
 
 

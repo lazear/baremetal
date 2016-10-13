@@ -1,5 +1,5 @@
 /*
-ext2.c
+ext2util.c
 ===============================================================================
 MIT License
 Copyright (c) 2007-2016 Michael Lazear
@@ -22,288 +22,182 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ===============================================================================
+
+ext2util is a command-line interface for reading/writing data from ext2
+disk images. ext2 driver code is directly ported from my own code used in a
+hobby operating system. buffer_read and buffer_write are "glue" functions
+allowing the ramdisk to emulate a hard disk
 */
-#include <ide.h>
+
 #include <ext2.h>
-#include <types.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
-#include <mutex.h>
-#include <ctype.h>
+
+
+#define NULL ((void*) 0)
+static int fp = NULL;
+
+
+/* Overloads for superblock read/write, since it is ALWAYS 1024 bytes in
+from the beginning of the disk, regardless of logical block size */
+buffer* buffer_read_superblock(struct ext2_fs* f) {
+	int block = (f->block_size == 1024) ? 1 : 0;
+	return buffer_read(f, block);
+}
+
+uint32_t buffer_write_superblock(struct ext2_fs *f, buffer* b) {
+	buffer_write(f, b);
+}
+
 
 /* 	Read superblock from device dev, and check the magic flag.
-	Return NULL if not a valid EXT2 partition */
-superblock* ext2_superblock(int dev) {
-
-	superblock* sb = NULL;
-	assert(dev);
-	if(!dev)
-		return NULL;
-	if (sb)
-		return sb;
-
-	buffer* b = buffer_read(dev, EXT2_SUPER);
-	sb = (superblock*) b->data;
-	
-	assert(sb->magic == EXT2_MAGIC);
-	if (sb->magic != EXT2_MAGIC)
-		return NULL;
-	assert(1024 << sb->log_block_size == BLOCK_SIZE);
-	return sb;
-}
-
-/* RW first superblock 
-set s to NULL to read a superblock */
-superblock* ext2_superblock_rw(int dev, superblock* s) {
-	assert(dev);
-	if (!dev) 
-		return NULL;
-	buffer* b = buffer_read(dev, EXT2_SUPER);
-
-	if (s->magic != EXT2_MAGIC) {	// Non-valid superblock, read 
-		s = (superblock*) b->data;
-	} else {							// Valid superblock, overwrite
-		memcpy(b->data, s, sizeof(superblock));
-		buffer_write(b);
-	}
-	
-	assert(s->magic == EXT2_MAGIC);
-	if (s->magic != EXT2_MAGIC)
-		return NULL;
-	assert(1024 << s->log_block_size == BLOCK_SIZE);
-	return s;
-}
-
-
-
-block_group_descriptor* ext2_blockdesc(int dev) {
-	assert(dev);
-	if (!dev) 
-		return NULL;
-
-	buffer* b = buffer_read(dev, EXT2_SUPER + 1);
-	block_group_descriptor* bg = (block_group_descriptor*) b->data;
-	return bg;
-}
-/* Set bg to NULL to read the block group descriptor
-Otherwise, overwrite it */
-block_group_descriptor* ext2_blockdesc_rw(int dev, block_group_descriptor* bg) {
-	assert(dev);
-	if (!dev) 
-		return NULL;
-	buffer* b = buffer_read(dev, EXT2_SUPER + 1);
-	if (bg == NULL) {
-		bg = (block_group_descriptor*) b->data;
-	} else {
-		memcpy(b->data, bg, sizeof(block_group_descriptor));
-		buffer_write(b);
-	}
-	return bg;
-}
-
-inode* ext2_inode(int dev, int i) {
-	superblock* s = ext2_superblock(dev);
-	block_group_descriptor* bgd = ext2_blockdesc(dev);
-
-	assert(s->magic == EXT2_MAGIC);
-	assert(bgd);
-
-	int block_group = (i - 1) / s->inodes_per_group; // block group #
-	int index 		= (i - 1) % s->inodes_per_group; // index into block group
-	int block 		= (index * INODE_SIZE) / BLOCK_SIZE; 
-	bgd += block_group;
-
-	// Not using the inode table was the issue...
-
-	buffer* b = buffer_read(dev, bgd->inode_table+block);
-	inode* in = (inode*)((uint32_t) b->data + (index % (BLOCK_SIZE/INODE_SIZE))*INODE_SIZE);
-
-	return in;
-}
-
-
-void* ext2_open(inode* in) {
-	assert(in);
-	if(!in)
-		return NULL;
-
-	int num_blocks = in->blocks / (BLOCK_SIZE/SECTOR_SIZE);	
-
-	assert(num_blocks != 0);
-	if (!num_blocks) 
-		return NULL;
-
-
-	size_t sz = BLOCK_SIZE*num_blocks;
-	void* buf = malloc(sz);
-	assert(buf != NULL);
-
-	int indirect = 0;
-
-
-
-	int blocknum = 0;
-	for (int i = 0; i < num_blocks; i++) {
-		if (i < 12) 
-			blocknum = in->block[i];
-		else if (i == 12)
-			indirect = in->block[i];
-		else
-			blocknum = ext2_read_indirect(indirect, i-12);
-		if (!blocknum || blocknum == 0)
-			return buf;
-		buffer* b = buffer_read(1, blocknum);
-		memcpy((uint32_t) buf + (i * BLOCK_SIZE), b->data, BLOCK_SIZE);
-		//printf("%x\n", b->data[i]);
-	}
-	return buf;
-}
-
-void ext2_open_alt(inode* in, void* buf) {
-		assert(in);
-	if(!in)
-		return NULL;
-
-	int num_blocks = in->blocks / (BLOCK_SIZE/SECTOR_SIZE);	
-
-	assert(num_blocks != 0);
-	if (!num_blocks) 
-		return NULL;
-
-
-	size_t sz = BLOCK_SIZE*num_blocks;
-	assert(buf != NULL);
-
-	int indirect = 0;
-
-	int blocknum = 0;
-	for (int i = 0; i < num_blocks; i++) {
-		if (i < 12) 
-			blocknum = in->block[i];
-		else if (i == 12)
-			indirect = in->block[i];
-		else
-			blocknum = ext2_read_indirect(indirect, i-12);
-		if (!blocknum || blocknum == 0)
-			return buf;
-		buffer* b = buffer_read(1, blocknum);
-		memcpy((uint32_t) buf + (i * BLOCK_SIZE), b->data, BLOCK_SIZE);
-		//printf("%x\n", b->data[i]);
-	}
-}
-
-
-
-
-void* ext2_file_seek(inode* in, size_t n, size_t offset) {
-	int nblocks 	= ((n-1 + BLOCK_SIZE & ~(BLOCK_SIZE-1)) / BLOCK_SIZE);
-	int off_block 	= (offset / BLOCK_SIZE);	// which block
-	int off 		= offset % BLOCK_SIZE;		// offset in block
-
-	void* buf = malloc(nblocks*BLOCK_SIZE);		// round up to whole block size
-
-	assert(nblocks <= in->blocks/2);
-	assert(off_block <= in->blocks/2);
-	for (int i = 0; i < nblocks; i++) {
-		buffer* b = buffer_read(1, in->block[off_block+i]);
-		memcpy(buf + (i*BLOCK_SIZE), b->data + off, BLOCK_SIZE);
-		printf("Read @ block %d (%d)\n",in->block[off_block+i], off_block);
-		off = 0;	// Eliminate offset after first block
-	}
-	return buf;
-
-}
-
-void ls(dirent* d) {
-	do{
-	//	d->name[d->name_len] = '\0';
-		printf("\t%s\ttype %d\n", d->name, d->file_type);
-
-		d = (dirent*)((uint32_t) d + d->rec_len);
-	} while(d->inode);
-}
-
-
-mutex llm = { .lock = 0};
-void lsroot() {
-	inode* i = ext2_inode(1, 2);			// Root directory
-
-	char* buf = malloc(BLOCK_SIZE*i->blocks/2);
-	memset(buf, 0, BLOCK_SIZE*i->blocks/2);
-
-	for (int q = 0; q < i->blocks / 2; q++) {
-		buffer* b = buffer_read(1, i->block[q]);
-		memcpy((uint32_t)buf+(q * BLOCK_SIZE), b->data, BLOCK_SIZE);
-	}
-
-	dirent* d = (dirent*) buf;
-	
-	int sum = 0;
-	int calc = 0;
-	do {
-		
-		// Calculate the 4byte aligned size of each entry
-		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
-		sum += d->rec_len;
-
-		printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
-		d = (dirent*)((char*)d + d->rec_len);
-
-	} while(sum < (1024 * i->blocks/2));
-
-	free(buf);
-	return NULL;
-}
-
-
-int find_inode_in_dir(const char* name, int dir_inode) {
-	if (!dir_inode)
+	Updates the filesystem pointer */
+int ext2_superblock_read(struct ext2_fs *f) {
+	if (!f)
 		return -1;
-	inode* i = ext2_inode(1, dir_inode);			// Root directory
+	if (!f->sb)
+		f->sb = malloc(sizeof(superblock));
 
-	char* buf = malloc(BLOCK_SIZE*i->blocks/2);
-	memset(buf, 0, BLOCK_SIZE*i->blocks/2);
+	buffer* b = buffer_read_superblock(f);
+	memcpy(f->sb, b->data, sizeof(superblock));
+	buffer_free(b);
 
-	for (int q = 0; q < i->blocks / 2; q++) {
-		buffer* b = buffer_read(1, i->block[q]);
-		memcpy((uint32_t)buf+(q * BLOCK_SIZE), b->data, BLOCK_SIZE);
+	#ifdef DEBUG
+	printf("Reading superblock\n");
+	#endif
+	assert(f->sb->magic == EXT2_MAGIC);
+	if (f->sb->magic != EXT2_MAGIC) {
+		printf("ABORT: INVALID SUPERBLOCK\n");
+		return NULL;
 	}
-
-	dirent* d = (dirent*) buf;
-	
-	int sum = 0;
-	int calc = 0;
-	do {
-		// Calculate the 4byte aligned size of each entry
-		calc = (sizeof(dirent) + d->name_len + 4) & ~0x3;
-		sum += d->rec_len;
-		//printf("%2d  %10s\t%2d %3d\n", (int)d->inode, d->name, d->name_len, d->rec_len);
-		if (strncmp(d->name, name, d->name_len)== 0) {
-			
-			free(buf);
-			return d->inode;
-		}
-		d = (dirent*)((uint32_t) d + d->rec_len);
-
-	} while(sum < (1024 * i->blocks/2));
-	free(buf);
-	return -1;
+	f->block_size = (1024 << f->sb->log_block_size);
+	return 0;
 }
 
-int ext_first_free(uint32_t* b, int sz) {
+/* Sync superblock to disk */
+int ext2_superblock_write(struct ext2_fs *f) {
+
+	if (!f)
+		return -1;
+	if (f->sb->magic != EXT2_MAGIC) {	// Non-valid superblock, read 
+		return -1;
+	} else {						// Valid superblock, overwrite
+		#ifdef DEBUG
+		printf("Writing to superblock\n");
+		#endif
+		buffer* b = buffer_read_superblock(f);
+		memcpy(b->data, f->sb, sizeof(superblock));
+		buffer_write_superblock(f, b);
+		buffer_free(b);
+	}
+	return 0;
+}
+
+int ext2_blockdesc_read(struct ext2_fs *f) {
+	if (!f) return -1;
+
+	int num_block_groups = (f->sb->blocks_count / f->sb->blocks_per_group);
+	int num_to_read = (num_block_groups * sizeof(block_group_descriptor)) / f->block_size;
+	f->num_bg = num_block_groups;
+	num_to_read++;	// round up
+
+	#ifdef DEBUG
+	printf("Number of block groups: %d (%d blocks)\n", f->num_bg, num_to_read);
+	#endif
+
+	if (!f->bg) {
+		f->bg = malloc(num_block_groups* sizeof(block_group_descriptor));
+	}
+
+	/* Above a certain block size to disk size ratio, we need more than one block */
+	for (int i = 0; i < num_to_read; i++) {
+		int n = EXT2_SUPER + i + ((f->block_size == 1024) ? 1 : 0); 	
+		buffer* b = buffer_read(f, n);
+		memcpy((uint32_t) f->bg + (i*f->block_size), b->data, f->block_size);
+		buffer_free(b);
+	}
+	return 0;
+}
+
+int ext2_blockdesc_write(struct ext2_fs *f) {
+	if (!f) return -1;
+
+	int num_block_groups = (f->sb->blocks_count / f->sb->blocks_per_group);
+	int num_to_read = (num_block_groups * sizeof(block_group_descriptor)) / f->block_size;
+	/* Above a certain block size to disk size ratio, we need more than one block */
+	num_to_read++;	// round up
+	for (int i = 0; i < num_to_read; i++) {
+		int n = EXT2_SUPER + i + ((f->block_size == 1024) ? 1 : 0); 	
+		buffer* b = buffer_read(f, n);
+		memcpy(b->data, (uint32_t) f->bg + (i*f->block_size), f->block_size);
+
+		#ifdef DEBUG
+		printf("Writing to block group desc (block %d)\n", n);
+		#endif
+		buffer_write(f, b);
+		buffer_free(b);
+	}
+	return 0;
+}
+
+
+int ext2_first_free(uint32_t* b, int sz) {
 	for (int q = 0; q < sz; q++) {
 		uint32_t free_bits = (b[q] ^ ~0x0);
 		for (int i = 0; i < 32; i++ ) 
 			if (free_bits & (0x1 << i)) 
 				return i + (q*32);
 	}
+	return -1;
 }
 
+/* 
+Finds a free block from the block descriptor group, and sets it as used
+*/
+uint32_t ext2_alloc_block(struct ext2_fs *f, int block_group) {
+	block_group_descriptor* bg = f->bg;
+	superblock* s = f->sb;
 
-char* open(char* path) {
-	int ino = pathize(path);
-	if (ino == -1)
-		return NULL;
-	printf("%+d \n", ino);
-	inode* i = ext2_inode(1, ino);
-	return ext2_open(i);
+	bg += block_group;
+	// Read the block and inode bitmaps from the block descriptor group
+	buffer* bitmap_buf;
+	uint32_t* bitmap = malloc(f->block_size);
+	uint32_t num = 0;
+	do {
+
+		bitmap_buf = buffer_read(f, bg->block_bitmap);
+		memcpy(bitmap, bitmap_buf->data, f->block_size);
+		// Find the first free bit in both bitmaps
+		bg++;
+		block_group++;
+	} while( (num = ext2_first_free(bitmap, f->block_size)) == -1);	
+
+	// Should use a macro, not "32"
+	bitmap[num / 32] |= (1<<(num % 32));
+
+	// Update bitmaps and write to disk
+	memcpy(bitmap_buf->data, bitmap, f->block_size);	
+	buffer_write(f, bitmap_buf);		
+
+	// Free our bitmaps
+	free(bitmap);			
+
+	s->free_inodes_count--;
+	bg->free_inodes_count--;
+	buffer_free(bitmap_buf);
+	return num + ((block_group - 1) * s->blocks_per_group) + 1;	// 1 indexed				
+}
+
+void ext2_write_indirect(struct ext2_fs *f, uint32_t indirect, uint32_t link, size_t block_num) {
+	buffer* b = buffer_read(f, indirect);
+	*(uint32_t*) ((uint32_t) b->data + block_num*4)  = link;
+	buffer_write(f, b);
+}
+
+uint32_t ext2_read_indirect(struct ext2_fs *f, uint32_t indirect, size_t block_num) {
+	buffer* b = buffer_read(f, indirect);
+	return *(uint32_t*) ((uint32_t) b->data + block_num*4);
 }
